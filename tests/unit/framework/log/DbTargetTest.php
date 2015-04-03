@@ -1,16 +1,17 @@
 <?php
-namespace yiiunit\framework\rbac;
+namespace yiiunit\framework\log;
 
 use Yii;
-use yii\console\Application;
-use yii\console\Controller;
 use yii\db\Connection;
-use yii\rbac\DbManager;
+use yii\db\Query;
+use yii\log\Logger;
+use yiiunit\framework\console\controllers\EchoMigrateController;
+use yiiunit\TestCase;
 
 /**
- * DbManagerTestCase
+ * @group log
  */
-abstract class DbManagerTestCase extends ManagerTestCase
+abstract class DbTargetTest extends TestCase
 {
     protected static $database;
     protected static $driverName = 'mysql';
@@ -20,23 +21,36 @@ abstract class DbManagerTestCase extends ManagerTestCase
      */
     protected static $db;
 
+    protected static $logTable = '{{%log}}';
+
     protected static function runConsoleAction($route, $params = [])
     {
         if (Yii::$app === null) {
-            new Application([
+            new \yii\console\Application([
                 'id' => 'Migrator',
                 'basePath' => '@yiiunit',
+                'controllerMap' => [
+                    'migrate' => EchoMigrateController::className(),
+                ],
                 'components' => [
                     'db' => static::getConnection(),
-                    'authManager' => '\yii\rbac\DbManager',
+                    'log' => [
+                        'targets' => [
+                            [
+                                'class' => 'yii\log\DbTarget',
+                                'levels' => ['warning'],
+                                'logTable' => self::$logTable,
+                            ],
+                        ],
+                    ],
                 ],
             ]);
         }
 
         ob_start();
         $result = Yii::$app->runAction($route, $params);
-        echo "Result is ".$result;
-        if ($result !== Controller::EXIT_CODE_NORMAL) {
+        echo "Result is " . $result;
+        if ($result !== \yii\console\Controller::EXIT_CODE_NORMAL) {
             ob_end_flush();
         } else {
             ob_end_clean();
@@ -54,12 +68,12 @@ abstract class DbManagerTestCase extends ManagerTestCase
             static::markTestSkipped('pdo and ' . $pdo_database . ' extension are required.');
         }
 
-        static::runConsoleAction('migrate/up', ['migrationPath' => '@yii/rbac/migrations/', 'interactive' => false]);
+        static::runConsoleAction('migrate/up', ['migrationPath' => '@yii/log/migrations/', 'interactive' => false]);
     }
 
     public static function tearDownAfterClass()
     {
-        static::runConsoleAction('migrate/down', ['migrationPath' => '@yii/rbac/migrations/', 'interactive' => false]);
+        static::runConsoleAction('migrate/down', ['migrationPath' => '@yii/log/migrations/', 'interactive' => false]);
         if (static::$db) {
             static::$db->close();
         }
@@ -67,16 +81,10 @@ abstract class DbManagerTestCase extends ManagerTestCase
         parent::tearDownAfterClass();
     }
 
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->auth = $this->createManager();
-    }
-
     protected function tearDown()
     {
         parent::tearDown();
-        $this->auth->removeAll();
+        self::getConnection()->createCommand()->truncateTable(self::$logTable)->execute();
     }
 
     /**
@@ -106,10 +114,29 @@ abstract class DbManagerTestCase extends ManagerTestCase
     }
 
     /**
-     * @return \yii\rbac\ManagerInterface
+     * Tests that precision isn't lost for log timestamps
+     * @see https://github.com/yiisoft/yii2/issues/7384
      */
-    protected function createManager()
+    public function testTimestamp()
     {
-        return new DbManager(['db' => $this->getConnection()]);
+        $logger = Yii::getLogger();
+
+        $time = 1424865393.0105;
+
+        // forming message data manually in order to set time
+        $messsageData = [
+            'test',
+            Logger::LEVEL_WARNING,
+            'test',
+            $time,
+            []
+        ];
+
+        $logger->messages[] = $messsageData;
+        $logger->flush(true);
+
+        $query = (new Query())->select('log_time')->from(self::$logTable)->where(['category' => 'test']);
+        $loggedTime = $query->createCommand(self::getConnection())->queryScalar();
+        static::assertEquals($time, $loggedTime);
     }
 }
