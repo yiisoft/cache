@@ -1,8 +1,8 @@
 {
     "name": "yiisoft/cache",
-    "description": "Yii PHP Framework Core",
+    "description": "Yii Framework 3.0 cache components",
     "keywords": [
-        "yii2",
+        "yii",
         "framework",
         "cache"
     ],
