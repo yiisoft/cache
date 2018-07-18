@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'logger' => [
+    'cache' => [
         '__class' => yii\cache\Cache::class,
     ],
 ];
