@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace yii\cache\dependencies;
 
 /**
  * TagDependency associates a cached data item with one or multiple [[tags]].

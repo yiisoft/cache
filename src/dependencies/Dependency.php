@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace yii\cache\dependencies;
 
 /**
  * Dependency is the base class for cache dependency classes.

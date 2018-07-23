@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace yii\cache\dependencies;
 
 /**
  * ChainedDependency represents a dependency which is composed of a list of other dependencies.

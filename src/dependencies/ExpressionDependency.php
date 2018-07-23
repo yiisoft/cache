@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace yii\cache\dependencies;
 
 /**
  * ExpressionDependency represents a dependency based on the result of a PHP expression.
