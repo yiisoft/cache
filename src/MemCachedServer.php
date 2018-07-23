@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 /**
  * MemCachedServer represents the configuration data for a single memcached server.

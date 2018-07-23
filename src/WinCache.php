@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 /**
  * WinCache provides Windows Cache caching in terms of an application component.
@@ -19,9 +19,9 @@ namespace yii\caching;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\caching\Cache::class,
+ *             '__class' => yii\cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\caching\WinCache::class,
+ *                 '__class' => yii\cache\WinCache::class,
  *             ],
  *         ],
  *         // ...

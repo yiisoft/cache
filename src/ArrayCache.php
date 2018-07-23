@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
@@ -16,9 +16,9 @@ namespace yii\caching;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\caching\Cache::class,
+ *             '__class' => yii\cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\caching\ArrayCache::class,
+ *                 '__class' => yii\cache\ArrayCache::class,
  *             ],
  *         ],
  *         // ...
