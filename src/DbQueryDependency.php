@@ -7,7 +7,7 @@
 
 namespace yii\caching;
 
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\db\QueryInterface;
 use yii\di\Instance;
 
