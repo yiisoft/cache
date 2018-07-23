@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 use Psr\SimpleCache\CacheInterface;
 use yii\base\Component;

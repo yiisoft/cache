@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 use yii\exceptions\InvalidConfigException;
 use yii\db\QueryInterface;

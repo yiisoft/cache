@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 use Yii;
 use yii\helpers\FileHelper;
@@ -23,9 +23,9 @@ use yii\helpers\FileHelper;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\caching\Cache::class,
+ *             '__class' => yii\cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\caching\FileCache::class,
+ *                 '__class' => yii\cache\FileCache::class,
  *                 // 'cachePath' => '@runtime/cache',
  *             ],
  *         ],

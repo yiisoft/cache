@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 /**
  * CacheInterface defines the common interface to be implemented by cache classes.
@@ -43,7 +43,7 @@ namespace yii\caching;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Dmitry Naumenko <d.naumenko.a@gmail.com>
  * @author Paul Klimov <klimov.paul@gmail.com>
- * @since 2.0.13. Previous framework versions used abstract class [[\yii\caching\Cache]] as interface.
+ * @since 2.0.13. Previous framework versions used abstract class [[\yii\cache\Cache]] as interface.
  */
 interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
 {

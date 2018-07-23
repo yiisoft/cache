@@ -6,7 +6,7 @@
  */
 
 use yii\exceptions\InvalidConfigException;
-use yii\caching\DbCache;
+use yii\cache\DbCache;
 use yii\db\Migration;
 
 /**

@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\caching;
+namespace yii\cache;
 
 use yii\exceptions\InvalidConfigException;
 
@@ -21,9 +21,9 @@ use yii\exceptions\InvalidConfigException;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\caching\Cache::class,
+ *             '__class' => yii\cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\caching\ApcCache::class,
+ *                 '__class' => yii\cache\ApcCache::class,
  *             ],
  *         ],
  *         // ...
