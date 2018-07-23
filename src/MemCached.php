@@ -8,7 +8,7 @@
 namespace yii\caching;
 
 use Yii;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 
 /**
  * MemCached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL

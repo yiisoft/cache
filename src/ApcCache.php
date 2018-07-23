@@ -7,7 +7,7 @@
 
 namespace yii\caching;
 
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 
 /**
  * ApcCache provides APCu caching in terms of an application component.
@@ -44,7 +44,7 @@ class ApcCache extends SimpleCache
     /**
      * Initializes this application component.
      * It checks if extension required is loaded.
-     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\exceptions\InvalidConfigException
      */
     public function init()
     {

@@ -8,7 +8,7 @@
 namespace yii\caching;
 
 use Yii;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 
 /**
  * FileDependency represents a dependency based on a file's last modification time.
