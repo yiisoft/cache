@@ -1,6 +1,6 @@
 {
     "name": "yiisoft/cache",
-    "description": "Yii Framework 3.0 cache components",
+    "description": "Yii Caching Library",
     "keywords": [
         "yii",
         "framework",
