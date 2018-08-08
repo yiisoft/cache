@@ -1,13 +1,12 @@
 {
     "name": "yiisoft/cache",
+    "type": "library",
     "description": "Yii Caching Library",
     "keywords": [
         "yii",
-        "framework",
         "cache"
     ],
     "homepage": "http://www.yiiframework.com/",
-    "type": "library",
     "license": "BSD-3-Clause",
     "authors": [
         {
@@ -80,6 +79,9 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "3.0.x-dev"
+        },
         "config-plugin": {
             "params": "config/params.php",
             "common": "config/common.php"
