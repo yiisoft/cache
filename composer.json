@@ -73,9 +73,9 @@
             "yii\\cache\\": "src"
         }
     },
-    "autoload": {
+    "autoload-dev": {
         "psr-4": {
-            "yiiunit\\cache\\": "tests"
+            "yii\\cache\\tests\\": "tests"
         }
     },
     "extra": {
