@@ -73,6 +73,16 @@ class Cache extends Component implements CacheInterface
     public $_handler;
 
 
+    /**
+     * @param \Psr\SimpleCache\CacheInterface|array|\Closure|string cache handler or its DI compatible configuration.
+     */
+    public function __construct($handler = null)
+    {
+        if ($handler) {
+            $this->setHandler($handler);
+        }
+    }
+
     public function getHandler(): \Psr\SimpleCache\CacheInterface
     {
         return $this->_handler;
