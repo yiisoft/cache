@@ -112,7 +112,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      *
      * ```php
      * public function getTopProducts($count = 10) {
-     *     $cache = $this->cache; // Could be Yii::$app->cache
+     *     $cache = $this->cache; // Could be Yii::getApp()->cache
      *     return $cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
      *         return Products::find()->mostPopular()->limit(10)->all();
      *     }, 1000);

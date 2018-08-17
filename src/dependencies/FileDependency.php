@@ -7,8 +7,8 @@
 
 namespace yii\cache\dependencies;
 
-use Yii;
 use yii\exceptions\InvalidConfigException;
+use yii\helpers\Yii;
 
 /**
  * FileDependency represents a dependency based on a file's last modification time.

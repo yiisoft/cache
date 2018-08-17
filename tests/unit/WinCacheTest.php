@@ -7,8 +7,8 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\Cache;
-use yii\caching\WinCache;
+use yii\cache\Cache;
+use yii\cache\WinCache;
 
 /**
  * Class for testing wincache backend.

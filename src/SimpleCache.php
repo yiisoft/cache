@@ -9,8 +9,8 @@ namespace yii\cache;
 
 use Psr\SimpleCache\CacheInterface;
 use yii\base\Component;
-use yii\di\Instance;
 use yii\helpers\StringHelper;
+use yii\helpers\Yii;
 use yii\serialize\PhpSerializer;
 use yii\serialize\SerializerInterface;
 
@@ -49,7 +49,28 @@ abstract class SimpleCache extends Component implements CacheInterface
      */
     public $keyPrefix = '';
     /**
-     * @var SerializerInterface|array|false the serializer to be used for serializing and unserializing of the cached data.
+     * @var SerializerInterface|false the serializer to be used for serializing and unserializing of the cached data.
+     *
+     * If this property is set `false`, data will be directly sent to and retrieved from the underlying
+     * cache component without any serialization or deserialization. You should not turn off serialization if
+     * you are using [[Dependency|cache dependency]], because it relies on data serialization. Also, some
+     * implementations of the cache can not correctly save and retrieve data different from a string type.
+     */
+    protected $_serializer;
+
+
+    /**
+     * @var SerializerInterface|string|array|false the serializer to be used for serializing and unserializing of the cached data.
+     * Serializer should be an instance of [[SerializerInterface]] or its DI compatible configuration.
+     * @see setSerializer
+     */
+    public function __construct($serializer = null)
+    {
+        $this->setSerializer($serializer);
+    }
+
+    /**
+     * @var SerializerInterface|string|array|false the serializer to be used for serializing and unserializing of the cached data.
      * Serializer should be an instance of [[SerializerInterface]] or its DI compatible configuration. For example:
      *
      * ```php
@@ -59,24 +80,19 @@ abstract class SimpleCache extends Component implements CacheInterface
      * ```
      *
      * Default is [[PhpSerializer]], meaning using the default PHP `serialize()` and `unserialize()` functions.
-     *
-     * If this property is set `false`, data will be directly sent to and retrieved from the underlying
-     * cache component without any serialization or deserialization. You should not turn off serialization if
-     * you are using [[Dependency|cache dependency]], because it relies on data serialization. Also, some
-     * implementations of the cache can not correctly save and retrieve data different from a string type.
      */
-    public $serializer = PhpSerializer::class;
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
+    public function setSerializer($serializer)
     {
-        parent::init();
-
-        if ($this->serializer !== false) {
-            $this->serializer = Instance::ensure($this->serializer instanceof \Closure ? call_user_func($this->serializer) : $this->serializer, SerializerInterface::class);
+        if ($serializer === false) {
+            $this->_serializer = false;
+        } else {
+            if ($serializer === null) {
+                $serializer = PhpSerializer::class;
+            }
+            $this->_serializer = Yii::ensureObject(
+                $serializer instanceof \Closure ? call_user_func($serializer) : $serializer,
+                SerializerInterface::class
+            );
         }
     }
 
@@ -87,11 +103,11 @@ abstract class SimpleCache extends Component implements CacheInterface
     {
         $key = $this->normalizeKey($key);
         $value = $this->getValue($key);
-        if ($value === false || $this->serializer === false) {
+        if ($value === false || $this->_serializer === false) {
             return $default;
         }
 
-        return $this->serializer->unserialize($value);
+        return $this->_serializer->unserialize($value);
     }
 
     /**
@@ -108,10 +124,10 @@ abstract class SimpleCache extends Component implements CacheInterface
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
             if (isset($values[$newKey]) && $values[$newKey] !== false) {
-                if ($this->serializer === false) {
+                if ($this->_serializer === false) {
                     $results[$key] = $values[$newKey];
                 } else {
-                    $results[$key] = $this->serializer->unserialize($values[$newKey]);
+                    $results[$key] = $this->_serializer->unserialize($values[$newKey]);
                 }
             }
         }
@@ -133,8 +149,8 @@ abstract class SimpleCache extends Component implements CacheInterface
      */
     public function set($key, $value, $ttl = null)
     {
-        if ($this->serializer !== false) {
-            $value = $this->serializer->serialize($value);
+        if ($this->_serializer !== false) {
+            $value = $this->_serializer->serialize($value);
         }
         $key = $this->normalizeKey($key);
         $ttl = $this->normalizeTtl($ttl);
@@ -148,8 +164,8 @@ abstract class SimpleCache extends Component implements CacheInterface
     {
         $data = [];
         foreach ($values as $key => $value) {
-            if ($this->serializer !== false) {
-                $value = $this->serializer->serialize($value);
+            if ($this->_serializer !== false) {
+                $value = $this->_serializer->serialize($value);
             }
             $key = $this->normalizeKey($key);
             $data[$key] = $value;

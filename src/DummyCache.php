@@ -18,7 +18,7 @@ use yii\base\Component;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\caching\Cache::class,
+ *             '__class' => yii\cache\Cache::class,
  *             'handler' => [
  *                 '__class' => yii\cache\DummyCache::class,
  *             ],
@@ -30,7 +30,7 @@ use yii\base\Component;
  * ```
  *
  * DummyCache does not cache anything. It is provided so that one can always configure
- * a 'cache' application component and save the check of existence of `\Yii::$app->cache`.
+ * a 'cache' application component and save the check of existence of `\Yii::getApp()->cache`.
  * By replacing DummyCache with some other cache component, one can quickly switch from
  * non-caching mode to caching mode.
  *

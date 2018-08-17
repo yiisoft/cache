@@ -7,8 +7,8 @@
 
 namespace yii\cache;
 
-use Yii;
 use yii\helpers\FileHelper;
+use yii\helpers\Yii;
 
 /**
  * FileCache implements a cache handler using files.
@@ -48,7 +48,7 @@ class FileCache extends SimpleCache
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.
      * If not set, it will use the "cache" subdirectory under the application runtime path.
      */
-    public $cachePath = '@runtime/cache';
+    public $_cachePath;
     /**
      * @var string cache file suffix. Defaults to '.bin'.
      */
@@ -81,13 +81,22 @@ class FileCache extends SimpleCache
     public $dirMode = 0775;
 
 
-    /**
-     * Initializes this component by ensuring the existence of the cache path.
-     */
-    public function init()
+    public function __construct(string $cachePath = null, $serializer = null)
     {
-        parent::init();
-        $this->cachePath = Yii::getAlias($this->cachePath);
+        $this->setCachePath($cachePath);
+        parent::__construct($serializer);
+    }
+
+    /**
+     * Sets cache path and ensures it exists.
+     * @param string $cachePath
+     */
+    public function setCachePath(string $cachePath)
+    {
+        if ($cachePath === null) {
+            $cachePath = '@runtime/cache';
+        }
+        $this->cachePath = Yii::getAlias($cachePath);
         if (!is_dir($this->cachePath)) {
             FileHelper::createDirectory($this->cachePath, $this->dirMode, true);
         }

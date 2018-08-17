@@ -7,8 +7,8 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\Cache;
-use yii\caching\FileCache;
+use yii\cache\Cache;
+use yii\cache\FileCache;
 
 /**
  * Class for testing file cache backend.
@@ -24,9 +24,7 @@ class FileCacheTest extends CacheTestCase
     protected function getCacheInstance()
     {
         if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache([
-                'handler' => new FileCache(['cachePath' => '@yii/tests/runtime/cache'])
-            ]);
+            $this->_cacheInstance = new Cache(new FileCache('@yii/tests/runtime/cache'));
         }
 
         return $this->_cacheInstance;

@@ -29,7 +29,7 @@ function microtime($float = false)
 namespace yii\cache\tests\unit;
 
 use yii\cache\CacheInterface;
-use yii\cache\TagDependency;
+use yii\cache\dependencies\TagDependency;
 use yii\tests\TestCase;
 
 /**
@@ -286,6 +286,7 @@ abstract class CacheTestCase extends TestCase
 
         // Call again with another login to make sure that value is cached
         $loginClosure = function ($cache) use (&$login) { return 'SamDark'; };
+        $got = $cache->getOrSet('some-login', $loginClosure, null, $dependency);
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
 
         $dependency->invalidate($cache, 'test');

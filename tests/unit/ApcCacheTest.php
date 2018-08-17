@@ -7,8 +7,8 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\ApcCache;
-use yii\caching\Cache;
+use yii\cache\ApcCache;
+use yii\cache\Cache;
 
 /**
  * Class for testing APC cache backend.

@@ -7,9 +7,9 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\Cache;
-use yii\caching\Dependency;
-use yii\caching\SimpleCache;
+use yii\cache\Cache;
+use yii\cache\dependencies\Dependency;
+use yii\cache\SimpleCache;
 use yii\tests\data\cache\MockDependency;
 use yii\tests\TestCase;
 

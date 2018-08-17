@@ -7,9 +7,9 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\ArrayCache;
-use yii\caching\DbDependency;
-use yii\tests\framework\db\DatabaseTestCase;
+use yii\cache\ArrayCache;
+use yii\cache\dependencies\DbDependency;
+use yii\db\tests\unit\DatabaseTestCase;
 
 /**
  * @group caching

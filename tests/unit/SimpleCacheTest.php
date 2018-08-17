@@ -8,7 +8,7 @@
 namespace yii\cache\tests\unit;
 
 use DateInterval;
-use yii\caching\SimpleCache;
+use yii\cache\SimpleCache;
 use yii\tests\TestCase;
 
 /**
@@ -51,7 +51,7 @@ class SimpleCacheTest extends TestCase
     /**
      * @dataProvider dataProviderNormalizeTtl
      *
-     * @covers \yii\caching\SimpleCache::normalizeTtl()
+     * @covers \yii\cache\SimpleCache::normalizeTtl()
      *
      * @param mixed $ttl
      * @param int $expectedResult
