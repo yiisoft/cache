@@ -5,12 +5,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\caching;
+namespace yii\cache\tests\unit;
 
 use yii\caching\Cache;
 use yii\caching\FileCache;
 use yii\caching\TagDependency;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * @group caching
@@ -19,7 +19,7 @@ class TagDependencyTest extends TestCase
 {
     public function testInvalidate()
     {
-        $cache = new Cache(['handler' => new FileCache(['cachePath' => '@yiiunit/runtime/cache'])]);
+        $cache = new Cache(['handler' => new FileCache(['cachePath' => '@yii/tests/runtime/cache'])]);
 
         // single tag test
         $cache->set('a1', 11, 0, new TagDependency(['tags' => 't1']));

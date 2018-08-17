@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\caching;
+namespace yii\cache\tests\unit;
 
 use DateInterval;
 use yii\caching\SimpleCache;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * @group caching

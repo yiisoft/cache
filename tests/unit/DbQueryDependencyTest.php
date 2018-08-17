@@ -5,12 +5,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\caching;
+namespace yii\cache\tests\unit;
 
 use yii\caching\ArrayCache;
 use yii\caching\DbQueryDependency;
 use yii\db\Query;
-use yiiunit\framework\db\DatabaseTestCase;
+use yii\tests\framework\db\DatabaseTestCase;
 
 class DbQueryDependencyTest extends DatabaseTestCase
 {

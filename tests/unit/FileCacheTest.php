@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\caching;
+namespace yii\cache\tests\unit;
 
 use yii\caching\Cache;
 use yii\caching\FileCache;
@@ -25,7 +25,7 @@ class FileCacheTest extends CacheTestCase
     {
         if ($this->_cacheInstance === null) {
             $this->_cacheInstance = new Cache([
-                'handler' => new FileCache(['cachePath' => '@yiiunit/runtime/cache'])
+                'handler' => new FileCache(['cachePath' => '@yii/tests/runtime/cache'])
             ]);
         }
 
