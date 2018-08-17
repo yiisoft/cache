@@ -5,13 +5,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\caching;
+namespace yii\cache\tests\unit;
 
 use yii\caching\Cache;
 use yii\caching\Dependency;
 use yii\caching\SimpleCache;
-use yiiunit\data\cache\MockDependency;
-use yiiunit\TestCase;
+use yii\tests\data\cache\MockDependency;
+use yii\tests\TestCase;
 
 /**
  * Dependency (abstract) tests.
