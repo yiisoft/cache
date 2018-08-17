@@ -70,11 +70,7 @@
     },
     "autoload": {
         "psr-4": {
-            "yii\\cache\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
+            "yii\\cache\\": "src",
             "yii\\cache\\tests\\": "tests"
         }
     },
