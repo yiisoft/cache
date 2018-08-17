@@ -7,10 +7,10 @@
 
 namespace yii\cache;
 
-use Yii;
 use yii\base\Component;
 use yii\di\Instance;
 use yii\helpers\StringHelper;
+use yii\helpers\Yii;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -68,21 +68,28 @@ use yii\helpers\StringHelper;
 class Cache extends Component implements CacheInterface
 {
     /**
-     * @var \Psr\SimpleCache\CacheInterface|array|\Closure|string actual cache handler or its DI compatible configuration.
-     * After the Cache object is created, if you want to change this property, you should only assign it
-     * with a [[\Psr\SimpleCache\CacheInterface]] instance.
-     * @since 3.0.0
+     * @var \Psr\SimpleCache\CacheInterface actual cache handler.
      */
-    public $handler;
+    public $_handler;
 
+
+    public function getHandler(): \Psr\SimpleCache\CacheInterface
+    {
+        return $this->_handler;
+    }
 
     /**
-     * {@inheritdoc}
+     * @param \Psr\SimpleCache\CacheInterface|array|\Closure|string cache handler or its DI compatible configuration.
+     * @since 3.0.0
      */
-    public function init()
+    public function setHandler($handler): self
     {
-        parent::init();
-        $this->handler = Instance::ensure($this->handler instanceof \Closure ? call_user_func($this->handler) : $this->handler, \Psr\SimpleCache\CacheInterface::class);
+        $this->_handler = Yii::ensureObject(
+            $handler instanceof \Closure ? call_user_func($handler) : $handler,
+            \Psr\SimpleCache\CacheInterface::class
+        );
+
+        return $this;
     }
 
     /**
@@ -109,7 +116,7 @@ class Cache extends Component implements CacheInterface
     public function get($key, $default = null)
     {
         $key = $this->buildKey($key);
-        $value = $this->handler->get($key);
+        $value = $this->_handler->get($key);
 
         if ($value === null) {
             return $default;
@@ -131,7 +138,7 @@ class Cache extends Component implements CacheInterface
     public function has($key)
     {
         $key = $this->buildKey($key);
-        return $this->handler->has($key);
+        return $this->_handler->has($key);
     }
 
     /**
@@ -152,7 +159,7 @@ class Cache extends Component implements CacheInterface
         foreach ($keys as $key) {
             $keyMap[$key] = $this->buildKey($key);
         }
-        $values = $this->handler->getMultiple(array_values($keyMap));
+        $values = $this->_handler->getMultiple(array_values($keyMap));
         $results = [];
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
@@ -193,7 +200,7 @@ class Cache extends Component implements CacheInterface
             $value = [$value, $dependency];
         }
         $key = $this->buildKey($key);
-        return $this->handler->set($key, $value, $ttl);
+        return $this->_handler->set($key, $value, $ttl);
     }
 
     /**
@@ -224,7 +231,7 @@ class Cache extends Component implements CacheInterface
             $data[$key] = $value;
         }
 
-        return $this->handler->setMultiple($data, $ttl);
+        return $this->_handler->setMultiple($data, $ttl);
     }
 
     /**
@@ -237,7 +244,7 @@ class Cache extends Component implements CacheInterface
         foreach ($keys as $key) {
             $actualKeys[] = $this->buildKey($key);
         }
-        return $this->handler->deleteMultiple($actualKeys);
+        return $this->_handler->deleteMultiple($actualKeys);
     }
 
     /**
@@ -268,13 +275,13 @@ class Cache extends Component implements CacheInterface
             $data[$key] = $value;
         }
 
-        $existingValues = $this->handler->getMultiple(array_keys($data));
+        $existingValues = $this->_handler->getMultiple(array_keys($data));
         foreach ($existingValues as $key => $value) {
             if ($value !== null) {
                 unset($data[$key]);
             }
         }
-        return $this->handler->setMultiple($data, $ttl);
+        return $this->_handler->setMultiple($data, $ttl);
     }
 
     /**
@@ -298,11 +305,11 @@ class Cache extends Component implements CacheInterface
 
         $key = $this->buildKey($key);
 
-        if ($this->handler->has($key)) {
+        if ($this->_handler->has($key)) {
             return false;
         }
 
-        return $this->handler->set($key, $value, $ttl);
+        return $this->_handler->set($key, $value, $ttl);
     }
 
     /**
@@ -315,7 +322,7 @@ class Cache extends Component implements CacheInterface
     {
         $key = $this->buildKey($key);
 
-        return $this->handler->delete($key);
+        return $this->_handler->delete($key);
     }
 
     /**
@@ -325,7 +332,7 @@ class Cache extends Component implements CacheInterface
      */
     public function clear()
     {
-        return $this->handler->clear();
+        return $this->_handler->clear();
     }
 
     /**
