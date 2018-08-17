@@ -7,8 +7,8 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\Cache;
-use yii\caching\MemCached;
+use yii\cache\Cache;
+use yii\cache\MemCached;
 
 /**
  * Class for testing memcached cache backend.

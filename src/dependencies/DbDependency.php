@@ -7,7 +7,7 @@
 
 namespace yii\cache\dependencies;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\exceptions\InvalidConfigException;
 use yii\db\Connection;
 use yii\di\Instance;

@@ -7,8 +7,8 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\Cache;
-use yii\caching\DbCache;
+use yii\cache\Cache;
+use yii\cache\DbCache;
 
 /**
  * Class for testing file cache backend.

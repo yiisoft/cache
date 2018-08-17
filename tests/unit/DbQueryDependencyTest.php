@@ -7,10 +7,10 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\caching\ArrayCache;
-use yii\caching\DbQueryDependency;
+use yii\cache\ArrayCache;
+use yii\cache\dependencies\DbQueryDependency;
 use yii\db\Query;
-use yii\tests\framework\db\DatabaseTestCase;
+use yii\db\tests\unit\DatabaseTestCase;
 
 class DbQueryDependencyTest extends DatabaseTestCase
 {

@@ -14,11 +14,11 @@ namespace yii\cache\dependencies;
  *
  * ```php
  * // setting multiple cache keys to store data forever and tagging them with "user-123"
- * Yii::$app->cache->set('user_42_profile', '', 0, new TagDependency(['tags' => 'user-123']));
- * Yii::$app->cache->set('user_42_stats', '', 0, new TagDependency(['tags' => 'user-123']));
+ * Yii::getApp()->cache->set('user_42_profile', '', 0, new TagDependency(['tags' => 'user-123']));
+ * Yii::getApp()->cache->set('user_42_stats', '', 0, new TagDependency(['tags' => 'user-123']));
  *
  * // invalidating all keys tagged with "user-123"
- * TagDependency::invalidate(Yii::$app->cache, 'user-123');
+ * TagDependency::invalidate(Yii::getApp()->cache, 'user-123');
  * ```
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).

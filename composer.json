@@ -65,6 +65,15 @@
     "require": {
         "psr/simple-cache": "~1.0.0"
     },
+    "require-dev": {
+        "yiisoft/yii-web": "^3.0@dev",
+        "yiisoft/core": "^3.0@dev",
+        "yiisoft/view": "^3.0@dev",
+        "yiisoft/di": "^3.0@dev",
+        "yiisoft/db": "^3.0@dev",
+        "yiisoft/log": "^3.0@dev",
+        "hiqdev/composer-config-plugin": "^1.0@dev"
+    },
     "provide": {
         "psr/simple-cache-implementation": "1.0.0"
     },

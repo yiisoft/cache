@@ -23,7 +23,7 @@ class m150909_153426_cache_init extends Migration
      */
     protected function getCache()
     {
-        $cache = Yii::$app->getCache();
+        $cache = Yii::getApp()->getCache();
         if (!$cache instanceof DbCache) {
             throw new InvalidConfigException('You should configure "cache" component to use database before executing this migration.');
         }
