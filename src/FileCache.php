@@ -81,7 +81,7 @@ class FileCache extends SimpleCache
     public $dirMode = 0775;
 
 
-    public function __construct(string $cachePath = null, $serializer = null)
+    public function __construct(string $cachePath = '@runtime/cache', $serializer = null)
     {
         $this->setCachePath($cachePath);
         parent::__construct($serializer);
@@ -93,9 +93,6 @@ class FileCache extends SimpleCache
      */
     public function setCachePath(string $cachePath)
     {
-        if ($cachePath === null) {
-            $cachePath = '@runtime/cache';
-        }
         $this->cachePath = Yii::getAlias($cachePath);
         if (!is_dir($this->cachePath)) {
             FileHelper::createDirectory($this->cachePath, $this->dirMode, true);
