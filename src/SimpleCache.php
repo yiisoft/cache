@@ -103,10 +103,12 @@ abstract class SimpleCache extends Component implements CacheInterface
     {
         $key = $this->normalizeKey($key);
         $value = $this->getValue($key);
-        if ($value === false || $this->_serializer === false) {
+        if ($value === false) {
             return $default;
         }
-
+        if ($this->_serializer === false) {
+            return $value;
+        }
         return $this->_serializer->unserialize($value);
     }
 
