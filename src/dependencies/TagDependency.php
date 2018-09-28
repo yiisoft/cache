@@ -31,8 +31,16 @@ class TagDependency extends Dependency
     /**
      * @var string|array a list of tag names for this dependency. For a single tag, you may specify it as a string.
      */
-    public $tags = [];
+    public $tags;
 
+
+    /**
+     * @param string|array $tags a list of tag names for this dependency. For a single tag, you may specify it as a string.
+     */
+    public function __construct($tags)
+    {
+        $this->tags = $tags;
+    }
 
     /**
      * Generates the data needed to determine if dependency has been changed.
