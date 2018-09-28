@@ -278,7 +278,7 @@ abstract class CacheTestCase extends TestCase
     public function testGetOrSetWithDependencies()
     {
         $cache = $this->prepare();
-        $dependency = new TagDependency(['tags' => 'test']);
+        $dependency = new TagDependency('test');
 
         $expected = 'SilverFire';
         $loginClosure = function ($cache) use (&$login) { return 'SilverFire'; };
