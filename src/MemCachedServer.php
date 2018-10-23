@@ -15,21 +15,58 @@ namespace yii\cache;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
+ * @author Alexander Makarov <sam@rmcreative.ru>
  */
-class MemCachedServer extends \yii\base\BaseObject
+class MemCachedServer
 {
     /**
      * @var string memcached server hostname or IP address
      */
-    public $host;
+    private $host;
+
     /**
      * @var int memcached server port
      */
-    public $port = 11211;
+    private $port;
+
     /**
-     * @var int probability of using this server among all servers.
+     * @var int probability of using this server among all servers
      */
-    public $weight = 1;
+    private $weight;
+
+    /**
+     * @param string $host memcached server hostname or IP address
+     * @param int $port memcached server port
+     * @param int $weight probability of using this server among all servers
+     */
+    public function __construct(string $host, int $port = 11211, int $weight = 1)
+    {
+        $this->host = $host;
+        $this->port = $port;
+        $this->weight = $weight;
+    }
+
+    /**
+     * @return memcached server hostname or IP address
+     */
+    public function getHost(): string
+    {
+        return $this->host;
+    }
+
+    /**
+     * @return int memcached server port
+     */
+    public function getPort(): int
+    {
+        return $this->port;
+    }
+
+    /**
+     * @return int probability of using this server among all servers
+     */
+    public function getWeight(): int
+    {
+        return $this->weight;
+    }
 }

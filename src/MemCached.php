@@ -118,16 +118,7 @@ class MemCached extends SimpleCache
     protected function addServers($cache, $servers)
     {
         if (empty($servers)) {
-            $servers = [new MemCachedServer([
-                'host' => '127.0.0.1',
-                'port' => 11211,
-            ])];
-        } else {
-            foreach ($servers as $server) {
-                if ($server->host === null) {
-                    throw new InvalidConfigException("The 'host' property must be specified for every memcached server.");
-                }
-            }
+            $servers = [new MemCachedServer('127.0.0.1')];
         }
 
         $existingServers = [];
@@ -137,8 +128,8 @@ class MemCached extends SimpleCache
             }
         }
         foreach ($servers as $server) {
-            if (empty($existingServers) || !isset($existingServers[$server->host . ':' . $server->port])) {
-                $cache->addServer($server->host, $server->port, $server->weight);
+            if (empty($existingServers) || !isset($existingServers[$server->getPort() . ':' . $server->getPort()])) {
+                $cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
             }
         }
     }
