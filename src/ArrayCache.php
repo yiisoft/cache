@@ -50,7 +50,7 @@ class ArrayCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         $key = $this->normalizeKey($key);
         return isset($this->_cache[$key]) && ($this->_cache[$key][1] === 0 || $this->_cache[$key][1] > microtime(true));
@@ -71,7 +71,7 @@ class ArrayCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function setValue($key, $value, $ttl)
+    protected function setValue($key, $value, $ttl): bool
     {
         $this->_cache[$key] = [$value, $ttl === 0 ? 0 : microtime(true) + $ttl];
         return true;
@@ -80,7 +80,7 @@ class ArrayCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function deleteValue($key)
+    protected function deleteValue($key): bool
     {
         unset($this->_cache[$key]);
         return true;
@@ -89,7 +89,7 @@ class ArrayCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): bool
     {
         $this->_cache = [];
         return true;

@@ -100,7 +100,7 @@ class DbCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         $key = $this->normalizeKey($key);
 
@@ -145,7 +145,7 @@ class DbCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function getValues($keys)
+    protected function getValues($keys): array
     {
         if (empty($keys)) {
             return [];
@@ -166,7 +166,7 @@ class DbCache extends SimpleCache
 
         $results = array_fill_keys($keys, false);
         foreach ($rows as $row) {
-            if (is_resource($row['data']) && get_resource_type($row['data']) === 'stream') {
+            if (\is_resource($row['data']) && get_resource_type($row['data']) === 'stream') {
                 $results[$row['id']] = stream_get_contents($row['data']);
             } else {
                 $results[$row['id']] = $row['data'];
@@ -179,7 +179,7 @@ class DbCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function setValue($key, $value, $ttl)
+    protected function setValue($key, $value, $ttl): bool
     {
         try {
             $this->db->noCache(function (Connection $db) use ($key, $value, $ttl) {
@@ -209,7 +209,7 @@ class DbCache extends SimpleCache
      * @param int $duration the number of seconds in which the cached value will expire. 0 means never expire.
      * @return bool true if the value is successfully stored into cache, false otherwise
      */
-    protected function addValue($key, $value, $duration)
+    protected function addValue($key, $value, $duration): bool
     {
         $this->gc();
 
@@ -234,7 +234,7 @@ class DbCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function deleteValue($key)
+    protected function deleteValue($key): bool
     {
         $this->db->noCache(function (Connection $db) use ($key) {
             $db->createCommand()
@@ -262,7 +262,7 @@ class DbCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): bool
     {
         $this->db->createCommand()
             ->delete($this->cacheTable)

@@ -204,7 +204,7 @@ class Cache extends Component implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function set($key, $value, $ttl = null, $dependency = null)
+    public function set($key, $value, $ttl = null, $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -225,9 +225,8 @@ class Cache extends Component implements CacheInterface
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return array array of failed keys
-     * @since 2.0.7
      */
-    public function setMultiple($items, $ttl = 0, $dependency = null)
+    public function setMultiple($items, $ttl = 0, $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -249,7 +248,7 @@ class Cache extends Component implements CacheInterface
      * {@inheritdoc}
      * @since 3.0.0
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $actualKeys = [];
         foreach ($keys as $key) {
@@ -267,10 +266,9 @@ class Cache extends Component implements CacheInterface
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
-     * @return array array of failed keys
-     * @since 2.0.7
+     * @return bool
      */
-    public function addMultiple($values, $ttl = 0, $dependency = null)
+    public function addMultiple($values, $ttl = 0, $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -307,7 +305,7 @@ class Cache extends Component implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function add($key, $value, $ttl = null, $dependency = null)
+    public function add($key, $value, $ttl = null, $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -329,7 +327,7 @@ class Cache extends Component implements CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @return bool if no error happens during deletion
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         $key = $this->buildKey($key);
 
@@ -341,7 +339,7 @@ class Cache extends Component implements CacheInterface
      * Be careful of performing this operation if the cache is shared among multiple applications.
      * @return bool whether the flush operation was successful.
      */
-    public function clear()
+    public function clear(): bool
     {
         return $this->_handler->clear();
     }
@@ -352,7 +350,7 @@ class Cache extends Component implements CacheInterface
      * @param string $key a key identifying the cached value
      * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return $this->get($key) !== false;
     }
@@ -376,7 +374,7 @@ class Cache extends Component implements CacheInterface
      * @param string $key the key identifying the value to be cached
      * @param mixed $value the value to be cached
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         $this->set($key, $value);
     }
@@ -386,7 +384,7 @@ class Cache extends Component implements CacheInterface
      * This method is required by the interface [[\ArrayAccess]].
      * @param string $key the key of the value to be deleted
      */
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         $this->delete($key);
     }
@@ -415,7 +413,6 @@ class Cache extends Component implements CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is `false`.
      * @return mixed result of $callable execution
-     * @since 2.0.11
      */
     public function getOrSet($key, $callable, $ttl = null, $dependency = null)
     {
@@ -423,7 +420,7 @@ class Cache extends Component implements CacheInterface
             return $value;
         }
 
-        $value = call_user_func($callable, $this);
+        $value = $callable($this);
         if (!$this->set($key, $value, $ttl, $dependency)) {
             Yii::warning('Failed to set cache value for key ' . json_encode($key), __METHOD__);
         }

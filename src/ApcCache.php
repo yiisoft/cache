@@ -49,7 +49,7 @@ class ApcCache extends SimpleCache
     public function init()
     {
         parent::init();
-        if (!extension_loaded('apcu')) {
+        if (!\extension_loaded('apcu')) {
             throw new InvalidConfigException('ApcCache requires PHP apcu extension to be loaded.');
         }
     }
@@ -57,7 +57,7 @@ class ApcCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         return apcu_exists($this->normalizeKey($key));
     }
@@ -73,16 +73,16 @@ class ApcCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function getValues($keys)
+    protected function getValues($keys): array
     {
         $values = apcu_fetch($keys);
-        return is_array($values) ? $values : [];
+        return \is_array($values) ? $values : [];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setValue($key, $value, $ttl)
+    protected function setValue($key, $value, $ttl): bool
     {
         return apcu_store($key, $value, $ttl);
     }
@@ -90,16 +90,16 @@ class ApcCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function setValues($values, $ttl)
+    protected function setValues($values, $ttl): bool
     {
         $result = apcu_store($values, null, $ttl);
-        return is_array($result);
+        return \is_array($result);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function deleteValue($key)
+    protected function deleteValue($key): bool
     {
         return apcu_delete($key);
     }
@@ -107,7 +107,7 @@ class ApcCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): bool
     {
         return apcu_clear_cache();
     }

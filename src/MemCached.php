@@ -191,7 +191,7 @@ class MemCached extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function getValues($keys)
+    protected function getValues($keys): array
     {
         return $this->_cache->getMulti($keys);
     }
@@ -199,7 +199,7 @@ class MemCached extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function setValue($key, $value, $ttl)
+    protected function setValue($key, $value, $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
         // @see http://php.net/manual/en/memcached.expiration.php
@@ -211,7 +211,7 @@ class MemCached extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function setValues($values, $ttl)
+    protected function setValues($values, $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
         // @see http://php.net/manual/en/memcached.expiration.php
@@ -225,7 +225,7 @@ class MemCached extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function deleteValue($key)
+    protected function deleteValue($key): bool
     {
         return $this->_cache->delete($key, 0);
     }
@@ -233,7 +233,7 @@ class MemCached extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): bool
     {
         return $this->_cache->flush();
     }

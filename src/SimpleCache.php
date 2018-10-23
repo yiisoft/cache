@@ -9,7 +9,6 @@ namespace yii\cache;
 
 use Psr\SimpleCache\CacheInterface;
 use yii\base\Component;
-use yii\helpers\StringHelper;
 use yii\helpers\Yii;
 use yii\serialize\PhpSerializer;
 use yii\serialize\SerializerInterface;
@@ -90,7 +89,7 @@ abstract class SimpleCache extends Component implements CacheInterface
                 $serializer = PhpSerializer::class;
             }
             $this->_serializer = Yii::ensureObject(
-                $serializer instanceof \Closure ? call_user_func($serializer) : $serializer,
+                $serializer instanceof \Closure ? $serializer() : $serializer,
                 SerializerInterface::class
             );
         }
@@ -139,7 +138,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         $key = $this->normalizeKey($key);
         $value = $this->getValue($key);
@@ -149,7 +148,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         if ($this->_serializer !== false) {
             $value = $this->_serializer->serialize($value);
@@ -162,7 +161,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         $data = [];
         foreach ($values as $key => $value) {
@@ -178,7 +177,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         $key = $this->normalizeKey($key);
         return $this->deleteValue($key);
@@ -187,7 +186,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $result = true;
         foreach ($keys as $key) {
@@ -209,19 +208,19 @@ abstract class SimpleCache extends Component implements CacheInterface
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
      */
-    protected function normalizeKey($key)
+    protected function normalizeKey($key): string
     {
         $key = (string)$key;
-        $key = ctype_alnum($key) && StringHelper::byteLength($key) <= 32 ? $key : md5($key);
+        $key = ctype_alnum($key) && \strlen($key) <= 32 ? $key : md5($key);
         return $this->keyPrefix . $key;
     }
 
     /**
      * Normalizes cache TTL handling `null` value and [[\DateInterval]] objects.
-     * @param int|\DateInterval $ttl raw TTL.
+     * @param int|\DateInterval|null $ttl raw TTL.
      * @return int TTL value as UNIX timestamp.
      */
-    protected function normalizeTtl($ttl)
+    protected function normalizeTtl($ttl): int
     {
         if ($ttl === null) {
             return $this->defaultTtl;
@@ -252,7 +251,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      * @param int $ttl the number of seconds in which the cached value will expire.
      * @return bool true if the value is successfully stored into cache, false otherwise
      */
-    abstract protected function setValue($key, $value, $ttl);
+    abstract protected function setValue($key, $value, $ttl): bool;
 
     /**
      * Deletes a value with the specified key from cache
@@ -260,7 +259,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      * @param string $key the key of the value to be deleted
      * @return bool if no error happens during deletion
      */
-    abstract protected function deleteValue($key);
+    abstract protected function deleteValue($key): bool;
 
     /**
      * Retrieves multiple values from cache with the specified keys.
@@ -270,7 +269,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      * @param array $keys a list of keys identifying the cached values
      * @return array a list of cached values indexed by the keys
      */
-    protected function getValues($keys)
+    protected function getValues($keys): array
     {
         $results = [];
         foreach ($keys as $key) {
@@ -290,7 +289,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      * @param int $ttl the number of seconds in which the cached values will expire.
      * @return bool `true` on success and `false` on failure.
      */
-    protected function setValues($values, $ttl)
+    protected function setValues($values, $ttl): bool
     {
         $result = true;
         foreach ($values as $key => $value) {
