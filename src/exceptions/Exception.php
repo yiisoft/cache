@@ -11,7 +11,6 @@ namespace yii\cache\exceptions;
  * Exception represents an exception that is caused by some Caching-related operations.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
- * @since 3.0.0
  */
 class Exception extends \yii\exceptions\Exception implements \Psr\SimpleCache\CacheException
 {

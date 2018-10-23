@@ -61,7 +61,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function set($key, $value, $ttl = null, $dependency = null);
+    public function set($key, $value, $ttl = null, $dependency = null): bool;
 
     /**
      * Stores multiple items in cache. Each item contains a value identified by a key.
@@ -73,9 +73,9 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
-     * @return array array of failed keys
+     * @return bool
      */
-    public function setMultiple($items, $ttl = null, $dependency = null);
+    public function setMultiple($items, $ttl = null, $dependency = null): bool;
 
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
@@ -89,7 +89,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function add($key, $value, $ttl = 0, $dependency = null);
+    public function add($key, $value, $ttl = 0, $dependency = null): bool;
 
     /**
      * Stores multiple items in cache. Each item contains a value identified by a key.
@@ -100,9 +100,9 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
-     * @return array array of failed keys
+     * @return bool
      */
-    public function addMultiple($values, $ttl = 0, $dependency = null);
+    public function addMultiple($values, $ttl = 0, $dependency = null): bool;
 
     /**
      * Method combines both [[set()]] and [[get()]] methods to retrieve value identified by a $key,

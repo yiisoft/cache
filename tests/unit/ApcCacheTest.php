@@ -24,7 +24,7 @@ class ApcCacheTest extends CacheTestCase
      */
     protected function getCacheInstance()
     {
-        if (!extension_loaded('apcu')) {
+        if (!\extension_loaded('apcu')) {
             $this->markTestSkipped('APCu not installed. Skipping.');
         }
 

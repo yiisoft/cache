@@ -63,6 +63,9 @@
         "irc": "irc://irc.freenode.net/yii"
     },
     "require": {
+        "php": ">=7.1.0",
+        "ext-ctype": "*",
+        "ext-json": "*",
         "psr/simple-cache": "~1.0.0"
     },
     "require-dev": {
@@ -73,7 +76,8 @@
         "yiisoft/db": "^3.0@dev",
         "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
-        "hiqdev/composer-config-plugin": "^1.0@dev"
+        "hiqdev/composer-config-plugin": "^1.0@dev",
+        "phpunit/phpunit": "^7.2"
     },
     "provide": {
         "psr/simple-cache-implementation": "1.0.0"

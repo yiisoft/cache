@@ -102,7 +102,7 @@ class FileCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         $cacheFile = $this->getCacheFile($this->normalizeKey($key));
 
@@ -117,7 +117,7 @@ class FileCache extends SimpleCache
         $cacheFile = $this->getCacheFile($key);
 
         if (@filemtime($cacheFile) > time()) {
-            $fp = @fopen($cacheFile, 'r');
+            $fp = @fopen($cacheFile, 'rb');
             if ($fp !== false) {
                 @flock($fp, LOCK_SH);
                 $cacheValue = @stream_get_contents($fp);
@@ -133,17 +133,17 @@ class FileCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function setValue($key, $value, $ttl)
+    protected function setValue($key, $value, $ttl): bool
     {
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
-            @FileHelper::createDirectory(dirname($cacheFile), $this->dirMode, true);
+            @FileHelper::createDirectory(\dirname($cacheFile), $this->dirMode, true);
         }
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
         // https://github.com/yiisoft/yii2/pull/16120
-        if (is_file($cacheFile) && function_exists('posix_geteuid') && fileowner($cacheFile) !== posix_geteuid()) {
+        if (is_file($cacheFile) && \function_exists('posix_geteuid') && fileowner($cacheFile) !== posix_geteuid()) {
             @unlink($cacheFile);
         }
         if (@file_put_contents($cacheFile, $value, LOCK_EX) !== false) {
@@ -165,7 +165,7 @@ class FileCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    protected function deleteValue($key)
+    protected function deleteValue($key): bool
     {
         $cacheFile = $this->getCacheFile($key);
         return @unlink($cacheFile);
@@ -195,7 +195,7 @@ class FileCache extends SimpleCache
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): bool
     {
         $this->gc(true, false);
         return true;
@@ -210,7 +210,7 @@ class FileCache extends SimpleCache
      */
     public function gc($force = false, $expiredOnly = true)
     {
-        if ($force || mt_rand(0, 1000000) < $this->gcProbability) {
+        if ($force || random_int(0, 1000000) < $this->gcProbability) {
             $this->gcRecursive($this->cachePath, $expiredOnly);
         }
     }
@@ -232,13 +232,11 @@ class FileCache extends SimpleCache
                 $fullPath = $path . DIRECTORY_SEPARATOR . $file;
                 if (is_dir($fullPath)) {
                     $this->gcRecursive($fullPath, $expiredOnly);
-                    if (!$expiredOnly) {
-                        if (!@rmdir($fullPath)) {
-                            $error = error_get_last();
-                            Yii::warning("Unable to remove directory '{$fullPath}': {$error['message']}", __METHOD__);
-                        }
+                    if (!$expiredOnly && !@rmdir($fullPath)) {
+                        $error = error_get_last();
+                        Yii::warning("Unable to remove directory '{$fullPath}': {$error['message']}", __METHOD__);
                     }
-                } elseif (!$expiredOnly || $expiredOnly && @filemtime($fullPath) < time()) {
+                } elseif (!$expiredOnly || ($expiredOnly && @filemtime($fullPath) < time())) {
                     if (!@unlink($fullPath)) {
                         $error = error_get_last();
                         Yii::warning("Unable to remove file '{$fullPath}': {$error['message']}", __METHOD__);
