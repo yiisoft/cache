@@ -16,7 +16,6 @@ namespace yii\cache\dependencies;
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 abstract class Dependency extends \yii\base\BaseObject
 {

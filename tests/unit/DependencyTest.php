@@ -7,17 +7,14 @@
 
 namespace yii\cache\tests\unit;
 
-use yii\cache\Cache;
 use yii\cache\dependencies\Dependency;
 use yii\cache\SimpleCache;
-use yii\tests\data\cache\MockDependency;
 use yii\tests\TestCase;
 
 /**
  * Dependency (abstract) tests.
  * @group caching
  * @author Boudewijn Vahrmeijer <vahrmeijer@gmail.com>
- * @since 2.0.11
  */
 class DependencyTest extends TestCase
 {
