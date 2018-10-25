@@ -25,6 +25,7 @@ class DbQueryDependencyTest extends DatabaseTestCase
      */
     protected function setUp()
     {
+        $this->markTestSkipped('Depends on yii\di\Instance');
         parent::setUp();
 
         $db = $this->getConnection(false);

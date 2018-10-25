@@ -13,6 +13,7 @@ use yii\db\tests\unit\DatabaseTestCase;
 
 /**
  * @group caching
+ * @skp
  */
 class DbDependencyTest extends DatabaseTestCase
 {
@@ -27,6 +28,7 @@ class DbDependencyTest extends DatabaseTestCase
      */
     protected function setUp()
     {
+        $this->markTestSkipped('Depends on yii\di\Instance');
         parent::setUp();
 
         $db = $this->getConnection(false);
