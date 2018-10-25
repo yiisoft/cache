@@ -7,6 +7,7 @@
 
 namespace yii\cache\tests\unit;
 
+use phpmock\phpunit\PHPMock;
 use yii\cache\Cache;
 use yii\cache\FileCache;
 
@@ -16,6 +17,7 @@ use yii\cache\FileCache;
  */
 class FileCacheTest extends CacheTestCase
 {
+    use PHPMock;
     private $_cacheInstance = null;
 
     /**
@@ -56,11 +58,6 @@ class FileCacheTest extends CacheTestCase
 
     public function testCacheRenewalOnDifferentOwnership()
     {
-        $TRAVIS_SECOND_USER = getenv('TRAVIS_SECOND_USER');
-        if (empty($TRAVIS_SECOND_USER)) {
-            $this->markTestSkipped('Travis second user not found');
-        }
-
         $cache = $this->getCacheInstance();
 
         $cacheValue = uniqid('value_');
@@ -77,15 +74,13 @@ class FileCacheTest extends CacheTestCase
         $cacheFile = $refMethodGetCacheFile->invoke($cache->handler, $cacheInternalKey);
         $refMethodGetCacheFile->setAccessible(false);
 
+        // Override fileowner method so it always returns something not equal to the current user.
+        $this->getFunctionMock('yii\cache', 'fileowner')->expects($this->any())->willReturn(posix_geteuid() + 15);
+
+        $this->getFunctionMock('yii\cache', 'unlink')->expects($this->once());
+
         $output = array();
         $returnVar = null;
-        exec(sprintf('sudo chown %s %s',
-            escapeshellarg($TRAVIS_SECOND_USER),
-            escapeshellarg($cacheFile)
-        ), $output, $returnVar);
-
-        $this->assertSame(0, $returnVar, 'Cannot change ownership of cache file to test cache renewal');
-
         $this->assertTrue($cache->set($cachePublicKey, uniqid('value_2_'), 2), 'Cannot rebuild cache on different file ownership');
     }
 }

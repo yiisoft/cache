@@ -77,7 +77,9 @@
         "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev",
-        "phpunit/phpunit": "^7.2"
+        "phpunit/phpunit": "^7.2",
+        "php-mock/php-mock-phpunit": "^2"
+
     },
     "provide": {
         "psr/simple-cache-implementation": "1.0.0"
