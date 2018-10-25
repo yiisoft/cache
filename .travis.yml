@@ -87,7 +87,7 @@ before_script:
 
 script:
   # PHP tests
-  - vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --exclude-group wincache,xcache
+  - phpdbg -qrr vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --exclude-group wincache,xcache
 after_script:
   - travis_retry wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
