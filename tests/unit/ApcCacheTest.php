@@ -33,9 +33,7 @@ class ApcCacheTest extends CacheTestCase
         }
 
         if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache([
-                'handler' => new ApcCache()
-            ]);
+            $this->_cacheInstance = new Cache(new ApcCache());
         }
 
         return $this->_cacheInstance;

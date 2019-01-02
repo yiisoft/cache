@@ -34,9 +34,7 @@ class MemCachedTest extends CacheTestCase
         }
 
         if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache([
-                'handler' => new MemCached()
-            ]);
+            $this->_cacheInstance = new Cache(new MemCached());
         }
 
         return $this->_cacheInstance;
