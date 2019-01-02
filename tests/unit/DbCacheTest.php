@@ -79,9 +79,9 @@ class DbCacheTest extends CacheTestCase
     protected function getCacheInstance()
     {
         if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache([
-                'handler' => new DbCache(['db' => $this->getConnection()])
-            ]);
+            $dbCache = new DbCache();
+            $dbCache->db = $this->getConnection();
+            $this->_cacheInstance = new Cache($dbCache);
         }
 
         return $this->_cacheInstance;
