@@ -75,6 +75,7 @@
         "yiisoft/di": "^3.0@dev",
         "yiisoft/db": "^3.0@dev",
         "yiisoft/db-sqlite": "^3.0@dev",
+        "yiisoft/db-mysql": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev",
         "phpunit/phpunit": "^7.2"

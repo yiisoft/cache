@@ -87,8 +87,8 @@ install:
   # setup PHP extension
   - |
     if [[ $TASK_TESTS_PHP == 1 && $TRAVIS_PHP_VERSION != nightly ]]; then
-      tests/data/travis/apcu-setup.sh
-      tests/data/travis/memcache-setup.sh
+      vendor/yiisoft/yii-core/tests/data/travis/apcu-setup.sh
+      vendor/yiisoft/yii-core/tests/data/travis/memcache-setup.sh
     fi
 
   # Needed for FileCacheTest
