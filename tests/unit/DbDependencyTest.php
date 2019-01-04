@@ -44,8 +44,7 @@ class DbDependencyTest extends DatabaseTestCase
         $db = $this->getConnection(false);
         $cache = new ArrayCache();
 
-        $dependency = new DbDependency();
-        $dependency->db = $db;
+        $dependency = new DbDependency($db);
         $dependency->sql = 'SELECT [[id]] FROM {{dependency_item}} ORDER BY [[id]] DESC LIMIT 1';
         $dependency->reusable = false;
 

@@ -42,7 +42,7 @@ class DbQueryDependencyTest extends DatabaseTestCase
         $db = $this->getConnection(false);
         $cache = new ArrayCache();
 
-        $dependency = new DbQueryDependency();
+        $dependency = new DbQueryDependency($db);
         $dependency->db = $db;
         $dependency->query = (new Query())
             ->select(['id'])
@@ -67,8 +67,7 @@ class DbQueryDependencyTest extends DatabaseTestCase
         $db = $this->getConnection(false);
         $cache = new ArrayCache();
 
-        $dependency = new DbQueryDependency();
-        $dependency->db = $db;
+        $dependency = new DbQueryDependency($db);
         $dependency->query = (new Query())
             ->from('dependency_item')
             ->andWhere(['value' => 'active']);
@@ -91,8 +90,7 @@ class DbQueryDependencyTest extends DatabaseTestCase
         $db = $this->getConnection(false);
         $cache = new ArrayCache();
 
-        $dependency = new DbQueryDependency();
-        $dependency->db = $db;
+        $dependency = new DbQueryDependency($db);
         $dependency->query = (new Query())
             ->from('dependency_item')
             ->andWhere(['value' => 'not exist']);
