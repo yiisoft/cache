@@ -7,10 +7,8 @@
 
 namespace yii\cache\dependencies;
 
-use yii\helpers\Yii;
 use yii\exceptions\InvalidConfigException;
-use yii\db\Connection;
-use yii\di\Instance;
+use yii\db\ConnectionInterface;
 
 /**
  * DbDependency represents a dependency based on the query result of a SQL statement.
@@ -26,9 +24,9 @@ use yii\di\Instance;
 class DbDependency extends Dependency
 {
     /**
-     * @var string the application component ID of the DB connection.
+     * @var ConnectionInterface DB connection.
      */
-    public $db = 'db';
+    public $db;
     /**
      * @var string the SQL query whose result is used to determine if the dependency has been changed.
      * Only the first row of the query result will be used.
@@ -40,6 +38,11 @@ class DbDependency extends Dependency
     public $params = [];
 
 
+    public function __construct(ConnectionInterface $db)
+    {
+        $this->db = $db;
+    }
+
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method returns the value of the global state.
@@ -50,18 +53,17 @@ class DbDependency extends Dependency
     protected function generateDependencyData($cache)
     {
     	/* @var $db Connection */
-        $db = Instance::ensure($this->db, Connection::class);
         if ($this->sql === null) {
             throw new InvalidConfigException('DbDependency::sql must be set.');
         }
 
-        if ($db->enableQueryCache) {
+        if ($this->db->enableQueryCache) {
             // temporarily disable and re-enable query caching
-            $db->enableQueryCache = false;
-            $result = $db->createCommand($this->sql, $this->params)->queryOne();
-            $db->enableQueryCache = true;
+            $this->db->enableQueryCache = false;
+            $result = $this->db->createCommand($this->sql, $this->params)->queryOne();
+            $this->db->enableQueryCache = true;
         } else {
-            $result = $db->createCommand($this->sql, $this->params)->queryOne();
+            $result = $this->db->createCommand($this->sql, $this->params)->queryOne();
         }
 
         return $result;
