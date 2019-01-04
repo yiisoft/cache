@@ -8,8 +8,8 @@
 namespace yii\cache\dependencies;
 
 use yii\exceptions\InvalidConfigException;
+use yii\db\ConnectionInterface;
 use yii\db\QueryInterface;
-use yii\di\Instance;
 
 /**
  * DbQueryDependency represents a dependency based on the query result of an [[QueryInterface]] instance.
@@ -30,9 +30,7 @@ use yii\di\Instance;
 class DbQueryDependency extends Dependency
 {
     /**
-     * @var string|array|object the application component ID of the database connection, connection object or
-     * its array configuration.
-     * This field can be left blank, allowing query to determine connection automatically.
+     * @var ConnectionInterface DB connection.
      */
     public $db;
     /**
@@ -59,6 +57,11 @@ class DbQueryDependency extends Dependency
     public $method;
 
 
+    public function __construct(ConnectionInterface $db)
+    {
+        $this->db = $db;
+    }
+
     /**
      * Generates the data needed to determine if dependency is changed.
      *
@@ -69,23 +72,18 @@ class DbQueryDependency extends Dependency
      */
     protected function generateDependencyData($cache)
     {
-        $db = $this->db;
-        if ($db !== null) {
-            $db = Instance::ensure($db);
-        }
-
         if (!$this->query instanceof QueryInterface) {
             throw new InvalidConfigException('"' . get_class($this) . '::$query" should be an instance of "yii\db\QueryInterface".');
         }
 
-        if (!empty($db->enableQueryCache)) {
+        if (!empty($this->db->enableQueryCache)) {
             // temporarily disable and re-enable query caching
-            $originEnableQueryCache = $db->enableQueryCache;
-            $db->enableQueryCache = false;
-            $result = $this->executeQuery($this->query, $db);
-            $db->enableQueryCache = $originEnableQueryCache;
+            $originEnableQueryCache = $this->db->enableQueryCache;
+            $this->db->enableQueryCache = false;
+            $result = $this->executeQuery($this->query, $this->db);
+            $this->db->enableQueryCache = $originEnableQueryCache;
         } else {
-            $result = $this->executeQuery($this->query, $db);
+            $result = $this->executeQuery($this->query, $this->db);
         }
 
         return $result;
