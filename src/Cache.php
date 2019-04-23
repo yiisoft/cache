@@ -10,7 +10,7 @@ namespace yii\cache;
 use yii\base\Component;
 use yii\cache\dependencies\Dependency;
 use yii\di\Instance;
-use yii\helpers\StringHelper;
+use Yiisoft\Strings\StringHelper;
 use yii\helpers\Yii;
 
 /**
