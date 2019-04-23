@@ -52,7 +52,7 @@ class DbDependency extends Dependency
      */
     protected function generateDependencyData($cache)
     {
-    	/* @var $db Connection */
+        /* @var $db Connection */
         if ($this->sql === null) {
             throw new InvalidConfigException('DbDependency::sql must be set.');
         }
