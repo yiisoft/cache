@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\exceptions;
+namespace Yiisoft\Cache\Exceptions;
 
 /**
  * Exception represents an exception that is caused by some Caching-related operations.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  */
-class Exception extends \yii\exceptions\Exception implements \Psr\SimpleCache\CacheException
+class Exception extends \Exception implements \Psr\SimpleCache\CacheException
 {
     /**
      * {@inheritdoc}

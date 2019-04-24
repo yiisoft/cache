@@ -5,8 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-use yii\exceptions\InvalidConfigException;
-use yii\cache\DbCache;
+use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
+use Yiisoft\Cache\DbCache;
 use yii\db\Migration;
 
 /**

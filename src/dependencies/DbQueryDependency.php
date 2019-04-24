@@ -5,9 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\dependencies;
+namespace Yiisoft\Cache\Dependencies;
 
-use yii\exceptions\InvalidConfigException;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
 use yii\db\ConnectionInterface;
 use yii\db\QueryInterface;
 
@@ -66,7 +66,7 @@ class DbQueryDependency extends Dependency
      * Generates the data needed to determine if dependency is changed.
      *
      * This method returns the query result.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      * @throws InvalidConfigException on invalid configuration.
      */

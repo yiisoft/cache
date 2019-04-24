@@ -1,5 +1,5 @@
 /**
- * Database schema required by \yii\cache\DbCache.
+ * Database schema required by \Yiisoft\Cache\DbCache.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Misbahul D Munir <misbahuldmunir@gmail.com>

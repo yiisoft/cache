@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 use yii\base\Component;
 
@@ -18,9 +18,9 @@ use yii\base\Component;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\DummyCache::class,
+ *                 '__class' => Yiisoft\Cache\DummyCache::class,
  *             ],
  *         ],
  *         // ...

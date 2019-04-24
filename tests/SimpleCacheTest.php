@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
 use DateInterval;
-use yii\cache\SimpleCache;
+use Yiisoft\Cache\SimpleCache;
 use yii\tests\TestCase;
 
 /**
@@ -51,7 +51,7 @@ class SimpleCacheTest extends TestCase
     /**
      * @dataProvider dataProviderNormalizeTtl
      *
-     * @covers \yii\cache\SimpleCache::normalizeTtl()
+     * @covers \Yiisoft\Cache\SimpleCache::normalizeTtl()
      *
      * @param mixed $ttl
      * @param int $expectedResult

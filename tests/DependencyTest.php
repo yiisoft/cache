@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\dependencies\Dependency;
-use yii\cache\SimpleCache;
+use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\SimpleCache;
 use yii\tests\TestCase;
 
 /**

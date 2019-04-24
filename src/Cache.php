@@ -5,11 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 use yii\base\Component;
-use yii\cache\dependencies\Dependency;
-use yii\di\Instance;
+use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Strings\StringHelper;
 use yii\helpers\Yii;
 
@@ -24,9 +23,9 @@ use yii\helpers\Yii;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\FileCache::class,
+ *                 '__class' => Yiisoft\Cache\FileCache::class,
  *                 'cachePath' => '@runtime/cache',
  *             ],
  *         ],
@@ -96,7 +95,7 @@ class Cache extends Component implements CacheInterface
     public function setHandler($handler): self
     {
         $this->_handler = Yii::ensureObject(
-            $handler instanceof \Closure ? call_user_func($handler) : $handler,
+            $handler instanceof \Closure ? $handler() : $handler,
             \Psr\SimpleCache\CacheInterface::class
         );
 
@@ -179,9 +178,9 @@ class Cache extends Component implements CacheInterface
                 if (is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
                     if ($value[1]->isChanged($this)) {
                         continue;
-                    } else {
-                        $value = $value[0];
                     }
+
+                    $value = $value[0];
                 }
                 $results[$key] = $value;
             }

@@ -5,14 +5,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
+use yii\db\ConnectionInterface;
 use yii\helpers\Yii;
-use yii\exceptions\InvalidConfigException;
 use yii\db\Connection;
 use yii\db\PdoValue;
 use yii\db\Query;
-use yii\di\Instance;
 
 /**
  * DbCache implements a cache application component by storing cached data in a database.
@@ -28,9 +27,9 @@ use yii\di\Instance;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache:class,
+ *             '__class' => Yiisoft\Cache\Cache:class,
  *             'handler' => [
- *                 '__class' => yii\cache\DbCache::class,
+ *                 '__class' => Yiisoft\Cache\DbCache::class,
  *                 // 'db' => 'mydb',
  *                 // 'cacheTable' => 'my_cache',
  *             ],
@@ -85,18 +84,12 @@ class DbCache extends SimpleCache
      */
     public $gcProbability = 100;
 
-
-    /**
-     * Initializes the DbCache component.
-     * This method will initialize the [[db]] property to make sure it refers to a valid DB connection.
-     * @throws InvalidConfigException if [[db]] is invalid.
-     */
-    public function init()
+    public function __construct($serializer = null, ConnectionInterface $db)
     {
-        parent::init();
-        $this->db = Instance::ensure($this->db, Connection::class);
+        $this->db = $db;
+        parent::__construct($serializer);
     }
-
+    
     /**
      * {@inheritdoc}
      */
