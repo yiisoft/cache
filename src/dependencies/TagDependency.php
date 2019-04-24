@@ -65,7 +65,7 @@ class TagDependency extends Dependency
     /**
      * {@inheritdoc}
      */
-    public function isChanged($cache)
+    public function isChanged($cache): bool
     {
         $timestamps = $this->getTimestamps($cache, (array) $this->tags);
         return $timestamps !== $this->data;
@@ -76,7 +76,7 @@ class TagDependency extends Dependency
      * @param \Psr\SimpleCache\CacheInterface $cache the cache component that caches the data items
      * @param string|array $tags
      */
-    public static function invalidate($cache, $tags)
+    public static function invalidate($cache, $tags): void
     {
         $keys = [];
         foreach ((array) $tags as $tag) {
@@ -90,8 +90,9 @@ class TagDependency extends Dependency
      * @param \Psr\SimpleCache\CacheInterface $cache
      * @param string[] $keys
      * @return array the timestamp indexed by cache keys
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected static function touchKeys($cache, $keys)
+    protected static function touchKeys($cache, $keys): array
     {
         $items = [];
         $time = microtime();
@@ -107,8 +108,9 @@ class TagDependency extends Dependency
      * @param \Psr\SimpleCache\CacheInterface $cache
      * @param string[] $tags
      * @return array the timestamps indexed by the specified tags.
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function getTimestamps($cache, $tags)
+    protected function getTimestamps($cache, $tags): array
     {
         if (empty($tags)) {
             return [];
@@ -128,7 +130,7 @@ class TagDependency extends Dependency
      * @param string $tag tag name.
      * @return string cache key.
      */
-    protected static function buildCacheKey($tag)
+    protected static function buildCacheKey($tag): string
     {
         return md5(json_encode([__CLASS__, $tag]));
     }

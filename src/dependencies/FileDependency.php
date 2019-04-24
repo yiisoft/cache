@@ -7,8 +7,7 @@
 
 namespace Yiisoft\Cache\Dependencies;
 
-use yii\exceptions\InvalidConfigException;
-use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
 
 /**
  * FileDependency represents a dependency based on a file's last modification time.
@@ -40,8 +39,7 @@ class FileDependency extends Dependency
             throw new InvalidConfigException('FileDependency::fileName must be set');
         }
 
-        $fileName = Yii::getAlias($this->fileName);
-        clearstatcache(false, $fileName);
-        return @filemtime($fileName);
+        clearstatcache(false, $this->fileName);
+        return @filemtime($this->fileName);
     }
 }

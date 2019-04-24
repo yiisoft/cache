@@ -36,7 +36,7 @@ class ChainedDependency extends Dependency
      * Evaluates the dependency by generating and saving the data related with dependency.
      * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      */
-    public function evaluateDependency($cache)
+    public function evaluateDependency($cache): void
     {
         foreach ($this->dependencies as $dependency) {
             $dependency->evaluateDependency($cache);
@@ -57,7 +57,7 @@ class ChainedDependency extends Dependency
     /**
      * {@inheritdoc}
      */
-    public function isChanged($cache)
+    public function isChanged($cache): bool
     {
         foreach ($this->dependencies as $dependency) {
             if ($this->dependOnAll && $dependency->isChanged($cache)) {
