@@ -17,9 +17,6 @@ use yii\db\ConnectionInterface;
  * The query is specified via the [[sql]] property.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class DbDependency extends Dependency
 {

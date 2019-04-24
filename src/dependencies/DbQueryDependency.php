@@ -23,9 +23,6 @@ use yii\db\QueryInterface;
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  *
  * @see QueryInterface
- *
- * @author Paul Klimov <klimov.paul@gmail.com>
- * @since 2.0.12
  */
 class DbQueryDependency extends Dependency
 {

@@ -38,9 +38,6 @@ use yii\helpers\Yii;
  * Please refer to [[\Psr\SimpleCache\CacheInterface]] for common cache operations that are supported by FileCache.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class FileCache extends SimpleCache
 {

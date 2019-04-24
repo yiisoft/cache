@@ -39,11 +39,6 @@ namespace Yiisoft\Cache;
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
  *
  * @see \Psr\SimpleCache\CacheInterface
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @author Dmitry Naumenko <d.naumenko.a@gmail.com>
- * @author Paul Klimov <klimov.paul@gmail.com>
- * @since 2.0.13. Previous framework versions used abstract class [[\Yiisoft\Cache\Cache]] as interface.
  */
 interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
 {

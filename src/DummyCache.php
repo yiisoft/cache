@@ -35,9 +35,6 @@ use yii\base\Component;
  * non-caching mode to caching mode.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class DummyCache extends Component implements \Psr\SimpleCache\CacheInterface
 {

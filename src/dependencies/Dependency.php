@@ -14,8 +14,6 @@ namespace Yiisoft\Cache\Dependencies;
  * the actual dependency data.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
  */
 abstract class Dependency extends \yii\base\BaseObject
 {
@@ -60,7 +58,6 @@ abstract class Dependency extends \yii\base\BaseObject
      * Checks whether the dependency is changed.
      * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return bool whether the dependency has changed.
-     * @since 2.0.11
      */
     public function isChanged($cache)
     {

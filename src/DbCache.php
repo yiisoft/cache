@@ -41,9 +41,6 @@ use yii\db\Query;
  * ```
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class DbCache extends SimpleCache
 {
@@ -89,7 +86,7 @@ class DbCache extends SimpleCache
         $this->db = $db;
         parent::__construct($serializer);
     }
-    
+
     /**
      * {@inheritdoc}
      */

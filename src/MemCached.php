@@ -58,9 +58,6 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  * This property is read-only.
  * @property MemCachedServer[] $servers List of memcached server configurations. Note that the type of this
  * property differs in getter and setter. See [[getServers()]] and [[setServers()]] for details.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class MemCached extends SimpleCache
 {

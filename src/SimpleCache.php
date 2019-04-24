@@ -28,9 +28,6 @@ use yii\serialize\SerializerInterface;
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
  *
  * @see CacheInterface
- *
- * @author Paul Klimov <klimov.paul@gmail.com>
- * @since 3.0.0
  */
 abstract class SimpleCache extends Component implements CacheInterface
 {

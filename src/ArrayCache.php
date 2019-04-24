@@ -35,9 +35,6 @@ namespace Yiisoft\Cache;
  * For enhanced performance of ArrayCache, you can disable serialization of the stored data by setting [[$serializer]] to `false`.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Carsten Brandt <mail@cebe.cc>
- * @since 2.0
  */
 class ArrayCache extends SimpleCache
 {

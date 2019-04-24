@@ -22,9 +22,6 @@ namespace Yiisoft\Cache\Dependencies;
  * ```
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class TagDependency extends Dependency
 {
@@ -130,7 +127,6 @@ class TagDependency extends Dependency
      * for any particular cache storage.
      * @param string $tag tag name.
      * @return string cache key.
-     * @since 3.0.0
      */
     protected static function buildCacheKey($tag)
     {

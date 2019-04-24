@@ -61,9 +61,6 @@ use yii\helpers\Yii;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class Cache extends Component implements CacheInterface
 {
@@ -90,7 +87,6 @@ class Cache extends Component implements CacheInterface
 
     /**
      * @param \Psr\SimpleCache\CacheInterface|array|\Closure|string cache handler or its DI compatible configuration.
-     * @since 3.0.0
      */
     public function setHandler($handler): self
     {
@@ -161,7 +157,6 @@ class Cache extends Component implements CacheInterface
      * @return array list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
-     * @since 2.0.7
      */
     public function getMultiple($keys, $default = null)
     {
@@ -245,7 +240,6 @@ class Cache extends Component implements CacheInterface
 
     /**
      * {@inheritdoc}
-     * @since 3.0.0
      */
     public function deleteMultiple($keys): bool
     {
