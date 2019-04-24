@@ -91,8 +91,4 @@ class ArrayCache extends SimpleCache
         $this->_cache = [];
         return true;
     }
-    
-    public function init(): void
-    {
-    }
 }
