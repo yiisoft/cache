@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\Cache;
-use yii\cache\DbCache;
+use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\DbCache;
 
 /**
  * Class for testing file cache backend.
@@ -79,8 +79,7 @@ class DbCacheTest extends CacheTestCase
     protected function getCacheInstance()
     {
         if ($this->_cacheInstance === null) {
-            $dbCache = new DbCache();
-            $dbCache->db = $this->getConnection();
+            $dbCache = new DbCache(null, $this->getConnection());
             $this->_cacheInstance = new Cache($dbCache);
         }
 

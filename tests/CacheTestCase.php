@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 /**
  * Mock for the time() function for caching classes.
@@ -13,7 +13,7 @@ namespace yii\cache;
  */
 function time()
 {
-    return \yii\cache\tests\unit\CacheTestCase::$time ?: \time();
+    return \Yiisoft\Cache\Tests\CacheTestCase::$time ?: \time();
 }
 
 /**
@@ -23,13 +23,13 @@ function time()
  */
 function microtime($float = false)
 {
-    return \yii\cache\tests\unit\CacheTestCase::$microtime ?: \microtime($float);
+    return \Yiisoft\Cache\Tests\CacheTestCase::$microtime ?: \microtime($float);
 }
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\CacheInterface;
-use yii\cache\dependencies\TagDependency;
+use Yiisoft\Cache\CacheInterface;
+use Yiisoft\Cache\Dependencies\TagDependency;
 use yii\tests\TestCase;
 
 /**

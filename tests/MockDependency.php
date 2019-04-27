@@ -5,9 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\dependencies\Dependency;
+use Yiisoft\Cache\Dependencies\Dependency;
 
 /**
  * Class MockDependency.

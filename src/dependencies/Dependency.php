@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\dependencies;
+namespace Yiisoft\Cache\Dependencies;
 
 /**
  * Dependency is the base class for cache dependency classes.
@@ -14,8 +14,6 @@ namespace yii\cache\dependencies;
  * the actual dependency data.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
  */
 abstract class Dependency extends \yii\base\BaseObject
 {
@@ -37,13 +35,12 @@ abstract class Dependency extends \yii\base\BaseObject
      */
     private static $_reusableData = [];
 
-
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
      * This method is invoked by cache before writing data into it.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      */
-    public function evaluateDependency($cache)
+    public function evaluateDependency($cache): void
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
@@ -58,11 +55,10 @@ abstract class Dependency extends \yii\base\BaseObject
 
     /**
      * Checks whether the dependency is changed.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return bool whether the dependency has changed.
-     * @since 2.0.11
      */
-    public function isChanged($cache)
+    public function isChanged($cache): bool
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
@@ -80,7 +76,7 @@ abstract class Dependency extends \yii\base\BaseObject
     /**
      * Resets all cached data for reusable dependencies.
      */
-    public static function resetReusableData()
+    public static function resetReusableData(): void
     {
         self::$_reusableData = [];
     }
@@ -90,7 +86,7 @@ abstract class Dependency extends \yii\base\BaseObject
      * @return string a unique hash value for this cache dependency.
      * @see reusable
      */
-    protected function generateReusableHash()
+    protected function generateReusableHash(): string
     {
         $data = $this->data;
         $this->data = null;  // https://github.com/yiisoft/yii2/issues/3052
@@ -102,7 +98,7 @@ abstract class Dependency extends \yii\base\BaseObject
     /**
      * Generates the data needed to determine if dependency is changed.
      * Derived classes should override this method to generate the actual dependency data.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      */
     abstract protected function generateDependencyData($cache);

@@ -5,20 +5,18 @@
  * @license http://www.yiiframework.com/license/
  */
 
-use yii\exceptions\InvalidConfigException;
-use yii\cache\DbCache;
+use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
+use Yiisoft\Cache\DbCache;
 use yii\db\Migration;
 
 /**
  * Initializes Cache tables.
- *
- * @author Misbahul D Munir <misbahuldmunir@gmail.com>
- * @since 2.0.7
  */
 class m150909_153426_cache_init extends Migration
 {
     /**
-     * @throws yii\exceptions\InvalidConfigException
+     * @throws InvalidConfigException
      * @return DbCache
      */
     protected function getCache()

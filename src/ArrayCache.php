@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
@@ -16,9 +16,9 @@ namespace yii\cache;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\ArrayCache::class,
+ *                 '__class' => Yiisoft\Cache\ArrayCache::class,
  *             ],
  *         ],
  *         // ...
@@ -35,9 +35,6 @@ namespace yii\cache;
  * For enhanced performance of ArrayCache, you can disable serialization of the stored data by setting [[$serializer]] to `false`.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Carsten Brandt <mail@cebe.cc>
- * @since 2.0
  */
 class ArrayCache extends SimpleCache
 {

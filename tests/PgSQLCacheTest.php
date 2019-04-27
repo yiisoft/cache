@@ -5,7 +5,7 @@
  * @license   http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
 use yii\db\Connection;
 

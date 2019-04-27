@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\dependencies;
+namespace Yiisoft\Cache\Dependencies;
 
 /**
  * ChainedDependency represents a dependency which is composed of a list of other dependencies.
@@ -15,9 +15,6 @@ namespace yii\cache\dependencies;
  * this dependency is considered NOT changed.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class ChainedDependency extends Dependency
 {
@@ -37,9 +34,9 @@ class ChainedDependency extends Dependency
 
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      */
-    public function evaluateDependency($cache)
+    public function evaluateDependency($cache): void
     {
         foreach ($this->dependencies as $dependency) {
             $dependency->evaluateDependency($cache);
@@ -49,7 +46,7 @@ class ChainedDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method does nothing in this class.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      */
     protected function generateDependencyData($cache)
@@ -60,7 +57,7 @@ class ChainedDependency extends Dependency
     /**
      * {@inheritdoc}
      */
-    public function isChanged($cache)
+    public function isChanged($cache): bool
     {
         foreach ($this->dependencies as $dependency) {
             if ($this->dependOnAll && $dependency->isChanged($cache)) {

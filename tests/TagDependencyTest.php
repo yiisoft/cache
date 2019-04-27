@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\Cache;
-use yii\cache\FileCache;
-use yii\cache\dependencies\TagDependency;
+use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\FileCache;
+use Yiisoft\Cache\Dependencies\TagDependency;
 use yii\tests\TestCase;
 
 /**

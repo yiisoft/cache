@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\Cache;
-use yii\cache\MemCached;
+use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\MemCached;
 
 /**
  * Class for testing memcached cache backend.
@@ -17,7 +17,7 @@ use yii\cache\MemCached;
  */
 class MemCachedTest extends CacheTestCase
 {
-    private $_cacheInstance = null;
+    private $_cacheInstance;
 
     /**
      * @return Cache
@@ -34,7 +34,8 @@ class MemCachedTest extends CacheTestCase
         }
 
         if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache(new MemCached());
+            $memcached = new MemCached();
+            $this->_cacheInstance = new Cache($memcached);
         }
 
         return $this->_cacheInstance;

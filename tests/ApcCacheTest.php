@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\ApcCache;
-use yii\cache\Cache;
+use Yiisoft\Cache\ApcCache;
+use Yiisoft\Cache\Cache;
 
 /**
  * Class for testing APC cache backend.

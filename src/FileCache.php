@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 use yii\helpers\FileHelper;
 use yii\helpers\Yii;
@@ -23,9 +23,9 @@ use yii\helpers\Yii;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\FileCache::class,
+ *                 '__class' => Yiisoft\Cache\FileCache::class,
  *                 // 'cachePath' => '@runtime/cache',
  *             ],
  *         ],
@@ -38,9 +38,6 @@ use yii\helpers\Yii;
  * Please refer to [[\Psr\SimpleCache\CacheInterface]] for common cache operations that are supported by FileCache.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class FileCache extends SimpleCache
 {
@@ -93,7 +90,7 @@ class FileCache extends SimpleCache
      */
     public function setCachePath(string $cachePath)
     {
-        $this->cachePath = Yii::getAlias($cachePath);
+        $this->cachePath = $cachePath;
         if (!is_dir($this->cachePath)) {
             FileHelper::createDirectory($this->cachePath, $this->dirMode, true);
         }
