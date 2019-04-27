@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
-use yii\helpers\Yii;
-use yii\exceptions\InvalidConfigException;
+use yii\serialize\SerializerInterface;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
 
 /**
  * MemCached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
@@ -28,9 +28,9 @@ use yii\exceptions\InvalidConfigException;
  * [
  *     'components' => [
  *         'cache' => [
- *             '__class' => \yii\cache\Cache::class,
+ *             '__class' => \Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => \yii\cache\MemCached::class,
+ *                 '__class' => \Yiisoft\Cache\MemCached::class,
  *                 'servers' => [
  *                     [
  *                         'host' => 'server1',
@@ -58,9 +58,6 @@ use yii\exceptions\InvalidConfigException;
  * This property is read-only.
  * @property MemCachedServer[] $servers List of memcached server configurations. Note that the type of this
  * property differs in getter and setter. See [[getServers()]] and [[setServers()]] for details.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class MemCached extends SimpleCache
 {
@@ -95,17 +92,25 @@ class MemCached extends SimpleCache
     /**
      * @var array list of memcached server configurations
      */
-    private $_servers = [];
-
+    private $_servers;
 
     /**
-     * Initializes this application component.
-     * It creates the memcached instance and adds memcached servers.
+     * @param null $serializer
+     * @param array $servers
+     * @throws InvalidConfigException
+     * @see setSerializer
      */
-    public function init()
+    public function __construct(?SerializerInterface $serializer = null, array $servers = [])
     {
-        parent::init();
-        $this->addServers($this->getMemcached(), $this->getServers());
+        parent::__construct($serializer);
+
+        if (empty($servers)) {
+            $servers = [new MemCachedServer('127.0.0.1')];
+        }
+
+        $this->_servers = $servers;
+
+        $this->addServers($this->getMemcached(), $this->_servers);
     }
 
     /**
@@ -113,14 +118,9 @@ class MemCached extends SimpleCache
      *
      * @param \Memcached $cache
      * @param MemCachedServer[] $servers
-     * @throws InvalidConfigException
      */
     protected function addServers($cache, $servers)
     {
-        if (empty($servers)) {
-            $servers = [new MemCachedServer('127.0.0.1')];
-        }
-
         $existingServers = [];
         if ($this->persistentId !== null) {
             foreach ($cache->getServerList() as $s) {
@@ -128,7 +128,7 @@ class MemCached extends SimpleCache
             }
         }
         foreach ($servers as $server) {
-            if (empty($existingServers) || !isset($existingServers[$server->getPort() . ':' . $server->getPort()])) {
+            if (empty($existingServers) || !isset($existingServers[$server->getHost() . ':' . $server->getPort()])) {
                 $cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
             }
         }
@@ -217,9 +217,7 @@ class MemCached extends SimpleCache
         // @see http://php.net/manual/en/memcached.expiration.php
         $expire = $ttl > 0 ? $ttl + time() : 0;
 
-        // Memcached::setMulti() returns boolean
-        // @see http://php.net/manual/en/memcached.setmulti.php
-        return $this->_cache->setMulti($values, $expire) ? [] : array_keys($values);
+        return $this->_cache->setMulti($values, $expire);
     }
 
     /**

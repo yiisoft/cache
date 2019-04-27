@@ -5,9 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
-
-use yii\exceptions\InvalidConfigException;
+namespace Yiisoft\Cache;
 
 /**
  * ApcCache provides APCu caching in terms of an application component.
@@ -21,9 +19,9 @@ use yii\exceptions\InvalidConfigException;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\ApcCache::class,
+ *                 '__class' => Yiisoft\Cache\ApcCache::class,
  *             ],
  *         ],
  *         // ...
@@ -35,31 +33,15 @@ use yii\exceptions\InvalidConfigException;
  * See [[\Psr\SimpleCache\CacheInterface]] for common cache operations that ApcCache supports.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class ApcCache extends SimpleCache
 {
-    /**
-     * Initializes this application component.
-     * It checks if extension required is loaded.
-     * @throws \yii\exceptions\InvalidConfigException
-     */
-    public function init()
-    {
-        parent::init();
-        if (!\extension_loaded('apcu')) {
-            throw new InvalidConfigException('ApcCache requires PHP apcu extension to be loaded.');
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
     public function has($key): bool
     {
-        return apcu_exists($this->normalizeKey($key));
+        return \apcu_exists($this->normalizeKey($key));
     }
 
     /**
@@ -67,7 +49,7 @@ class ApcCache extends SimpleCache
      */
     protected function getValue($key)
     {
-        return apcu_fetch($key);
+        return \apcu_fetch($key);
     }
 
     /**
@@ -75,7 +57,7 @@ class ApcCache extends SimpleCache
      */
     protected function getValues($keys): array
     {
-        $values = apcu_fetch($keys);
+        $values = \apcu_fetch($keys);
         return \is_array($values) ? $values : [];
     }
 
@@ -84,7 +66,7 @@ class ApcCache extends SimpleCache
      */
     protected function setValue($key, $value, $ttl): bool
     {
-        return apcu_store($key, $value, $ttl);
+        return \apcu_store($key, $value, $ttl);
     }
 
     /**
@@ -92,7 +74,7 @@ class ApcCache extends SimpleCache
      */
     protected function setValues($values, $ttl): bool
     {
-        $result = apcu_store($values, null, $ttl);
+        $result = \apcu_store($values, null, $ttl);
         return \is_array($result);
     }
 
@@ -101,7 +83,7 @@ class ApcCache extends SimpleCache
      */
     protected function deleteValue($key): bool
     {
-        return apcu_delete($key);
+        return \apcu_delete($key);
     }
 
     /**
@@ -109,6 +91,6 @@ class ApcCache extends SimpleCache
      */
     public function clear(): bool
     {
-        return apcu_clear_cache();
+        return \apcu_clear_cache();
     }
 }

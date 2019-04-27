@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 /**
  * WinCache provides Windows Cache caching in terms of an application component.
@@ -19,9 +19,9 @@ namespace yii\cache;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\WinCache::class,
+ *                 '__class' => Yiisoft\Cache\WinCache::class,
  *             ],
  *         ],
  *         // ...
@@ -33,9 +33,6 @@ namespace yii\cache;
  * See [[\Psr\SimpleCache\CacheInterface]] for common cache operations that are supported by WinCache.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class WinCache extends SimpleCache
 {

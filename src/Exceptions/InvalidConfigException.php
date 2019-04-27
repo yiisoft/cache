@@ -8,15 +8,15 @@
 namespace Yiisoft\Cache\Exceptions;
 
 /**
- * Exception represents an exception that is caused by some Caching-related operations.
+ * InvalidConfigException represents an exception caused by an incorrect object configuration.
  */
-class Exception extends \Exception implements \Psr\SimpleCache\CacheException
+class InvalidConfigException extends Exception
 {
     /**
-     * {@inheritdoc}
+     * @return string the user-friendly name of this exception
      */
     public function getName()
     {
-        return 'Cache Exception';
+        return 'Invalid Configuration';
     }
 }

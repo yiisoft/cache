@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 /**
  * MemCachedServer represents the configuration data for a single memcached server.
@@ -14,8 +14,6 @@ namespace yii\cache;
  * of each configuration property.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Alexander Makarov <sam@rmcreative.ru>
  */
 class MemCachedServer
 {

@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\ArrayCache;
-use yii\cache\Cache;
+use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\Cache;
 
 /**
  * Class for testing file cache backend.

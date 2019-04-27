@@ -5,9 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\dependencies;
+namespace Yiisoft\Cache\Dependencies;
 
-use yii\exceptions\InvalidConfigException;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
 use yii\db\ConnectionInterface;
 
 /**
@@ -17,9 +17,6 @@ use yii\db\ConnectionInterface;
  * The query is specified via the [[sql]] property.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class DbDependency extends Dependency
 {
@@ -46,13 +43,13 @@ class DbDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method returns the value of the global state.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      * @throws InvalidConfigException if [[db]] is not a valid application component ID
      */
     protected function generateDependencyData($cache)
     {
-        /* @var $db Connection */
+        /* @var $db ConnectionInterface */
         if ($this->sql === null) {
             throw new InvalidConfigException('DbDependency::sql must be set.');
         }

@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\tests\unit;
+namespace Yiisoft\Cache\Tests;
 
-use yii\cache\Cache;
-use yii\cache\WinCache;
+use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\WinCache;
 
 /**
  * Class for testing wincache backend.

@@ -5,11 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache;
+namespace Yiisoft\Cache;
 
 use yii\base\Component;
-use yii\cache\dependencies\Dependency;
-use yii\di\Instance;
+use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Strings\StringHelper;
 use yii\helpers\Yii;
 
@@ -24,9 +23,9 @@ use yii\helpers\Yii;
  * return [
  *     'components' => [
  *         'cache' => [
- *             '__class' => yii\cache\Cache::class,
+ *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
- *                 '__class' => yii\cache\FileCache::class,
+ *                 '__class' => Yiisoft\Cache\FileCache::class,
  *                 'cachePath' => '@runtime/cache',
  *             ],
  *         ],
@@ -62,9 +61,6 @@ use yii\helpers\Yii;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class Cache extends Component implements CacheInterface
 {
@@ -91,12 +87,11 @@ class Cache extends Component implements CacheInterface
 
     /**
      * @param \Psr\SimpleCache\CacheInterface|array|\Closure|string cache handler or its DI compatible configuration.
-     * @since 3.0.0
      */
     public function setHandler($handler): self
     {
         $this->_handler = Yii::ensureObject(
-            $handler instanceof \Closure ? call_user_func($handler) : $handler,
+            $handler instanceof \Closure ? $handler() : $handler,
             \Psr\SimpleCache\CacheInterface::class
         );
 
@@ -162,7 +157,6 @@ class Cache extends Component implements CacheInterface
      * @return array list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
-     * @since 2.0.7
      */
     public function getMultiple($keys, $default = null)
     {
@@ -179,9 +173,9 @@ class Cache extends Component implements CacheInterface
                 if (is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
                     if ($value[1]->isChanged($this)) {
                         continue;
-                    } else {
-                        $value = $value[0];
                     }
+
+                    $value = $value[0];
                 }
                 $results[$key] = $value;
             }
@@ -246,7 +240,6 @@ class Cache extends Component implements CacheInterface
 
     /**
      * {@inheritdoc}
-     * @since 3.0.0
      */
     public function deleteMultiple($keys): bool
     {

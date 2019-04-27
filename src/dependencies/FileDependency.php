@@ -5,10 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\cache\dependencies;
+namespace Yiisoft\Cache\Dependencies;
 
-use yii\exceptions\InvalidConfigException;
-use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
 
 /**
  * FileDependency represents a dependency based on a file's last modification time.
@@ -17,9 +16,6 @@ use yii\helpers\Yii;
  * the dependency is considered as changed.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class FileDependency extends Dependency
 {
@@ -33,7 +29,7 @@ class FileDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method returns the file's last modification time.
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      * @throws InvalidConfigException if [[fileName]] is not set
      */
@@ -43,8 +39,7 @@ class FileDependency extends Dependency
             throw new InvalidConfigException('FileDependency::fileName must be set');
         }
 
-        $fileName = Yii::getAlias($this->fileName);
-        clearstatcache(false, $fileName);
-        return @filemtime($fileName);
+        clearstatcache(false, $this->fileName);
+        return @filemtime($this->fileName);
     }
 }

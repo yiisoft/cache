@@ -53,6 +53,10 @@
             "email": "info@dynasource.eu",
             "homepage": "http://dynasource.eu",
             "role": "Core framework development"
+        },
+        {
+            "name": "Misbahul D Munir",
+            "email": "misbahuldmunir@gmail.com"
         }
     ],
     "support": {
@@ -77,8 +81,9 @@
         "yiisoft/yii-web": "^3.0@dev",
         "yiisoft/view": "^3.0@dev",
         "yiisoft/db": "^3.0@dev",
-        "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/db-mysql": "^3.0@dev",
+        "yiisoft/db-pgsql": "^3.0@dev",
+        "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev",
         "phpunit/phpunit": "^7.2"
@@ -88,8 +93,12 @@
     },
     "autoload": {
         "psr-4": {
-            "yii\\cache\\": "src",
-            "yii\\cache\\tests\\": "tests"
+            "Yiisoft\\Cache\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yiisoft\\Cache\\Tests\\": "tests"
         }
     },
     "extra": {
