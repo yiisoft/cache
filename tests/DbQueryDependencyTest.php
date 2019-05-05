@@ -9,8 +9,8 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Dependencies\DbQueryDependency;
-use yii\db\Query;
-use yii\db\tests\unit\DatabaseTestCase;
+use Yiisoft\Db\Query;
+use Yiisoft\Db\Tests\DatabaseTestCase;
 
 class DbQueryDependencyTest extends DatabaseTestCase
 {
