@@ -217,7 +217,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      * @param int|\DateInterval|null $ttl raw TTL.
      * @return int TTL value as UNIX timestamp.
      */
-    protected function normalizeTtl($ttl): int
+    protected function normalizeTtl($ttl): float
     {
         if ($ttl === null) {
             return $this->defaultTtl;
@@ -225,7 +225,7 @@ abstract class SimpleCache extends Component implements CacheInterface
         if ($ttl instanceof \DateInterval) {
             return (new \DateTime('@0'))->add($ttl)->getTimestamp();
         }
-        return (int)$ttl;
+        return $ttl;
     }
 
     /**
