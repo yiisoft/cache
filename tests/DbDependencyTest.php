@@ -9,7 +9,7 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Dependencies\DbDependency;
-use yii\db\tests\unit\DatabaseTestCase;
+use Yiisoft\Db\Tests\DatabaseTestCase;
 
 /**
  * @group caching

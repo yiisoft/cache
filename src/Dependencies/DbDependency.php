@@ -8,7 +8,7 @@
 namespace Yiisoft\Cache\Dependencies;
 
 use Yiisoft\Cache\Exceptions\InvalidConfigException;
-use yii\db\ConnectionInterface;
+use Yiisoft\Db\ConnectionInterface;
 
 /**
  * DbDependency represents a dependency based on the query result of a SQL statement.

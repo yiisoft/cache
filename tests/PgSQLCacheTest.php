@@ -7,7 +7,7 @@
 
 namespace Yiisoft\Cache\Tests;
 
-use yii\db\Connection;
+use Yiisoft\Db\Connection;
 
 /**
  * Class for testing file cache backend.

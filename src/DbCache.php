@@ -7,11 +7,11 @@
 
 namespace Yiisoft\Cache;
 
-use yii\db\ConnectionInterface;
+use Yiisoft\Db\ConnectionInterface;
 use yii\helpers\Yii;
-use yii\db\Connection;
-use yii\db\PdoValue;
-use yii\db\Query;
+use Yiisoft\Db\Connection;
+use Yiisoft\Db\PdoValue;
+use Yiisoft\Db\Query;
 
 /**
  * DbCache implements a cache application component by storing cached data in a database.

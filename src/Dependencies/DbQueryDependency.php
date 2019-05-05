@@ -8,8 +8,8 @@
 namespace Yiisoft\Cache\Dependencies;
 
 use Yiisoft\Cache\Exceptions\InvalidConfigException;
-use yii\db\ConnectionInterface;
-use yii\db\QueryInterface;
+use Yiisoft\Db\ConnectionInterface;
+use Yiisoft\Db\QueryInterface;
 
 /**
  * DbQueryDependency represents a dependency based on the query result of an [[QueryInterface]] instance.
@@ -70,7 +70,7 @@ class DbQueryDependency extends Dependency
     protected function generateDependencyData($cache)
     {
         if (!$this->query instanceof QueryInterface) {
-            throw new InvalidConfigException('"' . get_class($this) . '::$query" should be an instance of "yii\db\QueryInterface".');
+            throw new InvalidConfigException('"' . get_class($this) . '::$query" should be an instance of "Yiisoft\Db\QueryInterface".');
         }
 
         if (!empty($this->db->enableQueryCache)) {

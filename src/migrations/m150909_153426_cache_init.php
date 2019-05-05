@@ -8,7 +8,7 @@
 use yii\helpers\Yii;
 use Yiisoft\Cache\Exceptions\InvalidConfigException;
 use Yiisoft\Cache\DbCache;
-use yii\db\Migration;
+use Yiisoft\Db\Migration;
 
 /**
  * Initializes Cache tables.
