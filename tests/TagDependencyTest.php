@@ -19,7 +19,7 @@ class TagDependencyTest extends TestCase
 {
     public function testInvalidate()
     {
-        $cache = new Cache(new FileCache('@yii/tests/runtime/cache'));
+        $cache = new Cache(new FileCache('tests/runtime/cache'));
 
         // single tag test
         $cache->set('a1', 11, 0, new TagDependency('t1'));
