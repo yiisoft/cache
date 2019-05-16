@@ -9,7 +9,6 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Cache\SimpleCache;
-use yii\tests\TestCase;
 
 /**
  * Dependency (abstract) tests.

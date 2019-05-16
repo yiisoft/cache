@@ -28,7 +28,6 @@ function microtime($float = false)
 
 namespace Yiisoft\Cache\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\TagDependency;
 
@@ -47,7 +46,6 @@ abstract class CacheTestCase extends TestCase
      * Null means normal microtime() behavior.
      */
     public static $microtime;
-    public static $params;
 
 
     /**
@@ -55,21 +53,6 @@ abstract class CacheTestCase extends TestCase
      */
     abstract protected function getCacheInstance();
 
-    /**
-     * Returns a test configuration param from /data/config.php.
-     * @param  string $name params name
-     * @param  mixed $default default value to use when param is not set.
-     * @return mixed  the value of the configuration param
-     */
-    public static function getParam($name, $default = null)
-    {
-        if (static::$params === null) {
-            static::$params = require dirname(__DIR__) . '/config/tests/params.php';
-        }
-
-        return static::$params[$name] ?? $default;
-    }
-    
     protected function tearDown()
     {
         static::$time = null;
