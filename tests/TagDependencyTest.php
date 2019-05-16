@@ -7,7 +7,6 @@
 
 namespace Yiisoft\Cache\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\FileCache;
 use Yiisoft\Cache\Dependencies\TagDependency;
