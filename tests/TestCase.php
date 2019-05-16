@@ -89,5 +89,4 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
         return $result;
     }
-
 }
