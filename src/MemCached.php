@@ -7,7 +7,7 @@
 
 namespace Yiisoft\Cache;
 
-use yii\serialize\SerializerInterface;
+use Yiisoft\Cache\Serializer\SerializerInterface;
 use Yiisoft\Cache\Exceptions\InvalidConfigException;
 
 /**

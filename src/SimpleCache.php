@@ -10,8 +10,8 @@ namespace Yiisoft\Cache;
 use Psr\SimpleCache\CacheInterface;
 use yii\base\Component;
 use yii\helpers\Yii;
-use yii\serialize\PhpSerializer;
-use yii\serialize\SerializerInterface;
+use Yiisoft\Cache\Serializer\PhpSerializer;
+use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
  * SimpleCache is the base class for cache classes implementing pure PSR-16 [[CacheInterface]].
@@ -71,7 +71,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      *
      * ```php
      * [
-     *     '__class' => \yii\serialize\IgbinarySerializer::class
+     *     '__class' => \Yiisoft\Cache\Serializer\IgbinarySerializer::class
      * ]
      * ```
      *
