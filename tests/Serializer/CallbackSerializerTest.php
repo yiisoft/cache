@@ -20,6 +20,6 @@ class CallbackSerializerTest extends SerializerTest
      */
     protected function createSerializer(): SerializerInterface
     {
-        return new CallbackSerializer('serialize','unserialize');
+        return new CallbackSerializer('serialize', 'unserialize');
     }
 }
