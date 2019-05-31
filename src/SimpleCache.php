@@ -10,6 +10,7 @@ namespace Yiisoft\Cache;
 use Psr\SimpleCache\CacheInterface;
 use yii\base\Component;
 use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\InvalidConfigException;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
@@ -45,9 +46,10 @@ abstract class SimpleCache extends Component implements CacheInterface
      */
     public $keyPrefix = '';
     /**
-     * @var SerializerInterface|false the serializer to be used for serializing and unserializing of the cached data.
+     * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      *
-     * If this property is set `false`, data will be directly sent to and retrieved from the underlying
+     * You can disable serialization by setting this property to `NullSerializer`,
+     * data will be directly sent to and retrieved from the underlying
      * cache component without any serialization or deserialization. You should not turn off serialization if
      * you are using [[Dependency|cache dependency]], because it relies on data serialization. Also, some
      * implementations of the cache can not correctly save and retrieve data different from a string type.
@@ -56,40 +58,23 @@ abstract class SimpleCache extends Component implements CacheInterface
 
 
     /**
-     * @var SerializerInterface|string|array|false the serializer to be used for serializing and unserializing of the cached data.
+     * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      * Serializer should be an instance of [[SerializerInterface]] or its DI compatible configuration.
      * @see setSerializer
      */
-    public function __construct($serializer = null)
+    public function __construct(SerializerInterface $serializer = null)
     {
         $this->setSerializer($serializer);
     }
 
     /**
-     * @var SerializerInterface|string|array|false the serializer to be used for serializing and unserializing of the cached data.
-     * Serializer should be an instance of [[SerializerInterface]] or its DI compatible configuration. For example:
-     *
-     * ```php
-     * [
-     *     '__class' => \Yiisoft\Cache\Serializer\IgbinarySerializer::class
-     * ]
-     * ```
+     * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      *
      * Default is [[PhpSerializer]], meaning using the default PHP `serialize()` and `unserialize()` functions.
      */
-    public function setSerializer($serializer)
+    public function setSerializer(SerializerInterface $serializer = null)
     {
-        if ($serializer === false) {
-            $this->_serializer = false;
-        } else {
-            if ($serializer === null) {
-                $serializer = PhpSerializer::class;
-            }
-            $this->_serializer = Yii::ensureObject(
-                $serializer instanceof \Closure ? $serializer() : $serializer,
-                SerializerInterface::class
-            );
-        }
+        $this->_serializer = $serializer ?? new PhpSerializer();
     }
 
     /**
@@ -102,9 +87,7 @@ abstract class SimpleCache extends Component implements CacheInterface
         if ($value === false) {
             return $default;
         }
-        if ($this->_serializer === false) {
-            return $value;
-        }
+
         return $this->_serializer->unserialize($value);
     }
 
@@ -122,11 +105,7 @@ abstract class SimpleCache extends Component implements CacheInterface
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
             if (isset($values[$newKey]) && $values[$newKey] !== false) {
-                if ($this->_serializer === false) {
-                    $results[$key] = $values[$newKey];
-                } else {
-                    $results[$key] = $this->_serializer->unserialize($values[$newKey]);
-                }
+                $results[$key] = $this->_serializer->unserialize($values[$newKey]);
             }
         }
         return $results;
@@ -147,9 +126,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      */
     public function set($key, $value, $ttl = null): bool
     {
-        if ($this->_serializer !== false) {
-            $value = $this->_serializer->serialize($value);
-        }
+        $value = $this->_serializer->serialize($value);
         $key = $this->normalizeKey($key);
         $ttl = $this->normalizeTtl($ttl);
         return $this->setValue($key, $value, $ttl);
@@ -162,9 +139,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     {
         $data = [];
         foreach ($values as $key => $value) {
-            if ($this->_serializer !== false) {
-                $value = $this->_serializer->serialize($value);
-            }
+            $value = $this->_serializer->serialize($value);
             $key = $this->normalizeKey($key);
             $data[$key] = $value;
         }
