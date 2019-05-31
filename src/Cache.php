@@ -71,13 +71,11 @@ class Cache extends Component implements CacheInterface
 
 
     /**
-     * @param \Psr\SimpleCache\CacheInterface|array|\Closure|string cache handler or its DI compatible configuration.
+     * @param \Psr\SimpleCache\CacheInterface cache handler.
      */
-    public function __construct($handler = null)
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
     {
-        if ($handler) {
-            $this->setHandler($handler);
-        }
+        $this->setHandler($handler);
     }
 
     public function getHandler(): \Psr\SimpleCache\CacheInterface
@@ -86,14 +84,13 @@ class Cache extends Component implements CacheInterface
     }
 
     /**
-     * @param \Psr\SimpleCache\CacheInterface|array|\Closure|string cache handler or its DI compatible configuration.
+     * @param \Psr\SimpleCache\CacheInterface|array cache handler.
      */
-    public function setHandler($handler): self
+    public function setHandler(\Psr\SimpleCache\CacheInterface $handler = null): self
     {
-        $this->_handler = Yii::ensureObject(
-            $handler instanceof \Closure ? $handler() : $handler,
-            \Psr\SimpleCache\CacheInterface::class
-        );
+        if ($handler) {
+            $this->_handler = $handler;
+        }
 
         return $this;
     }
