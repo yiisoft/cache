@@ -86,6 +86,7 @@
         "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev",
+        "nyholm/psr7": "^1.0",
         "phpunit/phpunit": "^7.2"
     },
     "provide": {
