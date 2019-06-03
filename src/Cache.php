@@ -7,10 +7,9 @@
 
 namespace Yiisoft\Cache;
 
-use yii\base\Component;
+use yii\helpers\Yii;
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Strings\StringHelper;
-use yii\helpers\Yii;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -62,7 +61,7 @@ use yii\helpers\Yii;
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
  */
-class Cache extends Component implements CacheInterface
+class Cache implements CacheInterface
 {
     /**
      * @var \Psr\SimpleCache\CacheInterface actual cache handler.
