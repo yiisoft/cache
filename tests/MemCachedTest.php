@@ -8,6 +8,7 @@
 namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\MemCached;
 
 /**
@@ -19,15 +20,13 @@ class MemCachedTest extends CacheTestCase
 {
     private $_cacheInstance;
 
+    protected static $required_extensions = ['memcached'];
+
     /**
      * @return Cache
      */
     protected function getCacheInstance()
     {
-        if (!extension_loaded('memcached')) {
-            $this->markTestSkipped('memcached not installed. Skipping.');
-        }
-
         // check whether memcached is running and skip tests if not.
         if (!@stream_socket_client('127.0.0.1:11211', $errorNumber, $errorDescription, 0.5)) {
             $this->markTestSkipped('No memcached server running at ' . '127.0.0.1:11211' . ' : ' . $errorNumber . ' - ' . $errorDescription);
@@ -41,19 +40,25 @@ class MemCachedTest extends CacheTestCase
         return $this->_cacheInstance;
     }
 
-    public function testExpire()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpire(CacheInterface $cache)
     {
         if (getenv('TRAVIS') == 'true') {
             $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
         }
-        parent::testExpire();
+        parent::testExpire($cache);
     }
 
-    public function testExpireAdd()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpireAdd(CacheInterface $cache)
     {
         if (getenv('TRAVIS') == 'true') {
             $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
         }
-        parent::testExpireAdd();
+        parent::testExpireAdd($cache);
     }
 }

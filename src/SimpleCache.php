@@ -30,13 +30,13 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * @see CacheInterface
  */
-abstract class SimpleCache extends Component implements CacheInterface
+abstract class SimpleCache implements CacheInterface
 {
     /**
      * @var int default TTL for a cache entry. Default value is 0, meaning infinity.
      * This value is used by [[set()]] and [[setMultiple()]], if the duration is not explicitly given.
      */
-    public $defaultTtl = 0;
+    private $defaultTtl = 0;
     /**
      * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
      * It is recommended that you set a unique cache key prefix for each application if the same cache
@@ -44,7 +44,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      *
      * To ensure interoperability, only alphanumeric characters should be used.
      */
-    public $keyPrefix = '';
+    private $keyPrefix = '';
     /**
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      *
@@ -54,7 +54,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      * you are using [[Dependency|cache dependency]], because it relies on data serialization. Also, some
      * implementations of the cache can not correctly save and retrieve data different from a string type.
      */
-    protected $_serializer;
+    private $serializer;
 
 
     /**
@@ -64,17 +64,25 @@ abstract class SimpleCache extends Component implements CacheInterface
      */
     public function __construct(SerializerInterface $serializer = null)
     {
-        $this->setSerializer($serializer);
+        $this->setSerializer($serializer ?? $this->createDefaultSerializer());
+    }
+
+    /**
+     * Creates a default serializer, when nothing is given
+     * @return PhpSerializer
+     */
+    protected function createDefaultSerializer() : PhpSerializer
+    {
+        return new PhpSerializer();
     }
 
     /**
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      *
-     * Default is [[PhpSerializer]], meaning using the default PHP `serialize()` and `unserialize()` functions.
      */
-    public function setSerializer(SerializerInterface $serializer = null)
+    public function setSerializer(SerializerInterface $serializer)
     {
-        $this->_serializer = $serializer ?? new PhpSerializer();
+        $this->serializer = $serializer;
     }
 
     /**
@@ -88,7 +96,7 @@ abstract class SimpleCache extends Component implements CacheInterface
             return $default;
         }
 
-        return $this->_serializer->unserialize($value);
+        return $this->serializer->unserialize($value);
     }
 
     /**
@@ -105,7 +113,7 @@ abstract class SimpleCache extends Component implements CacheInterface
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
             if (isset($values[$newKey]) && $values[$newKey] !== false) {
-                $results[$key] = $this->_serializer->unserialize($values[$newKey]);
+                $results[$key] = $this->serializer->unserialize($values[$newKey]);
             }
         }
         return $results;
@@ -126,7 +134,7 @@ abstract class SimpleCache extends Component implements CacheInterface
      */
     public function set($key, $value, $ttl = null): bool
     {
-        $value = $this->_serializer->serialize($value);
+        $value = $this->serializer->serialize($value);
         $key = $this->normalizeKey($key);
         $ttl = $this->normalizeTtl($ttl);
         return $this->setValue($key, $value, $ttl);
@@ -139,7 +147,7 @@ abstract class SimpleCache extends Component implements CacheInterface
     {
         $data = [];
         foreach ($values as $key => $value) {
-            $value = $this->_serializer->serialize($value);
+            $value = $this->serializer->serialize($value);
             $key = $this->normalizeKey($key);
             $data[$key] = $value;
         }
@@ -270,5 +278,33 @@ abstract class SimpleCache extends Component implements CacheInterface
             }
         }
         return $result;
+    }
+
+    /**
+     * @param int $defaultTtl
+     */
+    public function setDefaultTtl(int $defaultTtl): void
+    {
+        // @todo validate (possibly everything below 0 is forbidden)
+        $this->defaultTtl = $defaultTtl;
+    }
+
+    /**
+     * @param string $keyPrefix
+     */
+    public function setKeyPrefix(string $keyPrefix): void
+    {
+        if (!empty($keyPrefix) && !ctype_alnum($keyPrefix)) {
+            throw new \InvalidArgumentException("Given key prefix is not alpha-numeric");
+        }
+        $this->keyPrefix = $keyPrefix;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultTtl(): int
+    {
+        return $this->defaultTtl;
     }
 }

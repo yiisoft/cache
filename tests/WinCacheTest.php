@@ -19,15 +19,13 @@ class WinCacheTest extends CacheTestCase
 {
     private $_cacheInstance = null;
 
+    protected static $required_extensions = ['wincache'];
+
     /**
      * @return Cache
      */
     protected function getCacheInstance()
     {
-        if (!extension_loaded('wincache')) {
-            $this->markTestSkipped('Wincache not installed. Skipping.');
-        }
-
         if (!ini_get('wincache.ucenabled')) {
             $this->markTestSkipped('Wincache user cache disabled. Skipping.');
         }
