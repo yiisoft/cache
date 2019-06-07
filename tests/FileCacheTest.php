@@ -8,6 +8,7 @@
 namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\FileCache;
 
 /**
@@ -30,10 +31,11 @@ class FileCacheTest extends CacheTestCase
         return $this->_cacheInstance;
     }
 
-    public function testExpire()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpire(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         static::$time++;
@@ -42,9 +44,11 @@ class FileCacheTest extends CacheTestCase
         $this->assertNull($cache->get('expire_test'));
     }
 
-    public function testExpireAdd()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpireAdd(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
 
         static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));

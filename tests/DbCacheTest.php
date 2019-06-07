@@ -8,6 +8,7 @@
 namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\DbCache;
 
 /**
@@ -20,12 +21,11 @@ class DbCacheTest extends CacheTestCase
     private $_cacheInstance;
     private $_connection;
 
+    protected static $required_extensions = ['pdo', 'pdo_mysql'];
+
+
     protected function setUp()
     {
-        if (!extension_loaded('pdo') || !extension_loaded('pdo_mysql')) {
-            $this->markTestSkipped('pdo and pdo_mysql extensions are required.');
-        }
-
         parent::setUp();
 
         $this->getConnection()->createCommand('
@@ -86,10 +86,11 @@ class DbCacheTest extends CacheTestCase
         return $this->_cacheInstance;
     }
 
-    public function testExpire()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpire(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         static::$time++;
@@ -98,10 +99,11 @@ class DbCacheTest extends CacheTestCase
         $this->assertNull($cache->get('expire_test'));
     }
 
-    public function testExpireAdd()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpireAdd(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         static::$time++;

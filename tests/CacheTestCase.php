@@ -47,6 +47,12 @@ abstract class CacheTestCase extends TestCase
      */
     public static $microtime;
 
+    /**
+     * List of extensions, that underlying cache requires
+     * If one of extensions is missing - skip test
+     * @var string[]
+     */
+    protected static $required_extensions = [];
 
     /**
      * @return CacheInterface
@@ -59,20 +65,41 @@ abstract class CacheTestCase extends TestCase
         static::$microtime = null;
     }
 
-    /**
-     * @return CacheInterface
-     */
-    public function prepare()
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        foreach (static::$required_extensions as $extension) {
+            if (!extension_loaded($extension)) {
+                self::markTestSkipped("Required extension '{$extension}' is not loaded");
+            }
+        }
+    }
+
+    public function prepare() : CacheInterface
     {
         $cache = $this->getCacheInstance();
 
-        $cache->clear();
-        $cache->set('string_test', 'string_test');
-        $cache->set('number_test', 42);
-        $cache->set('array_test', ['array_test' => 'array_test']);
+        $this->assertTrue($cache->clear());
+        $this->assertTrue($cache->set('string_test', 'string_test'));
+        $this->assertTrue($cache->set('number_test', 42));
+        $this->assertTrue($cache->set('array_test', ['array_test' => 'array_test']));
         $cache['arrayaccess_test'] = new \stdClass();
 
         return $cache;
+    }
+
+    public function preparedCacheProvider()
+    {
+        return [
+            [$this->prepare()],
+        ];
+    }
+
+    public function ordinalCacheProvider()
+    {
+        return [
+            [$this->getCacheInstance()]
+        ];
     }
 
     public function testSet()
@@ -84,10 +111,11 @@ abstract class CacheTestCase extends TestCase
         $this->assertTrue($cache->set('array_test', ['array_test' => 'array_test']));
     }
 
-    public function testGet()
+    /**
+     * @dataProvider preparedCacheProvider
+     */
+    public function testGet(CacheInterface $cache)
     {
-        $cache = $this->prepare();
-
         $this->assertEquals('string_test', $cache->get('string_test'));
 
         $this->assertEquals(42, $cache->get('number_test'));
@@ -129,10 +157,11 @@ abstract class CacheTestCase extends TestCase
         $this->assertEquals('array_test', $array['array_test']);
     }
 
-    public function testHas()
+    /**
+     * @dataProvider preparedCacheProvider
+     */
+    public function testHas(CacheInterface $cache)
     {
-        $cache = $this->prepare();
-
         $this->assertTrue($cache->has('string_test'));
         // check whether exists affects the value
         $this->assertEquals('string_test', $cache->get('string_test'));
@@ -141,25 +170,28 @@ abstract class CacheTestCase extends TestCase
         $this->assertFalse($cache->has('not_exists'));
     }
 
-    public function testArrayAccess()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testArrayAccess(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         $cache['arrayaccess_test'] = new \stdClass();
         $this->assertInstanceOf('stdClass', $cache['arrayaccess_test']);
     }
 
-    public function testGetNonExistent()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testGetNonExistent(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         $this->assertNull($cache->get('non_existent_key'));
     }
 
-    public function testStoreSpecialValues()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testStoreSpecialValues(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         $this->assertTrue($cache->set('null_value', null));
         $this->assertNull($cache->get('null_value'));
 
@@ -167,27 +199,30 @@ abstract class CacheTestCase extends TestCase
         $this->assertTrue($cache->get('bool_value'));
     }
 
-    public function testGetMultiple()
+    /**
+     * @dataProvider preparedCacheProvider
+     */
+    public function testGetMultiple(CacheInterface $cache)
     {
-        $cache = $this->prepare();
-
         $this->assertEquals(['string_test' => 'string_test', 'number_test' => 42], $cache->getMultiple(['string_test', 'number_test']));
         // ensure that order does not matter
         $this->assertEquals(['number_test' => 42, 'string_test' => 'string_test'], $cache->getMultiple(['number_test', 'string_test']));
         $this->assertEquals(['number_test' => 42, 'non_existent_key' => null], $cache->getMultiple(['number_test', 'non_existent_key']));
     }
 
-    public function testDefaultTtl()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testDefaultTtl(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
-        $this->assertSame(0, $cache->handler->defaultTtl);
+        $this->assertSame(0, $cache->handler->getDefaultTtl());
     }
 
-    public function testExpire()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpire(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         usleep(500000);
         $this->assertEquals('expire_test', $cache->get('expire_test'));
@@ -195,10 +230,11 @@ abstract class CacheTestCase extends TestCase
         $this->assertNull($cache->get('expire_test'));
     }
 
-    public function testExpireAdd()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpireAdd(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         usleep(500000);
         $this->assertEquals('expire_testa', $cache->get('expire_testa'));
@@ -206,10 +242,11 @@ abstract class CacheTestCase extends TestCase
         $this->assertNull($cache->get('expire_testa'));
     }
 
-    public function testAdd()
+    /**
+     * @dataProvider preparedCacheProvider
+     */
+    public function testAdd(CacheInterface $cache)
     {
-        $cache = $this->prepare();
-
         // should not change existing keys
         $this->assertFalse($cache->add('number_test', 13));
         $this->assertEquals(42, $cache->get('number_test'));
@@ -220,16 +257,16 @@ abstract class CacheTestCase extends TestCase
         $this->assertEquals(13, $cache->get('add_test'));
     }
 
+    // @todo move to provider as well
     public function testAddMultiple()
     {
         $cache = $this->prepare();
-
         $this->assertNull($cache->get('add_test'));
 
-        $cache->addMultiple([
+        $this->assertTrue($cache->addMultiple([
             'number_test' => 13,
             'add_test' => 13,
-        ]);
+        ]));
 
         $this->assertEquals(42, $cache->get('number_test'));
         $this->assertEquals(13, $cache->get('add_test'));
@@ -244,17 +281,20 @@ abstract class CacheTestCase extends TestCase
         $this->assertNull($cache->get('number_test'));
     }
 
-    public function testClear()
+    /**
+     * @dataProvider preparedCacheProvider
+     */
+    public function testClear(CacheInterface $cache)
     {
-        $cache = $this->prepare();
         $this->assertTrue($cache->clear());
         $this->assertNull($cache->get('number_test'));
     }
 
-    public function testGetOrSet()
+    /**
+     * @dataProvider preparedCacheProvider
+     */
+    public function testGetOrSet(CacheInterface $cache)
     {
-        $cache = $this->prepare();
-
         $expected = $this->getOrSetCallable($cache);
         $callable = [$this, 'getOrSetCallable'];
 

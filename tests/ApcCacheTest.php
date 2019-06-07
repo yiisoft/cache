@@ -9,6 +9,7 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\ApcCache;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 
 /**
  * Class for testing APC cache backend.
@@ -19,15 +20,13 @@ class ApcCacheTest extends CacheTestCase
 {
     private $_cacheInstance = null;
 
+    protected static $required_extensions = ['apcu'];
+
     /**
      * @return Cache
      */
     protected function getCacheInstance()
     {
-        if (!\extension_loaded('apcu')) {
-            $this->markTestSkipped('APCu not installed. Skipping.');
-        }
-
         if (!ini_get('apc.enable_cli')) {
             $this->markTestSkipped('APC is installed but not enabled. Skipping.');
         }
@@ -39,12 +38,18 @@ class ApcCacheTest extends CacheTestCase
         return $this->_cacheInstance;
     }
 
-    public function testExpire()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpire(CacheInterface $cache)
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
     }
 
-    public function testExpireAdd()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpireAdd(CacheInterface $cache)
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
     }
