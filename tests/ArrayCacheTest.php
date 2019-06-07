@@ -7,6 +7,7 @@
 
 namespace Yiisoft\Cache\Tests;
 
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
@@ -33,8 +34,9 @@ class ArrayCacheTest extends CacheTestCase
 
     /**
      * @dataProvider ordinalCacheProvider
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function testExpire(CacheInterface $cache)
+    public function testExpire(PsrCacheInterface $cache)
     {
         static::$microtime = \microtime(true);
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
@@ -45,17 +47,24 @@ class ArrayCacheTest extends CacheTestCase
     }
 
     /**
-     * @dataProvider ordinalCacheProvider
+     * @dataProvider cacheIntegrationProvider
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function testExpireAdd(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         static::$microtime = \microtime(true);
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         static::$microtime++;
         $this->assertEquals('expire_testa', $cache->get('expire_testa'));
         static::$microtime++;
         $this->assertNull($cache->get('expire_testa'));
+    }
+
+    /**
+     * Factory method to create particular implementation. Called once per test
+     */
+    protected function createCacheInstance(): PsrCacheInterface
+    {
+        return new ArrayCache();
     }
 }
