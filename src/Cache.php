@@ -1,20 +1,21 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
+ * @link      http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license   http://www.yiiframework.com/license/
  */
 
 namespace Yiisoft\Cache;
 
-use yii\helpers\Yii;
+use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\Exceptions\SetCacheException;
 use Yiisoft\Strings\StringHelper;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
- * The actual data caching is performed via [[handler]], which should be configured to be [[\Psr\SimpleCache\CacheInterface]]
- * instance.
+ * The actual data caching is performed via [[handler]], which should be configured to be
+ * [[\Psr\SimpleCache\CacheInterface]] instance.
  *
  * Application configuration example:
  *
@@ -84,6 +85,8 @@ class Cache implements CacheInterface
 
     /**
      * @param \Psr\SimpleCache\CacheInterface|array cache handler.
+     *
+     * @return Cache
      */
     public function setHandler(\Psr\SimpleCache\CacheInterface $handler = null): self
     {
@@ -102,6 +105,7 @@ class Cache implements CacheInterface
      * the given key and applying MD5 hashing.
      *
      * @param mixed $key the key to be normalized
+     *
      * @return string the generated cache key
      */
     protected function buildKey($key)
@@ -148,11 +152,15 @@ class Cache implements CacheInterface
      * Some caches (such as memcache, apc) allow retrieving multiple cached values at the same time,
      * which may improve the performance. In case a cache does not support this feature natively,
      * this method will try to simulate it.
-     * @param string[] $keys list of string keys identifying the cached values
-     * @param mixed $default Default value to return for keys that do not exist.
+     *
+     * @param string[] $keys    list of string keys identifying the cached values
+     * @param mixed    $default Default value to return for keys that do not exist.
+     *
      * @return array list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
+     *
+     * @throws InvalidArgumentException
      */
     public function getMultiple($keys, $default = null)
     {
@@ -185,14 +193,19 @@ class Cache implements CacheInterface
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param mixed $key a key identifying the value to be cached. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
-     * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * @param mixed                  $key        a key identifying the value to be cached. This can be a simple string
+     *                                           or a complex data structure consisting of factors representing the
+     *                                           key.
+     * @param mixed                  $value      the value to be cached
+     * @param null|int|\DateInterval $ttl        the TTL value of this item. If not set, default value is used.
+     * @param Dependency             $dependency dependency of the cached item. If the dependency changes,
+     *                                           the corresponding value in the cache will be invalidated when it is
+     *                                           fetched via [[get()]]. This parameter is ignored if [[serializer]] is
+     *                                           false.
+     *
      * @return bool whether the value is successfully stored into cache
+     *
+     * @throws InvalidArgumentException
      */
     public function set($key, $value, $ttl = null, $dependency = null): bool
     {
@@ -201,6 +214,7 @@ class Cache implements CacheInterface
             $value = [$value, $dependency];
         }
         $key = $this->buildKey($key);
+
         return $this->_handler->set($key, $value, $ttl);
     }
 
@@ -209,12 +223,16 @@ class Cache implements CacheInterface
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param array $items the items to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * @param array                  $items      the items to be cached, as key-value pairs.
+     * @param null|int|\DateInterval $ttl        the TTL value of this item. If not set, default value is used.
+     * @param Dependency             $dependency dependency of the cached items. If the dependency changes,
+     *                                           the corresponding values in the cache will be invalidated when it is
+     *                                           fetched via [[get()]]. This parameter is ignored if [[serializer]] is
+     *                                           false.
+     *
      * @return array array of failed keys
+     *
+     * @throws InvalidArgumentException
      */
     public function setMultiple($items, $ttl = 0, $dependency = null): bool
     {
@@ -250,12 +268,16 @@ class Cache implements CacheInterface
      * Stores multiple items in cache. Each item contains a value identified by a key.
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
-     * @param array $values the items to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * @param array                  $values     the items to be cached, as key-value pairs.
+     * @param null|int|\DateInterval $ttl        the TTL value of this item. If not set, default value is used.
+     * @param Dependency             $dependency dependency of the cached items. If the dependency changes,
+     *                                           the corresponding values in the cache will be invalidated when it is
+     *                                           fetched via [[get()]]. This parameter is ignored if [[serializer]] is
+     *                                           false.
+     *
      * @return bool
+     *
+     * @throws InvalidArgumentException
      */
     public function addMultiple($values, $ttl = 0, $dependency = null): bool
     {
@@ -285,14 +307,19 @@ class Cache implements CacheInterface
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * Nothing will be done if the cache already contains the key.
-     * @param mixed $key a key identifying the value to be cached. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
-     * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     *
+     * @param mixed                  $key        a key identifying the value to be cached. This can be a simple string
+     *                                           or a complex data structure consisting of factors representing the
+     *                                           key.
+     * @param mixed                  $value      the value to be cached
+     * @param null|int|\DateInterval $ttl        the TTL value of this item. If not set, default value is used.
+     * @param Dependency             $dependency dependency of the cached item. If the dependency changes,
+     *                                           the corresponding value in the cache will be invalidated when it is
+     *                                           fetched via [[get()]]. This parameter is ignored if [[serializer]] is
+     *                                           false.
+     *
      * @return bool whether the value is successfully stored into cache
+     * @throws InvalidArgumentException
      */
     public function add($key, $value, $ttl = null, $dependency = null): bool
     {
@@ -312,9 +339,13 @@ class Cache implements CacheInterface
 
     /**
      * Deletes a value with the specified key from cache.
+     *
      * @param mixed $key a key identifying the value to be deleted from cache. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
+     *                   a complex data structure consisting of factors representing the key.
+     *
      * @return bool if no error happens during deletion
+     *
+     * @throws InvalidArgumentException
      */
     public function delete($key): bool
     {
@@ -326,6 +357,7 @@ class Cache implements CacheInterface
     /**
      * Deletes all values from cache.
      * Be careful of performing this operation if the cache is shared among multiple applications.
+     *
      * @return bool whether the flush operation was successful.
      */
     public function clear(): bool
@@ -336,8 +368,11 @@ class Cache implements CacheInterface
     /**
      * Returns whether there is a cache entry with a specified key.
      * This method is required by the interface [[\ArrayAccess]].
+     *
      * @param string $key a key identifying the cached value
+     *
      * @return bool
+     * @throws InvalidArgumentException
      */
     public function offsetExists($key): bool
     {
@@ -347,8 +382,11 @@ class Cache implements CacheInterface
     /**
      * Retrieves the value from cache with a specified key.
      * This method is required by the interface [[\ArrayAccess]].
+     *
      * @param string $key a key identifying the cached value
+     *
      * @return mixed the value stored in cache, false if the value is not in the cache or expired.
+     * @throws InvalidArgumentException
      */
     public function offsetGet($key)
     {
@@ -360,8 +398,11 @@ class Cache implements CacheInterface
      * If the cache already contains such a key, the existing value will be
      * replaced with the new ones. To add expiration and dependencies, use the [[set()]] method.
      * This method is required by the interface [[\ArrayAccess]].
-     * @param string $key the key identifying the value to be cached
-     * @param mixed $value the value to be cached
+     *
+     * @param string $key   the key identifying the value to be cached
+     * @param mixed  $value the value to be cached
+     *
+     * @throws InvalidArgumentException
      */
     public function offsetSet($key, $value): void
     {
@@ -371,7 +412,10 @@ class Cache implements CacheInterface
     /**
      * Deletes the value with the specified key from cache
      * This method is required by the interface [[\ArrayAccess]].
+     *
      * @param string $key the key of the value to be deleted
+     *
+     * @throws InvalidArgumentException
      */
     public function offsetUnset($key): void
     {
@@ -393,15 +437,22 @@ class Cache implements CacheInterface
      * }
      * ```
      *
-     * @param mixed $key a key identifying the value to be cached. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
-     * @param callable|\Closure $callable the callable or closure that will be used to generate a value to be cached.
-     * In case $callable returns `false`, the value will not be cached.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is `false`.
+     * @param mixed                  $key        a key identifying the value to be cached. This can be a simple string
+     *                                           or a complex data structure consisting of factors representing the
+     *                                           key.
+     * @param callable|\Closure      $callable   the callable or closure that will be used to generate a value to be
+     *                                           cached. In case $callable returns `false`, the value will not be
+     *                                           cached.
+     * @param null|int|\DateInterval $ttl        the TTL value of this item. If not set, default value is used.
+     * @param Dependency             $dependency dependency of the cached item. If the dependency changes,
+     *                                           the corresponding value in the cache will be invalidated when it is
+     *                                           fetched via [[get()]]. This parameter is ignored if [[serializer]] is
+     *                                           `false`.
+     *
      * @return mixed result of $callable execution
+     *
+     * @throws InvalidArgumentException
+     * @throws SetCacheException
      */
     public function getOrSet($key, $callable, $ttl = null, $dependency = null)
     {
@@ -411,7 +462,7 @@ class Cache implements CacheInterface
 
         $value = $callable($this);
         if (!$this->set($key, $value, $ttl, $dependency)) {
-            Yii::warning('Failed to set cache value for key ' . json_encode($key), __METHOD__);
+            throw new SetCacheException($key, $value, $this);
         }
 
         return $value;
