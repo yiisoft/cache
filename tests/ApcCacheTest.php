@@ -7,6 +7,7 @@
 
 namespace Yiisoft\Cache\Tests;
 
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\ApcCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
@@ -22,26 +23,18 @@ class ApcCacheTest extends CacheTestCase
 
     protected static $required_extensions = ['apcu'];
 
-    /**
-     * @return Cache
-     */
-    protected function getCacheInstance()
+    public static function setUpBeforeClass()
     {
+        parent::setUpBeforeClass();
         if (!ini_get('apc.enable_cli')) {
-            $this->markTestSkipped('APC is installed but not enabled. Skipping.');
+            self::markTestSkipped('APC is installed but not enabled. Skipping.');
         }
-
-        if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache(new ApcCache());
-        }
-
-        return $this->_cacheInstance;
     }
 
     /**
      * @dataProvider ordinalCacheProvider
      */
-    public function testExpire(CacheInterface $cache)
+    public function testExpire(\Psr\SimpleCache\CacheInterface $cache)
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
     }
@@ -52,5 +45,13 @@ class ApcCacheTest extends CacheTestCase
     public function testExpireAdd(CacheInterface $cache)
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function createCacheInstance(): PsrCacheInterface
+    {
+        return new ApcCache();
     }
 }
