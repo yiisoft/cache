@@ -7,6 +7,7 @@
 
 namespace Yiisoft\Cache\Tests;
 
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\DbCache;
@@ -74,22 +75,9 @@ class DbCacheTest extends CacheTestCase
     }
 
     /**
-     * @return Cache
-     */
-    protected function getCacheInstance()
-    {
-        if ($this->_cacheInstance === null) {
-            $dbCache = new DbCache(null, $this->getConnection());
-            $this->_cacheInstance = new Cache($dbCache);
-        }
-
-        return $this->_cacheInstance;
-    }
-
-    /**
      * @dataProvider ordinalCacheProvider
      */
-    public function testExpire(CacheInterface $cache)
+    public function testExpire(\Psr\SimpleCache\CacheInterface $cache)
     {
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
@@ -124,5 +112,13 @@ class DbCacheTest extends CacheTestCase
         $this->assertTrue($cache->set($KEY, $VALUE, 60));
 
         $this->assertEquals($VALUE, $cache->get($KEY));
+    }
+
+    /**
+     * Factory method to create particular implementation. Called once per test
+     */
+    protected function createCacheInstance(): PsrCacheInterface
+    {
+        return new DbCache(null, $this->getConnection());
     }
 }
