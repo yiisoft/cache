@@ -9,8 +9,6 @@ namespace Yiisoft\Cache;
 
 use Psr\SimpleCache\CacheInterface;
 use yii\base\Component;
-use yii\helpers\Yii;
-use Yiisoft\Cache\Exceptions\InvalidConfigException;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 

@@ -1,14 +1,15 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
+ * @link      http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license   http://www.yiiframework.com/license/
  */
 
 namespace Yiisoft\Cache;
 
-use yii\helpers\FileHelper;
 use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\Exception;
+use Yiisoft\Cache\Exceptions\SetCacheException;
 
 /**
  * FileCache implements a cache handler using files.
@@ -86,14 +87,16 @@ class FileCache extends SimpleCache
 
     /**
      * Sets cache path and ensures it exists.
+     *
      * @param string $cachePath
+     *
+     * @throws Exception
      */
     public function setCachePath(string $cachePath)
     {
         $this->cachePath = $cachePath;
-        if (!is_dir($this->cachePath)) {
-            FileHelper::createDirectory($this->cachePath, $this->dirMode, true);
-        }
+
+        $this->createDirectory($this->cachePath, $this->dirMode);
     }
 
     /**
@@ -129,13 +132,14 @@ class FileCache extends SimpleCache
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     protected function setValue($key, $value, $ttl): bool
     {
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
-            @FileHelper::createDirectory(\dirname($cacheFile), $this->dirMode, true);
+            $this->createDirectory(\dirname($cacheFile), $this->dirMode);
         }
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
@@ -155,8 +159,8 @@ class FileCache extends SimpleCache
         }
 
         $error = error_get_last();
-        Yii::warning("Unable to write cache file '{$cacheFile}': {$error['message']}", __METHOD__);
-        return false;
+
+        throw new SetCacheException($key, $value, $this, "Unable to write cache file '{$cacheFile}': {$error['message']}");
     }
 
     /**
@@ -170,7 +174,9 @@ class FileCache extends SimpleCache
 
     /**
      * Returns the cache file path given the cache key.
+     *
      * @param string $key cache key
+     *
      * @return string the cache file path
      */
     protected function getCacheFile($key)
@@ -200,10 +206,12 @@ class FileCache extends SimpleCache
 
     /**
      * Removes expired cache files.
-     * @param bool $force whether to enforce the garbage collection regardless of [[gcProbability]].
-     * Defaults to false, meaning the actual deletion happens with the probability as specified by [[gcProbability]].
+     *
+     * @param bool $force       whether to enforce the garbage collection regardless of [[gcProbability]].
+     *                          Defaults to false, meaning the actual deletion happens with the probability as
+     *                          specified by [[gcProbability]].
      * @param bool $expiredOnly whether to removed expired cache files only.
-     * If false, all cache files under [[cachePath]] will be removed.
+     *                          If false, all cache files under [[cachePath]] will be removed.
      */
     public function gc($force = false, $expiredOnly = true)
     {
@@ -215,9 +223,12 @@ class FileCache extends SimpleCache
     /**
      * Recursively removing expired cache files under a directory.
      * This method is mainly used by [[gc()]].
-     * @param string $path the directory under which expired cache files are removed.
-     * @param bool $expiredOnly whether to only remove expired cache files. If false, all files
-     * under `$path` will be removed.
+     *
+     * @param string $path        the directory under which expired cache files are removed.
+     * @param bool   $expiredOnly whether to only remove expired cache files. If false, all files
+     *                            under `$path` will be removed.
+     *
+     * @throws Exception
      */
     protected function gcRecursive($path, $expiredOnly)
     {
@@ -231,16 +242,30 @@ class FileCache extends SimpleCache
                     $this->gcRecursive($fullPath, $expiredOnly);
                     if (!$expiredOnly && !@rmdir($fullPath)) {
                         $error = error_get_last();
-                        Yii::warning("Unable to remove directory '{$fullPath}': {$error['message']}", __METHOD__);
+                        throw new Exception("Unable to remove directory '{$fullPath}': {$error['message']}");
                     }
                 } elseif (!$expiredOnly || ($expiredOnly && @filemtime($fullPath) < time())) {
                     if (!@unlink($fullPath)) {
                         $error = error_get_last();
-                        Yii::warning("Unable to remove file '{$fullPath}': {$error['message']}", __METHOD__);
+                        throw new Exception("Unable to remove file '{$fullPath}': {$error['message']}");
                     }
                 }
             }
             closedir($handle);
+        }
+    }
+
+    /**
+     * Directory creation
+     * See for details in
+     * https://github.com/kalessil/phpinspectionsea/blob/master/docs/probable-bugs.md#mkdir-race-condition
+     *
+     * @throws Exception
+     */
+    protected function createDirectory(string $cachePath, int $mode, bool $recursive = true): void
+    {
+        if (!is_dir($cachePath) && !mkdir($cachePath, $mode, $recursive) && !is_dir($cachePath)) {
+            throw new Exception("Can't create cache directory $cachePath");
         }
     }
 }

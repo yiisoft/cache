@@ -3,7 +3,7 @@
 namespace Yiisoft\Cache\Exceptions;
 
 use Throwable;
-use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 
 class SetCacheException extends Exception
 {
@@ -15,14 +15,14 @@ class SetCacheException extends Exception
     protected $value;
 
     /**
-     * @var Cache
+     * @var CacheInterface
      */
     protected $cache;
 
     public function __construct(
         string $key,
         $value,
-        Cache $cache,
+        CacheInterface $cache,
         $message = 'Could not store the value in the cache',
         $code = 0,
         Throwable $previous = null
@@ -51,9 +51,9 @@ class SetCacheException extends Exception
     }
 
     /**
-     * @return Cache
+     * @return CacheInterface
      */
-    public function getCache(): Cache
+    public function getCache(): CacheInterface
     {
         return $this->cache;
     }
