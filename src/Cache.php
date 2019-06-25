@@ -108,7 +108,7 @@ class Cache implements CacheInterface
      *
      * @return string the generated cache key
      */
-    protected function buildKey($key)
+    protected function buildKey($key): string
     {
         if (is_string($key)) {
             return ctype_alnum($key) && StringHelper::byteLength($key) <= 32 ? $key : md5($key);
@@ -141,7 +141,7 @@ class Cache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         $key = $this->buildKey($key);
         return $this->_handler->has($key);
@@ -162,7 +162,7 @@ class Cache implements CacheInterface
      *
      * @throws InvalidArgumentException
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): array
     {
         $keyMap = [];
         foreach ($keys as $key) {
@@ -230,11 +230,11 @@ class Cache implements CacheInterface
      *                                           fetched via [[get()]]. This parameter is ignored if [[serializer]] is
      *                                           false.
      *
-     * @return array array of failed keys
+     * @return bool
      *
      * @throws InvalidArgumentException
      */
-    public function setMultiple($items, $ttl = 0, $dependency = null): bool
+    public function setMultiple($items, $ttl = null, $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);

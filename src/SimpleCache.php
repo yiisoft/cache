@@ -187,8 +187,11 @@ abstract class SimpleCache extends Component implements CacheInterface
 
     /**
      * Normalizes cache TTL handling `null` value and [[\DateInterval]] objects.
+     *
      * @param int|\DateInterval|null $ttl raw TTL.
+     *
      * @return int|float TTL value as UNIX timestamp.
+     * @throws \Exception
      */
     protected function normalizeTtl($ttl)
     {

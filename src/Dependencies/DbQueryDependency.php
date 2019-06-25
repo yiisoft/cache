@@ -98,7 +98,7 @@ class DbQueryDependency extends Dependency
             return $query->one($db);
         }
         if (is_string($this->method)) {
-            return call_user_func([$query, $this->method], $db);
+            $query->{$this->method}($db);
         }
 
         return call_user_func($this->method, $query, $db);

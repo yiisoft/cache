@@ -98,7 +98,7 @@ class FileCache extends SimpleCache
      *
      * @throws Exception
      */
-    public function setCachePath(string $cachePath)
+    public function setCachePath(string $cachePath): void
     {
         $this->cachePath = $cachePath;
 

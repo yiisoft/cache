@@ -7,6 +7,10 @@
 
 namespace Yiisoft\Cache\Dependencies;
 
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
+use Yiisoft\Cache\CacheInterface;
+
 /**
  * TagDependency associates a cached data item with one or multiple [[tags]].
  *
@@ -42,8 +46,11 @@ class TagDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method does nothing in this class.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     *
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     *
      * @return mixed the data needed to determine if dependency has been changed.
+     * @throws InvalidArgumentException
      */
     protected function generateDependencyData($cache)
     {
@@ -64,6 +71,7 @@ class TagDependency extends Dependency
 
     /**
      * {@inheritdoc}
+     * @throws InvalidArgumentException
      */
     public function isChanged($cache): bool
     {
@@ -73,8 +81,11 @@ class TagDependency extends Dependency
 
     /**
      * Invalidates all of the cached data items that are associated with any of the specified [[tags]].
-     * @param \Psr\SimpleCache\CacheInterface $cache the cache component that caches the data items
-     * @param string|array $tags
+     *
+     * @param PsrCacheInterface $cache the cache component that caches the data items
+     * @param string|array      $tags
+     *
+     * @throws InvalidArgumentException
      */
     public static function invalidate($cache, $tags): void
     {
@@ -87,10 +98,12 @@ class TagDependency extends Dependency
 
     /**
      * Generates the timestamp for the specified cache keys.
-     * @param \Psr\SimpleCache\CacheInterface $cache
-     * @param string[] $keys
+     *
+     * @param PsrCacheInterface $cache
+     * @param string[]          $keys
+     *
      * @return array the timestamp indexed by cache keys
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected static function touchKeys($cache, $keys): array
     {
@@ -105,12 +118,14 @@ class TagDependency extends Dependency
 
     /**
      * Returns the timestamps for the specified tags.
-     * @param \Psr\SimpleCache\CacheInterface $cache
+     *
+     * @param PsrCacheInterface $cache
      * @param string[] $tags
-     * @return array the timestamps indexed by the specified tags.
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *
+     * @return array|iterable
+     * @throws InvalidArgumentException
      */
-    protected function getTimestamps($cache, $tags): array
+    protected function getTimestamps($cache, $tags): iterable
     {
         if (empty($tags)) {
             return [];

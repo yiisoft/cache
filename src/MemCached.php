@@ -95,7 +95,7 @@ class MemCached extends SimpleCache
     private $_servers;
 
     /**
-     * @param null $serializer
+     * @param SerializerInterface|null $serializer
      * @param array $servers
      * @throws InvalidConfigException
      * @see setSerializer
@@ -119,7 +119,7 @@ class MemCached extends SimpleCache
      * @param \Memcached $cache
      * @param MemCachedServer[] $servers
      */
-    protected function addServers($cache, $servers)
+    protected function addServers($cache, $servers): void
     {
         $existingServers = [];
         if ($this->persistentId !== null) {
@@ -139,7 +139,7 @@ class MemCached extends SimpleCache
      * @return \Memcached the memcached object used by this cache component.
      * @throws InvalidConfigException if memcached extension is not loaded
      */
-    public function getMemcached()
+    public function getMemcached(): \Memcached
     {
         if ($this->_cache === null) {
             if (!extension_loaded('memcached')) {
@@ -163,7 +163,7 @@ class MemCached extends SimpleCache
      * Returns the memcached server configurations.
      * @return MemCachedServer[] list of memcached server configurations.
      */
-    public function getServers()
+    public function getServers(): array
     {
         return $this->_servers;
     }
@@ -173,7 +173,7 @@ class MemCached extends SimpleCache
      * with the following keys: host, port, persistent, weight, timeout, retryInterval, status.
      * @see http://php.net/manual/en/memcached.addserver.php
      */
-    public function setServers($config)
+    public function setServers($config): void
     {
         foreach ($config as $c) {
             $this->_servers[] = new MemCachedServer($c);
@@ -225,7 +225,7 @@ class MemCached extends SimpleCache
      */
     protected function deleteValue($key): bool
     {
-        return $this->_cache->delete($key, 0);
+        return $this->_cache->delete($key);
     }
 
     /**

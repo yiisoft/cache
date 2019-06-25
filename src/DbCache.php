@@ -248,7 +248,7 @@ class DbCache extends SimpleCache
      *
      * @throws \Exception
      */
-    public function gc($force = false)
+    public function gc($force = false): void
     {
         if ($force || random_int(0, 1000000) < $this->gcProbability) {
             $this->db->createCommand()
