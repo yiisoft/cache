@@ -113,6 +113,10 @@
     },
     "suggest": {
         "ext-pdo": "Needed to use DB cache",
+        "ext-apcu": "Needed to use APCu cache",
+        "ext-wincache": "Needed to use wincache",
+        "ext-memcached": "Needed to use memcached",
+        "ext-igbinary": "Needed to use igbinary serialization",
         "ext-posix": "Will improve file cache validation"
     }
 }
