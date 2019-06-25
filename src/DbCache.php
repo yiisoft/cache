@@ -8,7 +8,6 @@
 namespace Yiisoft\Cache;
 
 use Yiisoft\Db\ConnectionInterface;
-use yii\helpers\Yii;
 use Yiisoft\Db\Connection;
 use Yiisoft\Db\PdoValue;
 use Yiisoft\Db\Query;
@@ -89,6 +88,7 @@ class DbCache extends SimpleCache
 
     /**
      * {@inheritdoc}
+     * @throws \Yiisoft\Db\Exception
      */
     public function has($key): bool
     {
@@ -112,6 +112,7 @@ class DbCache extends SimpleCache
 
     /**
      * {@inheritdoc}
+     * @throws \Yiisoft\Db\Exception
      */
     protected function getValue($key)
     {
@@ -134,6 +135,7 @@ class DbCache extends SimpleCache
 
     /**
      * {@inheritdoc}
+     * @throws \Yiisoft\Db\Exception
      */
     protected function getValues($keys): array
     {
@@ -167,62 +169,64 @@ class DbCache extends SimpleCache
     }
 
     /**
-     * {@inheritdoc}
+     * Stores a value identified by a key in cache.
+     * This method should be implemented by child classes to store the data
+     * in specific cache storage.
+     *
+     * @param string $key   the key identifying the value to be cached
+     * @param mixed  $value the value to be cached. Most often it's a string. If you have disabled [[serializer]],
+     *                      it could be something else.
+     * @param int    $ttl   the number of seconds in which the cached value will expire.
+     *
+     * @return bool true if the value is successfully stored into cache, false otherwise
+     * @throws \Throwable
      */
     protected function setValue($key, $value, $ttl): bool
     {
-        try {
-            $this->db->noCache(function (Connection $db) use ($key, $value, $ttl) {
-                $db->createCommand()->upsert($this->cacheTable, [
-                    'id' => $key,
-                    'expire' => $ttl > 0 ? $ttl + time() : 0,
-                    'data' => new PdoValue($value, \PDO::PARAM_LOB),
-                ])->execute();
-            });
+        $this->db->noCache(function (Connection $db) use ($key, $value, $ttl) {
+            $db->createCommand()->upsert($this->cacheTable, [
+                'id' => $key,
+                'expire' => $ttl > 0 ? $ttl + time() : 0,
+                'data' => new PdoValue($value, \PDO::PARAM_LOB),
+            ])->execute();
+        });
 
-            $this->gc();
+        $this->gc();
 
-            return true;
-        } catch (\Exception $e) {
-            Yii::warning("Unable to update or insert cache data: {$e->getMessage()}", __METHOD__);
-
-            return false;
-        }
+        return true;
     }
 
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * This is the implementation of the method declared in the parent class.
      *
-     * @param string $key the key identifying the value to be cached
-     * @param string $value the value to be cached. Other types (if you have disabled [[serializer]]) cannot be saved.
-     * @param int $duration the number of seconds in which the cached value will expire. 0 means never expire.
+     * @param string $key      the key identifying the value to be cached
+     * @param string $value    the value to be cached. Other types (if you have disabled [[serializer]]) cannot be
+     *                         saved.
+     * @param int    $duration the number of seconds in which the cached value will expire. 0 means never expire.
+     *
      * @return bool true if the value is successfully stored into cache, false otherwise
+     * @throws \Throwable
      */
     protected function addValue($key, $value, $duration): bool
     {
         $this->gc();
 
-        try {
-            $this->db->noCache(function (Connection $db) use ($key, $value, $duration) {
-                $db->createCommand()
-                    ->insert($this->cacheTable, [
-                        'id' => $key,
-                        'expire' => $duration > 0 ? $duration + time() : 0,
-                        'data' => new PdoValue($value, \PDO::PARAM_LOB),
-                    ])->execute();
-            });
+        $this->db->noCache(function (Connection $db) use ($key, $value, $duration) {
+            $db->createCommand()
+                ->insert($this->cacheTable, [
+                    'id' => $key,
+                    'expire' => $duration > 0 ? $duration + time() : 0,
+                    'data' => new PdoValue($value, \PDO::PARAM_LOB),
+                ])->execute();
+        });
 
-            return true;
-        } catch (\Exception $e) {
-            Yii::warning("Unable to insert cache data: {$e->getMessage()}", __METHOD__);
-
-            return false;
-        }
+        return true;
     }
 
     /**
      * {@inheritdoc}
+     * @throws \Throwable
      */
     protected function deleteValue($key): bool
     {
@@ -237,12 +241,16 @@ class DbCache extends SimpleCache
 
     /**
      * Removes the expired data values.
+     *
      * @param bool $force whether to enforce the garbage collection regardless of [[gcProbability]].
-     * Defaults to false, meaning the actual deletion happens with the probability as specified by [[gcProbability]].
+     *                    Defaults to false, meaning the actual deletion happens with the probability as specified by
+     *                    [[gcProbability]].
+     *
+     * @throws \Exception
      */
     public function gc($force = false)
     {
-        if ($force || mt_rand(0, 1000000) < $this->gcProbability) {
+        if ($force || random_int(0, 1000000) < $this->gcProbability) {
             $this->db->createCommand()
                 ->delete($this->cacheTable, '[[expire]] > 0 AND [[expire]] < ' . time())
                 ->execute();
@@ -251,6 +259,7 @@ class DbCache extends SimpleCache
 
     /**
      * {@inheritdoc}
+     * @throws \Yiisoft\Db\Exception
      */
     public function clear(): bool
     {
