@@ -2,8 +2,8 @@
 
 namespace Yiisoft\Cache\Exceptions;
 
+use Psr\SimpleCache\CacheInterface;
 use Throwable;
-use Yiisoft\Cache\CacheInterface;
 
 class SetCacheException extends Exception
 {

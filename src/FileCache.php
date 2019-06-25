@@ -7,9 +7,9 @@
 
 namespace Yiisoft\Cache;
 
-use yii\helpers\Yii;
 use Yiisoft\Cache\Exceptions\Exception;
 use Yiisoft\Cache\Exceptions\SetCacheException;
+use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
  * FileCache implements a cache handler using files.
@@ -79,7 +79,13 @@ class FileCache extends SimpleCache
     public $dirMode = 0775;
 
 
-    public function __construct(string $cachePath = '@runtime/cache', $serializer = null)
+    /**
+     * @param string $cachePath
+     * @param SerializerInterface   $serializer
+     *
+     * @throws Exception
+     */
+    public function __construct(string $cachePath = '@runtime/cache', SerializerInterface $serializer = null)
     {
         $this->setCachePath($cachePath);
         parent::__construct($serializer);
@@ -132,7 +138,7 @@ class FileCache extends SimpleCache
 
     /**
      * {@inheritdoc}
-     * @throws Exception
+     * @throws \Exception
      */
     protected function setValue($key, $value, $ttl): bool
     {
@@ -144,7 +150,7 @@ class FileCache extends SimpleCache
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
         // https://github.com/yiisoft/yii2/pull/16120
-        if (is_file($cacheFile) && \function_exists('posix_geteuid') && fileowner($cacheFile) !== posix_geteuid()) {
+        if (\function_exists('posix_geteuid') && is_file($cacheFile) && fileowner($cacheFile) !== posix_geteuid()) {
             @unlink($cacheFile);
         }
         if (@file_put_contents($cacheFile, $value, LOCK_EX) !== false) {
@@ -179,7 +185,7 @@ class FileCache extends SimpleCache
      *
      * @return string the cache file path
      */
-    protected function getCacheFile($key)
+    protected function getCacheFile($key): string
     {
         if ($this->directoryLevel > 0) {
             $base = $this->cachePath;
@@ -197,6 +203,7 @@ class FileCache extends SimpleCache
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function clear(): bool
     {
@@ -212,8 +219,10 @@ class FileCache extends SimpleCache
      *                          specified by [[gcProbability]].
      * @param bool $expiredOnly whether to removed expired cache files only.
      *                          If false, all cache files under [[cachePath]] will be removed.
+     *
+     * @throws \Exception
      */
-    public function gc($force = false, $expiredOnly = true)
+    public function gc($force = false, $expiredOnly = true): void
     {
         if ($force || random_int(0, 1000000) < $this->gcProbability) {
             $this->gcRecursive($this->cachePath, $expiredOnly);
@@ -230,11 +239,11 @@ class FileCache extends SimpleCache
      *
      * @throws Exception
      */
-    protected function gcRecursive($path, $expiredOnly)
+    protected function gcRecursive($path, $expiredOnly): void
     {
         if (($handle = opendir($path)) !== false) {
             while (($file = readdir($handle)) !== false) {
-                if ($file[0] === '.') {
+                if (strpos($file, '.') === 0) {
                     continue;
                 }
                 $fullPath = $path . DIRECTORY_SEPARATOR . $file;
@@ -259,6 +268,10 @@ class FileCache extends SimpleCache
      * Directory creation
      * See for details in
      * https://github.com/kalessil/phpinspectionsea/blob/master/docs/probable-bugs.md#mkdir-race-condition
+     *
+     * @param string $cachePath
+     * @param int    $mode
+     * @param bool   $recursive
      *
      * @throws Exception
      */

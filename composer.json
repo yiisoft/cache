@@ -110,5 +110,9 @@
             "params": "config/params.php",
             "common": "config/common.php"
         }
+    },
+    "suggest": {
+        "ext-pdo": "Needed to use DB cache",
+        "ext-posix": "Will improve file cache validation"
     }
 }
