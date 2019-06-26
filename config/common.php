@@ -1,11 +1,14 @@
 <?php
 
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Factory\Definitions\Reference;
 
 return [
-    \Psr\SimpleCache\CacheInterface::class => Reference::to('cache'),
-    \Yiisoft\Cache\CacheInterface::class => Reference::to('cache'),
+    PsrCacheInterface::class => Reference::to('cache'),
+    CacheInterface::class => Reference::to('cache'),
     'cache' => [
-        '__class' => \Yiisoft\Cache\Cache::class,
+        '__class' => Cache::class,
     ],
 ];
