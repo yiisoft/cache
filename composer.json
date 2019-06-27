@@ -73,17 +73,12 @@
         "ext-ctype": "*",
         "ext-json": "*",
         "yiisoft/strings": "^3.0@dev",
-        "yiisoft/yii-core": "^3.0@dev",
         "yiisoft/di": "^3.0@dev",
         "psr/simple-cache": "~1.0.0"
     },
     "require-dev": {
         "yiisoft/yii-web": "^3.0@dev",
         "yiisoft/view": "^3.0@dev",
-        "yiisoft/db": "^3.0@dev",
-        "yiisoft/db-mysql": "^3.0@dev",
-        "yiisoft/db-pgsql": "^3.0@dev",
-        "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev",
         "nyholm/psr7": "^1.0",

@@ -43,7 +43,7 @@ class MemCachedTest extends CacheTestCase
     }
 
     /**
-     * @dataProvider ordinalCacheProvider
+     * @dataProvider cacheIntegrationProvider
      */
     public function testExpireAdd(CacheInterface $cache)
     {

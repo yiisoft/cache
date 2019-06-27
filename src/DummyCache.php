@@ -7,8 +7,6 @@
 
 namespace Yiisoft\Cache;
 
-use yii\base\Component;
-
 /**
  * DummyCache is a placeholder cache component.
  *
@@ -36,7 +34,7 @@ use yii\base\Component;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class DummyCache extends Component implements \Psr\SimpleCache\CacheInterface
+class DummyCache implements \Psr\SimpleCache\CacheInterface
 {
     /**
      * {@inheritdoc}

@@ -45,10 +45,10 @@ trait IntegrationTestTrait
     /**
      * @dataProvider cacheIntegrationProvider
      */
-    public function testDefaultTtl(CacheInterface $cache)
+    public function testDefaultTtl(Cache $cache)
     {
         /** @var Cache $cache */
-        $this->assertSame(0, $cache->handler->getDefaultTtl());
+        $this->assertSame(0, $cache->getHandler()->getDefaultTtl());
     }
 
     /**
@@ -71,8 +71,9 @@ trait IntegrationTestTrait
     public function testAdd(CacheInterface $cache)
     {
         // should not change existing keys
-        $this->assertFalse($cache->add('number_test', 13));
         $this->assertEquals(42, $cache->get('number_test'));
+        $this->assertFalse($cache->add('number_test', 13));
+
 
         // should store data if it's not there yet
         $this->assertNull($cache->get('add_test'));
