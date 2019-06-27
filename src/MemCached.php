@@ -68,22 +68,22 @@ class MemCached extends SimpleCache
      * same ID will share the same connection.
      * @see http://ca2.php.net/manual/en/memcached.construct.php
      */
-    public $persistentId;
+    private $persistentId;
     /**
      * @var array options for Memcached.
      * @see http://ca2.php.net/manual/en/memcached.setoptions.php
      */
-    public $options;
+    private $options;
     /**
      * @var string memcached sasl username.
      * @see http://php.net/manual/en/memcached.setsaslauthdata.php
      */
-    public $username;
+    private $username;
     /**
      * @var string memcached sasl password.
      * @see http://php.net/manual/en/memcached.setsaslauthdata.php
      */
-    public $password;
+    private $password;
 
     /**
      * @var \Memcached the Memcached instance
@@ -178,6 +178,38 @@ class MemCached extends SimpleCache
         foreach ($config as $c) {
             $this->_servers[] = new MemCachedServer($c);
         }
+    }
+
+    /**
+     * @param string $persistentId
+     */
+    public function setPersistentId(string $persistentId): void
+    {
+        $this->persistentId = $persistentId;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions(array $options): void
+    {
+        $this->options = $options;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword(string $password): void
+    {
+        $this->password = $password;
     }
 
     /**

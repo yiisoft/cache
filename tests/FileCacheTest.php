@@ -18,20 +18,6 @@ use Yiisoft\Cache\FileCache;
  */
 class FileCacheTest extends CacheTestCase
 {
-    private $_cacheInstance = null;
-
-    /**
-     * @return Cache
-     */
-    protected function getCacheInstance()
-    {
-        if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new FileCache(__DIR__ . '/runtime/cache');
-        }
-
-        return $this->_cacheInstance;
-    }
-
     protected function createCacheInstance(): PsrCacheInterface
     {
         return new FileCache(__DIR__ . '/runtime/cache');
