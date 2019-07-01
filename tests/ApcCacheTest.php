@@ -21,7 +21,7 @@ class ApcCacheTest extends CacheTestCase
 {
     private $_cacheInstance = null;
 
-    protected static $required_extensions = ['apcu'];
+    protected static $requiredExtensions = ['apcu'];
 
     public static function setUpBeforeClass()
     {

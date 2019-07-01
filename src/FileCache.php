@@ -191,20 +191,22 @@ class FileCache extends SimpleCache
             if ($fd = fopen($cacheFile, 'cb'))
             {
                 if (!flock($fd, LOCK_EX)) {
-                    throw new \RuntimeException("Failed to flock '$cacheFile'");
+                    throw new Exception("Failed to flock '$cacheFile'");
                 } else if(!ftruncate($fd, 0)) {
-                    throw new \RuntimeException("Failed to truncate '$cacheFile");
+                    throw new Exception("Failed to truncate '$cacheFile");
                 } else if(file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
-                    throw new \RuntimeException("Failed to write data to '$cacheFile' totally");
+                    throw new Exception("Failed to write data to '$cacheFile' totally");
                 }
                 if ($ttl <= 0) {
                     $ttl = self::NEGATIVE_TTL_REPLACEMENT;
                 }
                 $mtimeInstallationResult = touch($cacheFile, time() + $ttl);
-                // @todo decide, whether to drop file if touched has failed
+                if (!$mtimeInstallationResult) {
+                    throw new Exception("Failed to install mtime to file '$cacheFile'");
+                }
                 flock($fd, LOCK_UN);
                 fclose($fd);
-                return $mtimeInstallationResult;
+                return true;
             }
         } catch (Exception $error) {
             unlink($cacheFile);

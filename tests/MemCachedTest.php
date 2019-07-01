@@ -19,7 +19,7 @@ use Yiisoft\Cache\MemCached;
  */
 class MemCachedTest extends CacheTestCase
 {
-    protected static $required_extensions = ['memcached'];
+    protected static $requiredExtensions = ['memcached'];
 
     public static function setUpBeforeClass()
     {
