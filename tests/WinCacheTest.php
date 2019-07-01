@@ -18,7 +18,7 @@ use Yiisoft\Cache\WinCache;
  */
 class WinCacheTest extends CacheTestCase
 {
-    protected static $required_extensions = ['wincache'];
+    protected static $requiredExtensions = ['wincache'];
 
     public static function setUpBeforeClass()
     {

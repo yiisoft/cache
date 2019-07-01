@@ -66,7 +66,7 @@ class Cache implements CacheInterface
     /**
      * @var \Psr\SimpleCache\CacheInterface actual cache handler.
      */
-    private $_handler;
+    private $handler;
 
 
     /**
@@ -79,7 +79,7 @@ class Cache implements CacheInterface
 
     public function getHandler(): \Psr\SimpleCache\CacheInterface
     {
-        return $this->_handler;
+        return $this->handler;
     }
 
     /**
@@ -88,7 +88,7 @@ class Cache implements CacheInterface
     public function setHandler(\Psr\SimpleCache\CacheInterface $handler = null): self
     {
         if ($handler) {
-            $this->_handler = $handler;
+            $this->handler = $handler;
         }
 
         return $this;
@@ -118,7 +118,7 @@ class Cache implements CacheInterface
     public function get($key, $default = null)
     {
         $key = $this->buildKey($key);
-        $value = $this->_handler->get($key);
+        $value = $this->handler->get($key);
 
         if ($value === null) {
             return $default;
@@ -140,7 +140,7 @@ class Cache implements CacheInterface
     public function has($key)
     {
         $key = $this->buildKey($key);
-        return $this->_handler->has($key);
+        return $this->handler->has($key);
     }
 
     /**
@@ -160,7 +160,7 @@ class Cache implements CacheInterface
         foreach ($keys as $key) {
             $keyMap[$key] = $this->buildKey($key);
         }
-        $values = $this->_handler->getMultiple(array_values($keyMap));
+        $values = $this->handler->getMultiple(array_values($keyMap));
         $results = [];
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
@@ -201,7 +201,7 @@ class Cache implements CacheInterface
             $value = [$value, $dependency];
         }
         $key = $this->buildKey($key);
-        return $this->_handler->set($key, $value, $ttl);
+        return $this->handler->set($key, $value, $ttl);
     }
 
     /**
@@ -231,7 +231,7 @@ class Cache implements CacheInterface
             $data[$key] = $value;
         }
 
-        return $this->_handler->setMultiple($data, $ttl);
+        return $this->handler->setMultiple($data, $ttl);
     }
 
     /**
@@ -243,7 +243,7 @@ class Cache implements CacheInterface
         foreach ($keys as $key) {
             $actualKeys[] = $this->buildKey($key);
         }
-        return $this->_handler->deleteMultiple($actualKeys);
+        return $this->handler->deleteMultiple($actualKeys);
     }
 
     /**
@@ -273,13 +273,13 @@ class Cache implements CacheInterface
             $data[$key] = $value;
         }
 
-        $existingValues = $this->_handler->getMultiple(array_keys($data));
+        $existingValues = $this->handler->getMultiple(array_keys($data));
         foreach ($existingValues as $key => $value) {
             if ($value !== null) {
                 unset($data[$key]);
             }
         }
-        return $this->_handler->setMultiple($data, $ttl);
+        return $this->handler->setMultiple($data, $ttl);
     }
 
     /**
@@ -303,11 +303,11 @@ class Cache implements CacheInterface
 
         $key = $this->buildKey($key);
 
-        if ($this->_handler->has($key)) {
+        if ($this->handler->has($key)) {
             return false;
         }
 
-        return $this->_handler->set($key, $value, $ttl);
+        return $this->handler->set($key, $value, $ttl);
     }
 
     /**
@@ -320,7 +320,7 @@ class Cache implements CacheInterface
     {
         $key = $this->buildKey($key);
 
-        return $this->_handler->delete($key);
+        return $this->handler->delete($key);
     }
 
     /**
@@ -330,7 +330,7 @@ class Cache implements CacheInterface
      */
     public function clear(): bool
     {
-        return $this->_handler->clear();
+        return $this->handler->clear();
     }
 
     /**

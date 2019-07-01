@@ -53,7 +53,7 @@ abstract class CacheTestCase extends TestCase
      * If one of extensions is missing - skip test
      * @var string[]
      */
-    protected static $required_extensions = [];
+    protected static $requiredExtensions = [];
 
     /**
      * An instance that is reused during the whole test
@@ -74,7 +74,7 @@ abstract class CacheTestCase extends TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        foreach (static::$required_extensions as $extension) {
+        foreach (static::$requiredExtensions as $extension) {
             if (!extension_loaded($extension)) {
                 self::markTestSkipped("Required extension '{$extension}' is not loaded");
             }
