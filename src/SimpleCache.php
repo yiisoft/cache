@@ -8,7 +8,6 @@
 namespace Yiisoft\Cache;
 
 use Psr\SimpleCache\CacheInterface;
-use yii\base\Component;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
@@ -28,7 +27,7 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * @see CacheInterface
  */
-abstract class SimpleCache extends Component implements CacheInterface
+abstract class SimpleCache implements CacheInterface
 {
     /**
      * @var int default TTL for a cache entry. Default value is 0, meaning infinity.
