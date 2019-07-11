@@ -61,7 +61,7 @@ class FileCacheTest extends CacheTest
         $refClass = new \ReflectionClass($cache->getHandler());
         $refMethodGetCacheFile = $refClass->getMethod('getCacheFile');
         $refMethodGetCacheFile->setAccessible(true);
-        $cacheFile = $refMethodGetCacheFile->invoke($cache->handler, $cacheInternalKey);
+        $cacheFile = $refMethodGetCacheFile->invoke($cache->getHandler(), $cacheInternalKey);
         $refMethodGetCacheFile->setAccessible(false);
 
         $output = array();
