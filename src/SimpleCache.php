@@ -71,7 +71,7 @@ abstract class SimpleCache implements CacheInterface
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      *
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }
@@ -276,7 +276,10 @@ abstract class SimpleCache implements CacheInterface
      */
     public function setDefaultTtl(int $defaultTtl): void
     {
-        // @todo validate (possibly everything below 0 is forbidden)
+        if ($defaultTtl < 0) {
+            throw new \InvalidArgumentException('TTL can not be negative.');
+        }
+
         $this->defaultTtl = $defaultTtl;
     }
 
@@ -285,17 +288,6 @@ abstract class SimpleCache implements CacheInterface
      */
     public function setKeyPrefix(string $keyPrefix): void
     {
-        if (!empty($keyPrefix) && !ctype_alnum($keyPrefix)) {
-            throw new \InvalidArgumentException("Given key prefix is not alpha-numeric");
-        }
         $this->keyPrefix = $keyPrefix;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDefaultTtl(): int
-    {
-        return $this->defaultTtl;
     }
 }

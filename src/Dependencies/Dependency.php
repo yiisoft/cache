@@ -9,7 +9,7 @@ namespace Yiisoft\Cache\Dependencies;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-abstract class Dependency extends \yii\base\BaseObject
+abstract class Dependency
 {
     /**
      * @var mixed the dependency data that is saved in cache and later is compared with the
