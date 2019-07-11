@@ -19,7 +19,7 @@ class ArrayCacheTest extends CacheTest
 
     public function testExpire(): void
     {
-        $cache = $cache = $this->createCacheInstance();
+        $cache = $this->createCacheInstance();
 
         static::$microtime = \microtime(true);
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));

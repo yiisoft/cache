@@ -30,9 +30,9 @@ namespace Yiisoft\Cache;
  */
 final class ApcCache extends SimpleCache
 {
-    public function hasValue($key): bool
+    public function hasValue(string $key): bool
     {
-        return \apcu_exists($key);
+        return (bool)\apcu_exists($key);
     }
 
     protected function getValue(string $key, $default = null)
@@ -49,7 +49,7 @@ final class ApcCache extends SimpleCache
 
     protected function setValue(string $key, $value, int $ttl): bool
     {
-        return \apcu_store($key, $value, $ttl);
+        return (bool)\apcu_store($key, $value, $ttl);
     }
 
     protected function setValues(array $values, int $ttl): bool
@@ -59,7 +59,7 @@ final class ApcCache extends SimpleCache
 
     protected function deleteValue(string $key): bool
     {
-        return \apcu_delete($key);
+        return (bool)\apcu_delete($key);
     }
 
     public function clear(): bool

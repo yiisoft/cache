@@ -264,16 +264,16 @@ abstract class CacheTest extends TestCase
         $dependency = new TagDependency('test');
 
         $expected = 'SilverFire';
-        $loginClosure = static function (CacheInterface $cache) use (&$login): string {
+        $loginClosure = static function (): string {
             return 'SilverFire';
         };
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
 
         // Call again with another login to make sure that value is cached
-        $loginClosure = static function (CacheInterface $cache) use (&$login): string {
+        $loginClosure = static function (): string {
             return 'SamDark';
         };
-        $got = $cache->getOrSet('some-login', $loginClosure, null, $dependency);
+        $cache->getOrSet('some-login', $loginClosure, null, $dependency);
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
 
         TagDependency::invalidate($cache, 'test');

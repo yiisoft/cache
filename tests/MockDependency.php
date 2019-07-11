@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\Dependency;
 
 /**
@@ -8,7 +9,7 @@ use Yiisoft\Cache\Dependencies\Dependency;
  */
 class MockDependency extends Dependency
 {
-    protected function generateDependencyData($cache)
+    protected function generateDependencyData(CacheInterface $cache)
     {
         return $this->data;
     }

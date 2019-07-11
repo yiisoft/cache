@@ -1,8 +1,8 @@
 <?php
 namespace Yiisoft\Cache;
 
-use Psr\SimpleCache\InvalidArgumentException;
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Yiisoft\Cache\Exceptions\InvalidArgumentException;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
@@ -19,10 +19,8 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
- *
- * @see CacheInterface
  */
-abstract class SimpleCache implements CacheInterface
+abstract class SimpleCache implements PsrCacheInterface
 {
     /**
      * @var int default TTL for a cache entry. Default value is 0, meaning infinity.
@@ -111,7 +109,7 @@ abstract class SimpleCache implements CacheInterface
         return $this->hasValue($key);
     }
 
-    abstract protected function hasValue($key): bool;
+    abstract protected function hasValue(string $key): bool;
 
     public function set($key, $value, $ttl = null): bool
     {

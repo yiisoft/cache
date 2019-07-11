@@ -52,7 +52,7 @@ final class NullCache implements CacheInterface
         return $default;
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         return array_fill_keys($keys, $default);
     }
@@ -77,12 +77,12 @@ final class NullCache implements CacheInterface
         // do nothing
     }
 
-    public function clear()
+    public function clear(): bool
     {
         return true;
     }
 
-    public function has($key)
+    public function has($key): bool
     {
         return false;
     }

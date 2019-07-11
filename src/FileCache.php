@@ -96,7 +96,7 @@ final class FileCache extends SimpleCache
     }
 
 
-    public function hasValue($key): bool
+    public function hasValue(string $key): bool
     {
         $cacheFile = $this->getCacheFile($key);
 
