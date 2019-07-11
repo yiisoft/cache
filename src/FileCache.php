@@ -90,12 +90,10 @@ class FileCache extends SimpleCache
         $this->createDirectory($this->cachePath, $this->dirMode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function has($key): bool
+
+    public function hasValue($key): bool
     {
-        $cacheFile = $this->getCacheFile($this->normalizeKey($key));
+        $cacheFile = $this->getCacheFile($key);
 
         return @filemtime($cacheFile) > time();
     }
@@ -132,9 +130,7 @@ class FileCache extends SimpleCache
         $this->dirMode = $dirMode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function getValue($key)
     {
         $cacheFile = $this->getCacheFile($key);
@@ -153,9 +149,7 @@ class FileCache extends SimpleCache
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function setValue($key, $value, $ttl): bool
     {
         $this->gc();
@@ -203,9 +197,7 @@ class FileCache extends SimpleCache
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function deleteValue($key): bool
     {
         $cacheFile = $this->getCacheFile($key);
@@ -233,9 +225,7 @@ class FileCache extends SimpleCache
         return $this->cachePath . DIRECTORY_SEPARATOR . $key . $this->cacheFileSuffix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function clear(): bool
     {
         $this->gc(true, false);

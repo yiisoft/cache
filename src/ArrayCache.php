@@ -35,54 +35,37 @@ class ArrayCache extends SimpleCache
     /**
      * @var array cached values.
      */
-    private $_cache = [];
+    private $cache = [];
 
-
-    /**
-     * {@inheritdoc}
-     */
-    public function has($key): bool
+    public function hasValue($key): bool
     {
-        $key = $this->normalizeKey($key);
-        return isset($this->_cache[$key]) && ($this->_cache[$key][1] === 0 || $this->_cache[$key][1] > microtime(true));
+        return isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > microtime(true));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValue($key)
     {
-        if (isset($this->_cache[$key]) && ($this->_cache[$key][1] === 0 || $this->_cache[$key][1] > microtime(true))) {
-            return $this->_cache[$key][0];
+        if (isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > microtime(true))) {
+            return $this->cache[$key][0];
         }
 
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setValue($key, $value, $ttl): bool
     {
-        $this->_cache[$key] = [$value, $ttl === 0 ? 0 : microtime(true) + $ttl];
+        $this->cache[$key] = [$value, $ttl === 0 ? 0 : microtime(true) + $ttl];
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function deleteValue($key): bool
     {
-        unset($this->_cache[$key]);
+        unset($this->cache[$key]);
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): bool
     {
-        $this->_cache = [];
+        $this->cache = [];
         return true;
     }
 }

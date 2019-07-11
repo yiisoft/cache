@@ -56,9 +56,7 @@ class TagDependency extends Dependency
         return $timestamps;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function isChanged($cache): bool
     {
         $timestamps = $this->getTimestamps($cache, (array) $this->tags);
