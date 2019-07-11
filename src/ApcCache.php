@@ -53,8 +53,7 @@ class ApcCache extends SimpleCache
 
     protected function setValues($values, $ttl): bool
     {
-        $result = \apcu_store($values, null, $ttl);
-        return \is_array($result);
+        return \apcu_store($values, null, $ttl) === [];
     }
 
     protected function deleteValue($key): bool
