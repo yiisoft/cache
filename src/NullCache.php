@@ -62,7 +62,7 @@ final class NullCache implements CacheInterface
         return true;
     }
 
-    public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool
+    public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
     {
         return true;
     }

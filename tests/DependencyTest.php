@@ -1,10 +1,8 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
-use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Cache\NullCache;
-use Yiisoft\Cache\SimpleCache;
 
 /**
  * Dependency (abstract) tests.

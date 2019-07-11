@@ -30,6 +30,8 @@ namespace Yiisoft\Cache;
  */
 final class ApcCache extends SimpleCache
 {
+    private const TTL_INFINITY = 0;
+
     public function hasValue(string $key): bool
     {
         return (bool)\apcu_exists($key);
@@ -47,14 +49,14 @@ final class ApcCache extends SimpleCache
         return \apcu_fetch($keys, $succses) ?: [];
     }
 
-    protected function setValue(string $key, $value, int $ttl): bool
+    protected function setValue(string $key, $value, ?int $ttl): bool
     {
-        return (bool)\apcu_store($key, $value, $ttl);
+        return (bool)\apcu_store($key, $value, $ttl ?? self::TTL_INFINITY);
     }
 
-    protected function setValues(array $values, int $ttl): bool
+    protected function setValues(array $values, ?int $ttl): bool
     {
-        return \apcu_store($values, null, $ttl) === [];
+        return \apcu_store($values, null, $ttl ?? self::TTL_INFINITY) === [];
     }
 
     protected function deleteValue(string $key): bool

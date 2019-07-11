@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 use Yiisoft\Cache\Exceptions\InvalidConfigException;
 
@@ -50,6 +51,8 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  */
 final class MemCached extends SimpleCache
 {
+    private const TTL_INFINITY = 0;
+
     /**
      * @var string an ID that identifies a Memcached instance.
      * By default the Memcached instances are destroyed at the end of the request. To create an instance that
@@ -225,22 +228,24 @@ final class MemCached extends SimpleCache
         return array_fill_keys($keys, $default);
     }
 
-    protected function setValue(string $key, $value, int $ttl): bool
+    protected function setValue(string $key, $value, ?int $ttl): bool
     {
-        // Use UNIX timestamp since it doesn't have any limitation
-        // @see http://php.net/manual/en/memcached.expiration.php
-        $expire = $ttl > 0 ? $ttl + time() : 0;
-
-        return $this->cache->set($key, $value, $expire);
+        if ($ttl === null) {
+            $ttl = self::TTL_INFINITY;
+        } else {
+            $ttl += time();
+        }
+        return $this->cache->set($key, $value, $ttl);
     }
 
-    protected function setValues(array $values, int $ttl): bool
+    protected function setValues(array $values, ?int $ttl): bool
     {
-        // Use UNIX timestamp since it doesn't have any limitation
-        // @see http://php.net/manual/en/memcached.expiration.php
-        $expire = $ttl > 0 ? $ttl + time() : 0;
-
-        return $this->cache->setMulti($values, $expire);
+        if ($ttl === null) {
+            $ttl = self::TTL_INFINITY;
+        } else {
+            $ttl += time();
+        }
+        return $this->cache->setMulti($values, $ttl);
     }
 
     protected function deleteValue(string $key): bool

@@ -30,6 +30,8 @@ namespace Yiisoft\Cache;
  */
 final class WinCache extends SimpleCache
 {
+    private const TTL_INFINITY = 0;
+
     public function hasValue(string $key): bool
     {
         return \wincache_ucache_exists($key);
@@ -47,14 +49,14 @@ final class WinCache extends SimpleCache
         return array_merge($defaultValues, \wincache_ucache_get($keys));
     }
 
-    protected function setValue(string $key, $value, int $ttl): bool
+    protected function setValue(string $key, $value, ?int $ttl): bool
     {
-        return \wincache_ucache_set($key, $value, $ttl);
+        return \wincache_ucache_set($key, $value, $ttl ?? self::TTL_INFINITY);
     }
 
-    protected function setValues(array $values, int $ttl): bool
+    protected function setValues(array $values, ?int $ttl): bool
     {
-        return \wincache_ucache_set($values, null, $ttl) === [];
+        return \wincache_ucache_set($values, null, $ttl ?? self::TTL_INFINITY) === [];
     }
 
     protected function deleteValue(string $key): bool

@@ -32,6 +32,8 @@ namespace Yiisoft\Cache;
  */
 final class ArrayCache extends SimpleCache
 {
+    private const TTL_INFINITY = 0;
+
     /**
      * @var array cached values.
      */
@@ -51,9 +53,9 @@ final class ArrayCache extends SimpleCache
         return $default;
     }
 
-    protected function setValue(string $key, $value, int $ttl): bool
+    protected function setValue(string $key, $value, ?int $ttl): bool
     {
-        $this->cache[$key] = [$value, $ttl === 0 ? 0 : microtime(true) + $ttl];
+        $this->cache[$key] = [$value, $ttl === null ? self::TTL_INFINITY : microtime(true) + $ttl];
         return true;
     }
 

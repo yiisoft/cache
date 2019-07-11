@@ -93,7 +93,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return bool
      */
-    public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool;
+    public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool;
 
     /**
      * Method combines both [[set()]] and [[get()]] methods to retrieve value identified by a $key,

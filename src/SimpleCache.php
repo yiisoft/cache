@@ -7,7 +7,7 @@ use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
- * SimpleCache is the base class for cache classes implementing pure PSR-16 [[CacheInterface]].
+ * SimpleCache is the base class for cache classes implementing pure PSR-16 {@see \Psr\SimpleCache\CacheInterface}.
  * This class handles cache key normalization, default TTL specification normalization, data serialization.
  *
  * Derived classes should implement the following methods which do the actual cache storage operations:
@@ -23,18 +23,18 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
 abstract class SimpleCache implements PsrCacheInterface
 {
     /**
-     * @var int default TTL for a cache entry. Default value is 0, meaning infinity.
+     * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
      * This value is used by [[set()]] and [[setMultiple()]], if the duration is not explicitly given.
      */
-    private $defaultTtl = 0;
+    private $defaultTtl;
+
     /**
      * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
      * It is recommended that you set a unique cache key prefix for each application if the same cache
      * storage is being used by different applications.
-     *
-     * To ensure interoperability, only alphanumeric characters should be used.
      */
     private $keyPrefix = '';
+
     /**
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      *
@@ -45,7 +45,6 @@ abstract class SimpleCache implements PsrCacheInterface
      * implementations of the cache can not correctly save and retrieve data different from a string type.
      */
     private $serializer;
-
 
     /**
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
@@ -113,6 +112,10 @@ abstract class SimpleCache implements PsrCacheInterface
 
     public function set($key, $value, $ttl = null): bool
     {
+        if ($ttl !== null && $ttl <= 0) {
+            return $this->delete($key);
+        }
+
         $value = $this->serializer->serialize($value);
         $key = $this->normalizeKey($key);
         $ttl = $this->normalizeTtl($ttl);
@@ -123,6 +126,10 @@ abstract class SimpleCache implements PsrCacheInterface
     {
         $data = [];
         foreach ($values as $key => $value) {
+            if ($ttl !== null && $ttl <= 0) {
+                return $this->delete($key);
+            }
+
             $value = $this->serializer->serialize($value);
             $key = $this->normalizeKey($key);
             $data[$key] = $value;
@@ -153,7 +160,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * The given key will be type-casted to string.
      * If the result string does not contain alphanumeric characters only or has more than 32 characters,
      * then the hash of the key will be used.
-     * The result key will be returned back prefixed with [[keyPrefix]].
+     * The result key will be returned back prefixed with {@see keyPrefix}.
      *
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
@@ -166,12 +173,12 @@ abstract class SimpleCache implements PsrCacheInterface
     }
 
     /**
-     * Normalizes cache TTL handling `null` value and [[\DateInterval]] objects.
+     * Normalizes cache TTL handling `null` value and {@see \DateInterval} objects.
      * @param int|\DateInterval|null $ttl raw TTL.
-     * @return int|float TTL value as UNIX timestamp.
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity
      * @throws \Exception
      */
-    protected function normalizeTtl($ttl): int
+    protected function normalizeTtl($ttl): ?int
     {
         if ($ttl === null) {
             return $this->defaultTtl;
@@ -189,7 +196,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * @param string $key a unique key identifying the cached value
      * @param mixed $default default value to return if value is not in the cache or expired
      * @return mixed the value stored in cache. $default is returned if the value is not in the cache or expired. Most often
-     * value is a string. If you have disabled [[serializer]], it could be something else.
+     * value is a string. If you have disabled {@see serializer}}, it could be something else.
      */
     abstract protected function getValue(string $key, $default = null);
 
@@ -198,12 +205,13 @@ abstract class SimpleCache implements PsrCacheInterface
      * This method should be implemented by child classes to store the data
      * in specific cache storage.
      * @param string $key the key identifying the value to be cached
-     * @param mixed $value the value to be cached. Most often it's a string. If you have disabled [[serializer]],
+     * @param mixed $value the value to be cached. Most often it's a string. If you have disabled {@see serializer},
      * it could be something else.
-     * @param int $ttl the number of seconds in which the cached value will expire.
+     * @param int|null $ttl the number of seconds in which the cached value will expire. Null means infinity.
+     * Negative value will result in deleting a value.
      * @return bool true if the value is successfully stored into cache, false otherwise
      */
-    abstract protected function setValue(string $key, $value, int $ttl): bool;
+    abstract protected function setValue(string $key, $value, ?int $ttl): bool;
 
     /**
      * Deletes a value with the specified key from cache
@@ -215,7 +223,7 @@ abstract class SimpleCache implements PsrCacheInterface
 
     /**
      * Retrieves multiple values from cache with the specified keys.
-     * The default implementation calls [[getValue()]] multiple times to retrieve
+     * The default implementation calls {@see getValue()} multiple times to retrieve
      * the cached values one by one. If the underlying cache storage supports multiget,
      * this method should be overridden to exploit that feature.
      * @param array $keys a list of keys identifying the cached values
@@ -236,13 +244,14 @@ abstract class SimpleCache implements PsrCacheInterface
 
     /**
      * Stores multiple key-value pairs in cache.
-     * The default implementation calls [[setValue()]] multiple times store values one by one. If the underlying cache
+     * The default implementation calls {@see setValue()} multiple times store values one by one. If the underlying cache
      * storage supports multi-set, this method should be overridden to exploit that feature.
      * @param array $values array where key corresponds to cache key while value is the value stored
-     * @param int $ttl the number of seconds in which the cached values will expire.
+     * @param int|null $ttl the number of seconds in which the cached values will expire. Null means infinity.
+     * Negative value will result in deleting a value.
      * @return bool `true` on success and `false` on failure.
      */
-    protected function setValues(array $values, int $ttl): bool
+    protected function setValues(array $values, ?int $ttl): bool
     {
         $result = true;
         foreach ($values as $key => $value) {
@@ -254,22 +263,24 @@ abstract class SimpleCache implements PsrCacheInterface
     }
 
     /**
-     * @param int $defaultTtl
+     * @param int|null $defaultTtl default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
+     * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
      */
-    public function setDefaultTtl(int $defaultTtl): void
+    public function setDefaultTtl(?int $defaultTtl): void
     {
-        if ($defaultTtl < 0) {
-            throw new InvalidArgumentException('TTL can not be negative.');
-        }
-
         $this->defaultTtl = $defaultTtl;
     }
 
     /**
-     * @param string $keyPrefix
+     * @param string $keyPrefix a string prefixed to every cache key so that it is unique globally in the whole cache storage.
+     * It is recommended that you set a unique cache key prefix for each application if the same cache
+     * storage is being used by different applications.
      */
     public function setKeyPrefix(string $keyPrefix): void
     {
+        if (!ctype_alnum($keyPrefix)) {
+            throw new InvalidArgumentException('Cache key prefix should be alphanumeric');
+        }
         $this->keyPrefix = $keyPrefix;
     }
 }
