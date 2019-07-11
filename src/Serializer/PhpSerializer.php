@@ -6,19 +6,13 @@ namespace Yiisoft\Cache\Serializer;
  */
 class PhpSerializer implements SerializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function serialize($value): string
     {
         return serialize($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserialize(string $value)
     {
-        return unserialize($value);
+        return unserialize($value, true);
     }
 }

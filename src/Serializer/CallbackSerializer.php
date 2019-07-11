@@ -21,17 +21,11 @@ class CallbackSerializer implements SerializerInterface
         $this->unserialize = $unserialize;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serialize($value): string
     {
         return call_user_func($this->serialize, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserialize(string $value)
     {
         return call_user_func($this->unserialize, $value);
