@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
+use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Cache\Exceptions\SetCacheException;
 
@@ -141,6 +142,7 @@ final class Cache implements CacheInterface
      * @return interable list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
+     * @throws InvalidArgumentException
      */
     public function getMultiple($keys, $default = null): iterable
     {
@@ -181,6 +183,7 @@ final class Cache implements CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
+     * @throws InvalidArgumentException
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
@@ -202,7 +205,8 @@ final class Cache implements CacheInterface
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
-     * @return array array of failed keys
+     * @return bool True on success and false on failure.
+     * @throws InvalidArgumentException
      */
     public function setMultiple($items, $ttl = null, Dependency $dependency = null): bool
     {
@@ -242,6 +246,7 @@ final class Cache implements CacheInterface
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool
+     * @throws InvalidArgumentException
      */
     public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool
     {
@@ -279,6 +284,7 @@ final class Cache implements CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
+     * @throws InvalidArgumentException
      */
     public function add($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
@@ -301,6 +307,7 @@ final class Cache implements CacheInterface
      * @param mixed $key a key identifying the value to be deleted from cache. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @return bool if no error happens during deletion
+     * @throws InvalidArgumentException
      */
     public function delete($key): bool
     {
@@ -344,9 +351,9 @@ final class Cache implements CacheInterface
      * This parameter is ignored if [[serializer]] is `false`.
      * @return mixed result of $callable execution
      * @throws SetCacheException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function getOrSet($key, $callable, $ttl = null, Dependency $dependency = null)
+    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null)
     {
         if (($value = $this->get($key)) !== null) {
             return $value;
