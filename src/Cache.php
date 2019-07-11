@@ -183,7 +183,7 @@ class Cache implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function set($key, $value, $ttl = null, $dependency = null): bool
+    public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -205,7 +205,7 @@ class Cache implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return array array of failed keys
      */
-    public function setMultiple($items, $ttl = null, $dependency = null): bool
+    public function setMultiple($items, $ttl = null, Dependency $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
