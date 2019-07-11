@@ -30,7 +30,7 @@ use Yiisoft\Cache\Dependencies\Dependency;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class NullCache implements CacheInterface
+final class NullCache implements CacheInterface
 {
     public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool
     {

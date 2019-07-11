@@ -28,7 +28,7 @@ namespace Yiisoft\Cache;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class ApcCache extends SimpleCache
+final class ApcCache extends SimpleCache
 {
     public function hasValue($key): bool
     {

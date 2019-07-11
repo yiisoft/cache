@@ -12,7 +12,7 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class FileDependency extends Dependency
+final class FileDependency extends Dependency
 {
     /**
      * @var string the file path or [path alias](guide:concept-aliases) whose last modification time is used to

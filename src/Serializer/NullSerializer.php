@@ -4,7 +4,7 @@ namespace Yiisoft\Cache\Serializer;
 /**
  * NullSerializer returns input unchanged.
  */
-class NullSerializer implements SerializerInterface
+final class NullSerializer implements SerializerInterface
 {
     public function serialize($value): string
     {

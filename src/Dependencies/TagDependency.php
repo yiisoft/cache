@@ -19,7 +19,7 @@ use Yiisoft\Cache\CacheInterface;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class TagDependency extends Dependency
+final class TagDependency extends Dependency
 {
     /**
      * @var string|array a list of tag names for this dependency. For a single tag, you may specify it as a string.

@@ -5,7 +5,7 @@ namespace Yiisoft\Cache\Serializer;
  * IgbinarySerializer uses [Igbinary PHP extension](http://pecl.php.net/package/igbinary) for serialization.
  * Make sure you have 'igbinary' PHP extension install at your system before attempt to use this serializer.
  */
-class IgbinarySerializer implements SerializerInterface
+final class IgbinarySerializer implements SerializerInterface
 {
     public function serialize($value): string
     {

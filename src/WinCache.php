@@ -28,7 +28,7 @@ namespace Yiisoft\Cache;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class WinCache extends SimpleCache
+final class WinCache extends SimpleCache
 {
     public function hasValue($key): bool
     {

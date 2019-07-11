@@ -12,7 +12,7 @@ use Yiisoft\Cache\CacheInterface;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class ChainedDependency extends Dependency
+final class ChainedDependency extends Dependency
 {
     /**
      * @var Dependency[] list of dependencies that this dependency is composed of.

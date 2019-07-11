@@ -34,7 +34,7 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class FileCache extends SimpleCache
+final class FileCache extends SimpleCache
 {
     /**
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.

@@ -15,7 +15,7 @@ use Yiisoft\Cache\CacheInterface;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class ExpressionDependency extends Dependency
+final class ExpressionDependency extends Dependency
 {
     /**
      * @var string the string representation of a PHP expression whose result is used to determine the dependency.

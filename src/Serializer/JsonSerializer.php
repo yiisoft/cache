@@ -6,7 +6,7 @@ namespace Yiisoft\Cache\Serializer;
 /**
  * JsonSerializer serializes data in JSON format.
  */
-class JsonSerializer implements SerializerInterface
+final class JsonSerializer implements SerializerInterface
 {
     private $options;
 
