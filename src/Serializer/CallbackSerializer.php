@@ -9,25 +9,25 @@ final class CallbackSerializer implements SerializerInterface
     /**
      * @var callable PHP callback, which should be used to serialize value.
      */
-    private $serialize;
+    private $serializeCallback;
     /**
      * @var callable PHP callback, which should be used to unserialize value.
      */
-    private $unserialize;
+    private $unserializeCallback;
 
-    public function __construct($serialize, $unserialize)
+    public function __construct(callable $serializeCallback, callable $unserializeCallback)
     {
-        $this->serialize = $serialize;
-        $this->unserialize = $unserialize;
+        $this->serializeCallback = $serializeCallback;
+        $this->unserializeCallback = $unserializeCallback;
     }
 
     public function serialize($value): string
     {
-        return call_user_func($this->serialize, $value);
+        return \call_user_func($this->serializeCallback, $value);
     }
 
     public function unserialize(string $value)
     {
-        return call_user_func($this->unserialize, $value);
+        return \call_user_func($this->unserializeCallback, $value);
     }
 }

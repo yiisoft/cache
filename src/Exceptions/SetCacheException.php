@@ -14,7 +14,7 @@ final class SetCacheException extends CacheException
     /**
      * @var CacheInterface
      */
-    protected $cache;
+    private $cache;
 
     public function __construct(
         string $key,

@@ -108,7 +108,7 @@ final class MemCached extends SimpleCache
      * @param \Memcached $cache
      * @param MemCachedServer[] $servers
      */
-    protected function addServers(\Memcached $cache, array $servers): void
+    private function addServers(\Memcached $cache, array $servers): void
     {
         $existingServers = [];
         if ($this->persistentId !== null) {
@@ -117,7 +117,8 @@ final class MemCached extends SimpleCache
             }
         }
         foreach ($servers as $server) {
-            if (empty($existingServers) || !isset($existingServers[$server->getHost() . ':' . $server->getPort()])) {
+            $serverAddress = $server->getHost() . ':' . $server->getPort();
+            if (empty($existingServers) || !isset($existingServers[$serverAddress])) {
                 $cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
             }
         }
@@ -131,7 +132,7 @@ final class MemCached extends SimpleCache
     public function getMemcached(): \Memcached
     {
         if ($this->cache === null) {
-            if (!extension_loaded('memcached')) {
+            if (!\extension_loaded('memcached')) {
                 throw new InvalidConfigException('MemCached requires PHP memcached extension to be loaded.');
             }
 

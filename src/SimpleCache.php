@@ -187,6 +187,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * This method should be implemented by child classes to retrieve the data
      * from specific cache storage.
      * @param string $key a unique key identifying the cached value
+     * @param mixed $default default value to return if value is not in the cache or expired
      * @return mixed the value stored in cache. $default is returned if the value is not in the cache or expired. Most often
      * value is a string. If you have disabled [[serializer]], it could be something else.
      */
@@ -245,7 +246,7 @@ abstract class SimpleCache implements PsrCacheInterface
     {
         $result = true;
         foreach ($values as $key => $value) {
-            if ($this->setValue($key, $value, $ttl) === false) {
+            if (!$this->setValue($key, $value, $ttl)) {
                 $result = false;
             }
         }
