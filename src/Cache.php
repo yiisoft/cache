@@ -3,7 +3,6 @@ namespace Yiisoft\Cache;
 
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Cache\Exceptions\SetCacheException;
-use Yiisoft\Strings\StringHelper;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -97,7 +96,7 @@ class Cache implements CacheInterface
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
      */
-    protected function buildKey($key)
+    protected function buildKey($key): string
     {
         if (is_string($key)) {
             return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
@@ -126,7 +125,7 @@ class Cache implements CacheInterface
     }
 
 
-    public function has($key)
+    public function has($key): bool
     {
         $key = $this->buildKey($key);
         return $this->handler->has($key);
@@ -143,7 +142,7 @@ class Cache implements CacheInterface
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): array
     {
         $keyMap = [];
         foreach ($keys as $key) {
@@ -244,7 +243,7 @@ class Cache implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return bool
      */
-    public function addMultiple($values, $ttl = 0, $dependency = null): bool
+    public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -281,7 +280,7 @@ class Cache implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function add($key, $value, $ttl = null, $dependency = null): bool
+    public function add($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -318,51 +317,6 @@ class Cache implements CacheInterface
     public function clear(): bool
     {
         return $this->handler->clear();
-    }
-
-    /**
-     * Returns whether there is a cache entry with a specified key.
-     * This method is required by the interface [[\ArrayAccess]].
-     * @param string $key a key identifying the cached value
-     * @return bool
-     */
-    public function offsetExists($key): bool
-    {
-        return $this->get($key) !== false;
-    }
-
-    /**
-     * Retrieves the value from cache with a specified key.
-     * This method is required by the interface [[\ArrayAccess]].
-     * @param string $key a key identifying the cached value
-     * @return mixed the value stored in cache, false if the value is not in the cache or expired.
-     */
-    public function offsetGet($key)
-    {
-        return $this->get($key);
-    }
-
-    /**
-     * Stores the value identified by a key into cache.
-     * If the cache already contains such a key, the existing value will be
-     * replaced with the new ones. To add expiration and dependencies, use the [[set()]] method.
-     * This method is required by the interface [[\ArrayAccess]].
-     * @param string $key the key identifying the value to be cached
-     * @param mixed $value the value to be cached
-     */
-    public function offsetSet($key, $value): void
-    {
-        $this->set($key, $value);
-    }
-
-    /**
-     * Deletes the value with the specified key from cache
-     * This method is required by the interface [[\ArrayAccess]].
-     * @param string $key the key of the value to be deleted
-     */
-    public function offsetUnset($key): void
-    {
-        $this->delete($key);
     }
 
     /**

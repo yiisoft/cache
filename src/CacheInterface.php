@@ -36,7 +36,7 @@ use Yiisoft\Cache\Dependencies\Dependency;
  *
  * @see \Psr\SimpleCache\CacheInterface
  */
-interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
+interface CacheInterface extends \Psr\SimpleCache\CacheInterface
 {
     /**
      * Stores a value identified by a key into cache.
@@ -55,18 +55,18 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool;
 
     /**
-     * Stores multiple items in cache. Each item contains a value identified by a key.
+     * Stores multiple values in cache. Each item contains a value identified by a key.
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param array $items the items to be cached, as key-value pairs.
+     * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool
      */
-    public function setMultiple($items, $ttl = null, Dependency $dependency = null): bool;
+    public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool;
 
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
@@ -83,12 +83,12 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
     public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool;
 
     /**
-     * Stores multiple items in cache. Each item contains a value identified by a key.
+     * Stores multiple values in cache. Each item contains a value identified by a key.
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
-     * @param array $values the items to be cached, as key-value pairs.
+     * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool

@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
+use Psr\SimpleCache\InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
@@ -87,7 +88,7 @@ abstract class SimpleCache implements CacheInterface
         return $this->serializer->unserialize($value);
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): array
     {
         $keyMap = [];
         foreach ($keys as $originalKey) {
@@ -172,7 +173,7 @@ abstract class SimpleCache implements CacheInterface
      * @return int|float TTL value as UNIX timestamp.
      * @throws \Exception
      */
-    protected function normalizeTtl($ttl)
+    protected function normalizeTtl($ttl): int
     {
         if ($ttl === null) {
             return $this->defaultTtl;
@@ -191,7 +192,7 @@ abstract class SimpleCache implements CacheInterface
      * @return mixed the value stored in cache. $default is returned if the value is not in the cache or expired. Most often
      * value is a string. If you have disabled [[serializer]], it could be something else.
      */
-    abstract protected function getValue($key, $default = null);
+    abstract protected function getValue(string $key, $default = null);
 
     /**
      * Stores a value identified by a key in cache.
@@ -203,7 +204,7 @@ abstract class SimpleCache implements CacheInterface
      * @param int $ttl the number of seconds in which the cached value will expire.
      * @return bool true if the value is successfully stored into cache, false otherwise
      */
-    abstract protected function setValue($key, $value, $ttl): bool;
+    abstract protected function setValue(string $key, $value, int $ttl): bool;
 
     /**
      * Deletes a value with the specified key from cache
@@ -211,7 +212,7 @@ abstract class SimpleCache implements CacheInterface
      * @param string $key the key of the value to be deleted
      * @return bool if no error happens during deletion
      */
-    abstract protected function deleteValue($key): bool;
+    abstract protected function deleteValue(string $key): bool;
 
     /**
      * Retrieves multiple values from cache with the specified keys.
@@ -222,7 +223,7 @@ abstract class SimpleCache implements CacheInterface
      * @param mixed $default default value to return if value is not in the cache or expired
      * @return array a list of cached values indexed by the keys
      */
-    protected function getValues($keys, $default = null): array
+    protected function getValues(array $keys, $default = null): array
     {
         $results = [];
         foreach ($keys as $key) {
@@ -242,7 +243,7 @@ abstract class SimpleCache implements CacheInterface
      * @param int $ttl the number of seconds in which the cached values will expire.
      * @return bool `true` on success and `false` on failure.
      */
-    protected function setValues($values, $ttl): bool
+    protected function setValues(array $values, int $ttl): bool
     {
         $result = true;
         foreach ($values as $key => $value) {
@@ -259,7 +260,7 @@ abstract class SimpleCache implements CacheInterface
     public function setDefaultTtl(int $defaultTtl): void
     {
         if ($defaultTtl < 0) {
-            throw new \InvalidArgumentException('TTL can not be negative.');
+            throw new InvalidArgumentException('TTL can not be negative.');
         }
 
         $this->defaultTtl = $defaultTtl;

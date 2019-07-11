@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
+use Psr\Log\NullLogger;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\FileCache;
 use Yiisoft\Cache\Dependencies\TagDependency;
@@ -10,9 +11,9 @@ use Yiisoft\Cache\Dependencies\TagDependency;
  */
 class TagDependencyTest extends TestCase
 {
-    public function testInvalidate()
+    public function testInvalidate(): void
     {
-        $cache = new Cache(new FileCache('tests/runtime/cache'));
+        $cache = new Cache(new FileCache('tests/runtime/cache', new NullLogger()));
 
         // single tag test
         $cache->set('a1', 11, 0, new TagDependency('t1'));

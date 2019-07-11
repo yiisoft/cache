@@ -17,7 +17,7 @@ class JsonSerializer implements SerializerInterface
      * <http://www.php.net/manual/en/function.json-encode.php>.
      * Default is `JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE`.
      */
-    public function __construct($options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+    public function __construct(int $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
     {
         $this->options = $options;
     }

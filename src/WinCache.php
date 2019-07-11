@@ -35,29 +35,29 @@ class WinCache extends SimpleCache
         return \wincache_ucache_exists($key);
     }
 
-    protected function getValue($key, $default = null)
+    protected function getValue(string $key, $default = null)
     {
         $value = \wincache_ucache_get($key, $success);
         return $success ? $value : $default;
     }
 
-    protected function getValues($keys, $default = null): array
+    protected function getValues(array $keys, $default = null): array
     {
         $defaultValues = array_fill_keys($keys, $default);
         return array_merge($defaultValues, \wincache_ucache_get($keys));
     }
 
-    protected function setValue($key, $value, $ttl): bool
+    protected function setValue(string $key, $value, int $ttl): bool
     {
         return \wincache_ucache_set($key, $value, $ttl);
     }
 
-    protected function setValues($values, $ttl): bool
+    protected function setValues(array $values, int $ttl): bool
     {
         return \wincache_ucache_set($values, null, $ttl) === [];
     }
 
-    protected function deleteValue($key): bool
+    protected function deleteValue(string $key): bool
     {
         return \wincache_ucache_delete($key);
     }

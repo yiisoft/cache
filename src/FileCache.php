@@ -135,7 +135,7 @@ class FileCache extends SimpleCache
         $this->dirMode = $dirMode;
     }
 
-    protected function getValue($key, $default = null)
+    protected function getValue(string $key, $default = null)
     {
         $cacheFile = $this->getCacheFile($key);
 
@@ -153,7 +153,7 @@ class FileCache extends SimpleCache
         return $default;
     }
 
-    protected function setValue($key, $value, $ttl): bool
+    protected function setValue(string $key, $value, int $ttl): bool
     {
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
@@ -186,7 +186,7 @@ class FileCache extends SimpleCache
         return false;
     }
 
-    protected function deleteValue($key): bool
+    protected function deleteValue(string $key): bool
     {
         $cacheFile = $this->getCacheFile($key);
         return @unlink($cacheFile);

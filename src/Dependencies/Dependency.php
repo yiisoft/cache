@@ -36,7 +36,7 @@ abstract class Dependency
      * This method is invoked by cache before writing data into it.
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      */
-    public function evaluateDependency($cache): void
+    public function evaluateDependency(CacheInterface $cache): void
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
@@ -54,7 +54,7 @@ abstract class Dependency
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return bool whether the dependency has changed.
      */
-    public function isChanged($cache): bool
+    public function isChanged(CacheInterface $cache): bool
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
@@ -97,5 +97,5 @@ abstract class Dependency
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      */
-    abstract protected function generateDependencyData($cache);
+    abstract protected function generateDependencyData(CacheInterface $cache);
 }

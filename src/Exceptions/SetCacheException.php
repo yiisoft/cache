@@ -1,7 +1,7 @@
 <?php
 namespace Yiisoft\Cache\Exceptions;
 
-use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\CacheInterface;
 
 class SetCacheException extends CacheException
 {

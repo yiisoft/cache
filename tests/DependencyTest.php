@@ -3,6 +3,7 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\NullCache;
 use Yiisoft\Cache\SimpleCache;
 
 /**
@@ -11,7 +12,7 @@ use Yiisoft\Cache\SimpleCache;
  */
 class DependencyTest extends TestCase
 {
-    public function testResetReusableData()
+    public function testResetReusableData(): void
     {
         $value = ['dummy'];
         $dependency = new MockDependency();
@@ -36,9 +37,9 @@ class DependencyTest extends TestCase
     public function testIsChanged(): void
     {
         /* @var $dependency Dependency */
-        /* @var $cache SimpleCache */
+
         $dependency = $this->getMockForAbstractClass(Dependency::class);
-        $cache = $this->getMockForAbstractClass(SimpleCache::class);
+        $cache = new NullCache();
 
         $result = $dependency->isChanged($cache);
         $this->assertFalse($result);
