@@ -47,11 +47,6 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  * each server, such as `persistent`, `weight`, `timeout`. Please see [[MemCacheServer]] for available options.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
- *
- * @property \Memcached $memcached The memcached object used by this cache component.
- * This property is read-only.
- * @property MemCachedServer[] $servers List of memcached server configurations. Note that the type of this
- * property differs in getter and setter. See [[getServers()]] and [[setServers()]] for details.
  */
 class MemCached extends SimpleCache
 {
@@ -82,11 +77,11 @@ class MemCached extends SimpleCache
     /**
      * @var \Memcached the Memcached instance
      */
-    private $_cache;
+    private $cache;
     /**
      * @var array list of memcached server configurations
      */
-    private $_servers;
+    private $servers;
 
     /**
      * @param null $serializer
@@ -102,9 +97,9 @@ class MemCached extends SimpleCache
             $servers = [new MemCachedServer('127.0.0.1')];
         }
 
-        $this->_servers = $servers;
+        $this->servers = $servers;
 
-        $this->addServers($this->getMemcached(), $this->_servers);
+        $this->addServers($this->getMemcached(), $this->servers);
     }
 
     /**
@@ -135,22 +130,22 @@ class MemCached extends SimpleCache
      */
     public function getMemcached()
     {
-        if ($this->_cache === null) {
+        if ($this->cache === null) {
             if (!extension_loaded('memcached')) {
                 throw new InvalidConfigException('MemCached requires PHP memcached extension to be loaded.');
             }
 
-            $this->_cache = $this->persistentId !== null ? new \Memcached($this->persistentId) : new \Memcached;
+            $this->cache = $this->persistentId !== null ? new \Memcached($this->persistentId) : new \Memcached;
             if ($this->username !== null || $this->password !== null) {
-                $this->_cache->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
-                $this->_cache->setSaslAuthData($this->username, $this->password);
+                $this->cache->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
+                $this->cache->setSaslAuthData($this->username, $this->password);
             }
             if (!empty($this->options)) {
-                $this->_cache->setOptions($this->options);
+                $this->cache->setOptions($this->options);
             }
         }
 
-        return $this->_cache;
+        return $this->cache;
     }
 
     /**
@@ -159,7 +154,7 @@ class MemCached extends SimpleCache
      */
     public function getServers()
     {
-        return $this->_servers;
+        return $this->servers;
     }
 
     /**
@@ -170,7 +165,7 @@ class MemCached extends SimpleCache
     public function setServers($config)
     {
         foreach ($config as $c) {
-            $this->_servers[] = new MemCachedServer($c);
+            $this->servers[] = new MemCachedServer($c);
         }
     }
 
@@ -211,7 +206,7 @@ class MemCached extends SimpleCache
      */
     protected function getValue($key)
     {
-        return $this->_cache->get($key);
+        return $this->cache->get($key);
     }
 
     /**
@@ -219,7 +214,7 @@ class MemCached extends SimpleCache
      */
     protected function getValues($keys): array
     {
-        return $this->_cache->getMulti($keys);
+        return $this->cache->getMulti($keys);
     }
 
     /**
@@ -231,7 +226,7 @@ class MemCached extends SimpleCache
         // @see http://php.net/manual/en/memcached.expiration.php
         $expire = $ttl > 0 ? $ttl + time() : 0;
 
-        return $this->_cache->set($key, $value, $expire);
+        return $this->cache->set($key, $value, $expire);
     }
 
     /**
@@ -243,7 +238,7 @@ class MemCached extends SimpleCache
         // @see http://php.net/manual/en/memcached.expiration.php
         $expire = $ttl > 0 ? $ttl + time() : 0;
 
-        return $this->_cache->setMulti($values, $expire);
+        return $this->cache->setMulti($values, $expire);
     }
 
     /**
@@ -251,7 +246,7 @@ class MemCached extends SimpleCache
      */
     protected function deleteValue($key): bool
     {
-        return $this->_cache->delete($key, 0);
+        return $this->cache->delete($key, 0);
     }
 
     /**
@@ -259,6 +254,6 @@ class MemCached extends SimpleCache
      */
     public function clear(): bool
     {
-        return $this->_cache->flush();
+        return $this->cache->flush();
     }
 }
