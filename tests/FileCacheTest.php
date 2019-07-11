@@ -58,7 +58,7 @@ class FileCacheTest extends CacheTest
         $this->assertTrue($cache->set($cachePublicKey, $cacheValue, 2));
         $this->assertSame($cacheValue, $cache->get($cachePublicKey));
 
-        $refClass = new \ReflectionClass($cache->handler);
+        $refClass = new \ReflectionClass($cache->getHandler());
         $refMethodGetCacheFile = $refClass->getMethod('getCacheFile');
         $refMethodGetCacheFile->setAccessible(true);
         $cacheFile = $refMethodGetCacheFile->invoke($cache->handler, $cacheInternalKey);
