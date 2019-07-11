@@ -30,65 +30,41 @@ namespace Yiisoft\Cache;
  */
 class DummyCache implements \Psr\SimpleCache\CacheInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function has($key): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get($key, $default = null)
     {
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set($key, $value, $ttl = null): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete($key): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMultiple($keys, $default = null): array
     {
         return array_fill_keys($keys, $default);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMultiple($values, $ttl = null): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteMultiple($keys): bool
     {
         return true;

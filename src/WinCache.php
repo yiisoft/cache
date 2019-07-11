@@ -30,9 +30,9 @@ namespace Yiisoft\Cache;
  */
 class WinCache extends SimpleCache
 {
-    public function has($key): bool
+    public function hasValue($key): bool
     {
-        return \wincache_ucache_exists($this->normalizeKey($key));
+        return \wincache_ucache_exists($key);
     }
 
     protected function getValue($key)

@@ -48,9 +48,7 @@ class ChainedDependency extends Dependency
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function isChanged($cache): bool
     {
         foreach ($this->dependencies as $dependency) {

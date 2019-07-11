@@ -76,9 +76,7 @@ abstract class SimpleCache implements CacheInterface
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function get($key, $default = null)
     {
         $key = $this->normalizeKey($key);
@@ -90,9 +88,7 @@ abstract class SimpleCache implements CacheInterface
         return $this->serializer->unserialize($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function getMultiple($keys, $default = null)
     {
         $keyMap = [];
@@ -110,19 +106,14 @@ abstract class SimpleCache implements CacheInterface
         return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has($key): bool
     {
         $key = $this->normalizeKey($key);
-        $value = $this->getValue($key);
-        return $value !== false;
+        return $this->hasValue($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    abstract protected function hasValue($key): bool;
+
     public function set($key, $value, $ttl = null): bool
     {
         $value = $this->serializer->serialize($value);
@@ -131,9 +122,7 @@ abstract class SimpleCache implements CacheInterface
         return $this->setValue($key, $value, $ttl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function setMultiple($values, $ttl = null): bool
     {
         $data = [];
@@ -145,18 +134,14 @@ abstract class SimpleCache implements CacheInterface
         return $this->setValues($data, $this->normalizeTtl($ttl));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function delete($key): bool
     {
         $key = $this->normalizeKey($key);
         return $this->deleteValue($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function deleteMultiple($keys): bool
     {
         $result = true;
@@ -179,7 +164,7 @@ abstract class SimpleCache implements CacheInterface
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
      */
-    protected function normalizeKey($key): string
+    private function normalizeKey($key): string
     {
         $key = (string)$key;
         $key = ctype_alnum($key) && \strlen($key) <= 32 ? $key : md5($key);
@@ -190,6 +175,7 @@ abstract class SimpleCache implements CacheInterface
      * Normalizes cache TTL handling `null` value and [[\DateInterval]] objects.
      * @param int|\DateInterval|null $ttl raw TTL.
      * @return int|float TTL value as UNIX timestamp.
+     * @throws \Exception
      */
     protected function normalizeTtl($ttl)
     {

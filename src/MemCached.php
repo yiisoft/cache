@@ -201,25 +201,19 @@ class MemCached extends SimpleCache
         $this->password = $password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function getValue($key)
     {
         return $this->cache->get($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function getValues($keys): array
     {
         return $this->cache->getMulti($keys);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function setValue($key, $value, $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
@@ -229,9 +223,7 @@ class MemCached extends SimpleCache
         return $this->cache->set($key, $value, $expire);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function setValues($values, $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
@@ -241,19 +233,21 @@ class MemCached extends SimpleCache
         return $this->cache->setMulti($values, $expire);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     protected function deleteValue($key): bool
     {
         return $this->cache->delete($key, 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function clear(): bool
     {
         return $this->cache->flush();
+    }
+
+    protected function hasValue($key): bool
+    {
+        $value = $this->getValue($key);
+        return $value !== false;
     }
 }

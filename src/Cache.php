@@ -105,9 +105,7 @@ class Cache implements CacheInterface
         return md5(json_encode($key));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function get($key, $default = null)
     {
         $key = $this->buildKey($key);
@@ -127,9 +125,7 @@ class Cache implements CacheInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function has($key)
     {
         $key = $this->buildKey($key);
@@ -227,9 +223,7 @@ class Cache implements CacheInterface
         return $this->handler->setMultiple($data, $ttl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function deleteMultiple($keys): bool
     {
         $actualKeys = [];

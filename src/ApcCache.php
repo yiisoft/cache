@@ -30,59 +30,39 @@ namespace Yiisoft\Cache;
  */
 class ApcCache extends SimpleCache
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function has($key): bool
+
+    public function hasValue($key): bool
     {
-        return \apcu_exists($this->normalizeKey($key));
+        return \apcu_exists($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValue($key)
     {
         return \apcu_fetch($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValues($keys): array
     {
         $values = \apcu_fetch($keys);
         return \is_array($values) ? $values : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setValue($key, $value, $ttl): bool
     {
         return \apcu_store($key, $value, $ttl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setValues($values, $ttl): bool
     {
         $result = \apcu_store($values, null, $ttl);
         return \is_array($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function deleteValue($key): bool
     {
         return \apcu_delete($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): bool
     {
         return \apcu_clear_cache();
