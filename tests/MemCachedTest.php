@@ -33,7 +33,7 @@ class MemCachedTest extends CacheTest
     /**
      * @dataProvider cacheProvider
      */
-    public function testExpire(PsrCacheInterface $cache)
+    public function testExpire(PsrCacheInterface $cache): void
     {
         if (getenv('TRAVIS') == 'true') {
             $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
