@@ -4,9 +4,7 @@ namespace Yiisoft\Cache\Tests;
 use Yiisoft\Cache\Dependencies\Dependency;
 
 /**
- * Class MockDependency.
- *
- * @author Boudewijn Vahrmeijer <vahrmeijer@gmail.com>
+ * Class MockDependency
  */
 class MockDependency extends Dependency
 {

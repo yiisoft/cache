@@ -17,12 +17,10 @@ class ArrayCacheTest extends CacheTest
         return new Cache(new ArrayCache());
     }
 
-    /**
-     * @dataProvider cacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testExpire(PsrCacheInterface $cache): void
+    public function testExpire(): void
     {
+        $cache = $cache = $this->createCacheInstance();
+
         static::$microtime = \microtime(true);
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         static::$microtime++;
@@ -31,12 +29,10 @@ class ArrayCacheTest extends CacheTest
         $this->assertNull($cache->get('expire_test'));
     }
 
-    /**
-     * @dataProvider cacheIntegrationProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testExpireAdd(CacheInterface $cache): void
+    public function testExpireAdd(): void
     {
+        $cache = $this->createCacheInstance();
+
         static::$microtime = \microtime(true);
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         static::$microtime++;

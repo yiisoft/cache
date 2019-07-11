@@ -30,25 +30,19 @@ class MemCachedTest extends CacheTest
         return new Cache(new MemCached());
     }
 
-    /**
-     * @dataProvider cacheProvider
-     */
-    public function testExpire(PsrCacheInterface $cache): void
-    {
-        if (getenv('TRAVIS') == 'true') {
-            $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
-        }
-        parent::testExpire($cache);
-    }
-
-    /**
-     * @dataProvider cacheIntegrationProvider
-     */
-    public function testExpireAdd(CacheInterface $cache): void
+    public function testExpire(): void
     {
         if (getenv('TRAVIS') === 'true') {
             $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
         }
-        parent::testExpireAdd($cache);
+        parent::testExpire();
+    }
+
+    public function testExpireAdd(): void
+    {
+        if (getenv('TRAVIS') === 'true') {
+            $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
+        }
+        parent::testExpireAdd();
     }
 }

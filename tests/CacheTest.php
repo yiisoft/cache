@@ -64,26 +64,9 @@ abstract class CacheTest extends TestCase
         return $cache;
     }
 
-    public function preparedCacheProvider(): array
+    public function testSet(): void
     {
-        return [
-            [$this->prepare($this->createCacheInstance())],
-        ];
-    }
-
-    public function cacheProvider(): array
-    {
-        return [
-            [$this->createCacheInstance()],
-        ];
-    }
-
-    /**
-     * @dataProvider cacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testSet(PsrCacheInterface $cache): void
-    {
+        $cache = $this->createCacheInstance();
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($cache->set('string_test', 'string_test'));
             $this->assertTrue($cache->set('number_test', 42));
@@ -91,12 +74,11 @@ abstract class CacheTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider preparedCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testGet(PsrCacheInterface $cache): void
+    public function testGet(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $this->assertEquals('string_test', $cache->get('string_test'));
         $this->assertEquals(42, $cache->get('number_test'));
 
@@ -141,12 +123,11 @@ abstract class CacheTest extends TestCase
         $this->assertEquals('array_test', $array['array_test']);
     }
 
-    /**
-     * @dataProvider preparedCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testHas(PsrCacheInterface $cache): void
+    public function testHas(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $this->assertTrue($cache->has('string_test'));
         // check whether exists affects the value
         $this->assertEquals('string_test', $cache->get('string_test'));
@@ -155,20 +136,16 @@ abstract class CacheTest extends TestCase
         $this->assertFalse($cache->has('not_exists'));
     }
 
-    /**
-     * @dataProvider cacheProvider
-     */
-    public function testGetNonExistent(PsrCacheInterface $cache): void
+    public function testGetNonExistent(): void
     {
+        $cache = $this->createCacheInstance();
         $this->assertNull($cache->get('non_existent_key'));
     }
 
-    /**
-     * @dataProvider cacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testStoreSpecialValues(PsrCacheInterface $cache): void
+    public function testStoreSpecialValues(): void
     {
+        $cache = $this->createCacheInstance();
+
         $this->assertTrue($cache->set('null_value', null));
         $this->assertNull($cache->get('null_value'));
 
@@ -176,24 +153,22 @@ abstract class CacheTest extends TestCase
         $this->assertTrue($cache->get('bool_value'));
     }
 
-    /**
-     * @dataProvider preparedCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testGetMultiple(PsrCacheInterface $cache): void
+    public function testGetMultiple(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $this->assertEquals(['string_test' => 'string_test', 'number_test' => 42], $cache->getMultiple(['string_test', 'number_test']));
         // ensure that order does not matter
         $this->assertEquals(['number_test' => 42, 'string_test' => 'string_test'], $cache->getMultiple(['number_test', 'string_test']));
         $this->assertEquals(['number_test' => 42, 'non_existent_key' => null], $cache->getMultiple(['number_test', 'non_existent_key']));
     }
 
-    /**
-     * @dataProvider cacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testExpire(PsrCacheInterface $cache): void
+
+    public function testExpire(): void
     {
+        $cache = $this->createCacheInstance();
+
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         usleep(500000);
         $this->assertEquals('expire_test', $cache->get('expire_test'));
@@ -201,62 +176,36 @@ abstract class CacheTest extends TestCase
         $this->assertNull($cache->get('expire_test'));
     }
 
-    /**
-     * @dataProvider preparedCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testDelete(PsrCacheInterface $cache): void
+    public function testDelete(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $this->assertEquals(42, $cache->get('number_test'));
         $this->assertTrue($cache->delete('number_test'));
         $this->assertNull($cache->get('number_test'));
     }
 
-    /**
-     * @dataProvider preparedCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testClear(PsrCacheInterface $cache): void
+    public function testClear(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $this->assertTrue($cache->clear());
         $this->assertNull($cache->get('number_test'));
     }
 
-    /**
-     * Returns data for integration test of Cache class
-     */
-    public function cacheIntegrationProvider(): array
+    public function testArrayAccess(): void
     {
-        return [
-            [new Cache($this->createCacheInstance())],
-        ];
-    }
-
-    /**
-     * Returns data for integration test, prepared
-     */
-    public function preparedIntegrationCacheProvider(): array
-    {
-        return [
-            [$this->prepare(new Cache($this->createCacheInstance()))]
-        ];
-    }
-
-    /**
-     * @dataProvider cacheIntegrationProvider
-     */
-    public function testArrayAccess(CacheInterface $cache): void
-    {
+        $cache = $this->createCacheInstance();
         $cache['arrayaccess_test'] = new \stdClass();
         $this->assertInstanceOf('stdClass', $cache['arrayaccess_test']);
     }
 
-    /**
-     * @dataProvider cacheIntegrationProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testExpireAdd(CacheInterface $cache): void
+    public function testExpireAdd(): void
     {
+        $cache = $this->createCacheInstance();
+
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         usleep(500000);
         $this->assertEquals('expire_testa', $cache->get('expire_testa'));
@@ -264,12 +213,11 @@ abstract class CacheTest extends TestCase
         $this->assertNull($cache->get('expire_testa'));
     }
 
-    /**
-     * @dataProvider preparedIntegrationCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testAdd(CacheInterface $cache): void
+    public function testAdd(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         // should not change existing keys
         $this->assertEquals(42, $cache->get('number_test'));
         $this->assertFalse($cache->add('number_test', 13));
@@ -281,14 +229,11 @@ abstract class CacheTest extends TestCase
         $this->assertEquals(13, $cache->get('add_test'));
     }
 
-    /**
-     * @dataProvider cacheIntegrationProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testAddMultiple(CacheInterface $cache): void
+    public function testAddMultiple(): void
     {
-        /** @var CacheInterface $cache */
+        $cache = $this->createCacheInstance();
         $cache = $this->prepare($cache);
+
         $this->assertNull($cache->get('add_test'));
 
         $this->assertTrue(
@@ -304,12 +249,11 @@ abstract class CacheTest extends TestCase
         $this->assertEquals(13, $cache->get('add_test'));
     }
 
-    /**
-     * @dataProvider preparedIntegrationCacheProvider
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function testGetOrSet(CacheInterface $cache): void
+    public function testGetOrSet(): void
     {
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $expected = get_class($cache);
 
         $this->assertEquals(null, $cache->get('something'));
@@ -319,28 +263,27 @@ abstract class CacheTest extends TestCase
         $this->assertEquals($expected, $cache->get('something'));
     }
 
-    /**
-     * @dataProvider preparedIntegrationCacheProvider
-     */
-    public function testGetOrSetWithDependencies(PsrCacheInterface $cache): void
+    public function testGetOrSetWithDependencies(): void
     {
-        $cache = new Cache($cache);
+        $cache = $this->createCacheInstance();
+        $cache = $this->prepare($cache);
+
         $dependency = new TagDependency('test');
 
         $expected = 'SilverFire';
-        $loginClosure = function ($cache) use (&$login) {
+        $loginClosure = static function (CacheInterface $cache) use (&$login) {
             return 'SilverFire';
         };
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
 
         // Call again with another login to make sure that value is cached
-        $loginClosure = function ($cache) use (&$login) {
+        $loginClosure = static function (CacheInterface $cache) use (&$login) {
             return 'SamDark';
         };
         $got = $cache->getOrSet('some-login', $loginClosure, null, $dependency);
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
 
-        $dependency->invalidate($cache, 'test');
+        TagDependency::invalidate($cache, 'test');
         $expected = 'SamDark';
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
     }

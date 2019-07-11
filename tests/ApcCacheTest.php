@@ -29,18 +29,12 @@ class ApcCacheTest extends CacheTest
         return new Cache(new ApcCache());
     }
 
-    /**
-     * @dataProvider cacheProvider
-     */
-    public function testExpire(PsrCacheInterface $cache): void
+    public function testExpire(): void
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
     }
 
-    /**
-     * @dataProvider cacheProvider
-     */
-    public function testExpireAdd(CacheInterface $cache): void
+    public function testExpireAdd(): void
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
     }
