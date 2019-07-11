@@ -13,7 +13,7 @@ use Yiisoft\Cache\MemCached;
  */
 class MemCachedTest extends CacheTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!extension_loaded('memcached')) {
             self::markTestSkipped('Required extension "memcached" is not loaded');

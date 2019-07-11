@@ -5,7 +5,7 @@ namespace Yiisoft\Cache;
  * Mock for the time() function for caching classes.
  * @return int
  */
-function time()
+function time(): int
 {
     return \Yiisoft\Cache\Tests\CacheTest::$time ?: \time();
 }
@@ -15,7 +15,7 @@ function time()
  * @param bool $float
  * @return float
  */
-function microtime($float = false)
+function microtime(bool $float = false): float
 {
     return \Yiisoft\Cache\Tests\CacheTest::$microtime ?: \microtime($float);
 }
@@ -45,7 +45,7 @@ abstract class CacheTest extends TestCase
 
     abstract protected function createCacheInstance(): CacheInterface;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         static::$time = null;
         static::$microtime = null;
@@ -250,7 +250,7 @@ abstract class CacheTest extends TestCase
         $expected = get_class($cache);
 
         $this->assertEquals(null, $cache->get('something'));
-        $this->assertEquals($expected, $cache->getOrSet('something', static function (CacheInterface $cache) {
+        $this->assertEquals($expected, $cache->getOrSet('something', static function (CacheInterface $cache): string {
             return get_class($cache);
         }));
         $this->assertEquals($expected, $cache->get('something'));
@@ -264,13 +264,13 @@ abstract class CacheTest extends TestCase
         $dependency = new TagDependency('test');
 
         $expected = 'SilverFire';
-        $loginClosure = static function (CacheInterface $cache) use (&$login) {
+        $loginClosure = static function (CacheInterface $cache) use (&$login): string {
             return 'SilverFire';
         };
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
 
         // Call again with another login to make sure that value is cached
-        $loginClosure = static function (CacheInterface $cache) use (&$login) {
+        $loginClosure = static function (CacheInterface $cache) use (&$login): string {
             return 'SamDark';
         };
         $got = $cache->getOrSet('some-login', $loginClosure, null, $dependency);
