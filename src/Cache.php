@@ -100,7 +100,7 @@ class Cache implements CacheInterface
     protected function buildKey($key)
     {
         if (is_string($key)) {
-            return ctype_alnum($key) && StringHelper::byteLength($key) <= 32 ? $key : md5($key);
+            return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
         }
         return md5(json_encode($key));
     }

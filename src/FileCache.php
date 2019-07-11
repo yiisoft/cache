@@ -71,8 +71,7 @@ class FileCache extends SimpleCache
      */
     private $dirMode = 0775;
 
-    private const NEGATIVE_TTL_REPLACEMENT = 60 * 60 * 24 * 365;
-
+    private const NEGATIVE_TTL_REPLACEMENT = 31536000; // 1 year
 
     public function __construct(string $cachePath, SerializerInterface $serializer = null)
     {
@@ -84,7 +83,7 @@ class FileCache extends SimpleCache
      * Sets cache path and ensures it exists.
      * @param string $cachePath
      */
-    public function setCachePath(string $cachePath)
+    public function setCachePath(string $cachePath): void
     {
         $this->cachePath = $cachePath;
         $this->createDirectory($this->cachePath, $this->dirMode);
@@ -130,8 +129,7 @@ class FileCache extends SimpleCache
         $this->dirMode = $dirMode;
     }
 
-
-    protected function getValue($key)
+    protected function getValue($key, $default = null)
     {
         $cacheFile = $this->getCacheFile($key);
 
@@ -146,9 +144,8 @@ class FileCache extends SimpleCache
             }
         }
 
-        return false;
+        return $default;
     }
-
 
     protected function setValue($key, $value, $ttl): bool
     {
@@ -164,40 +161,20 @@ class FileCache extends SimpleCache
             @unlink($cacheFile);
         }
 
-        try {
-            // this implementation is more accurate than file_put_contents
-            // because it does not modify file content, if failed to read
-            if ($fd = fopen($cacheFile, 'cb')) {
-                if (!flock($fd, LOCK_EX)) {
-                    throw new CacheException("Failed to flock '$cacheFile'");
-                }
-
-                if (!ftruncate($fd, 0)) {
-                    throw new CacheException("Failed to truncate '$cacheFile");
-                }
-
-
-                if (file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
-                    throw new CacheException("Failed to write data to '$cacheFile' totally");
-                }
-
-                if ($ttl <= 0) {
-                    $ttl = self::NEGATIVE_TTL_REPLACEMENT;
-                }
-                $mtimeInstallationResult = touch($cacheFile, time() + $ttl);
-                if (!$mtimeInstallationResult) {
-                    throw new CacheException("Failed to install mtime to file '$cacheFile'");
-                }
-                flock($fd, LOCK_UN);
-                fclose($fd);
-                return true;
+        if (@file_put_contents($cacheFile, $value, LOCK_EX) !== false) {
+            if ($this->fileMode !== null) {
+                @chmod($cacheFile, $this->fileMode);
             }
-        } catch (Exception $error) {
-            unlink($cacheFile);
+            if ($ttl <= 0) {
+                $ttl = self::NEGATIVE_TTL_REPLACEMENT;
+            }
+            return @touch($cacheFile, $ttl + time());
         }
-        return false;
-    }
 
+        $error = error_get_last();
+        // log it instead
+        throw new CacheException("Failed to write data to \"$cacheFile\": " . $error['message']);
+    }
 
     protected function deleteValue($key): bool
     {
@@ -210,7 +187,7 @@ class FileCache extends SimpleCache
      * @param string $key cache key
      * @return string the cache file path
      */
-    protected function getCacheFile($key)
+    protected function getCacheFile(string $key): string
     {
         if ($this->directoryLevel > 0) {
             $base = $this->cachePath;
@@ -226,24 +203,20 @@ class FileCache extends SimpleCache
         return $this->cachePath . DIRECTORY_SEPARATOR . $key . $this->cacheFileSuffix;
     }
 
-
     public function clear(): bool
     {
-        $this->gc(true, false);
+        $this->removeCacheFiles($this->cachePath, false);
         return true;
     }
 
     /**
-     * Removes expired cache files.
-     * @param bool $force whether to enforce the garbage collection regardless of [[gcProbability]].
-     * Defaults to false, meaning the actual deletion happens with the probability as specified by [[gcProbability]].
-     * @param bool $expiredOnly whether to removed expired cache files only.
-     * If false, all cache files under [[cachePath]] will be removed.
+     * Removes expired cache files
+     * @throws \Exception
      */
-    public function gc($force = false, $expiredOnly = true)
+    public function gc(): void
     {
-        if ($force || random_int(0, 1000000) < $this->gcProbability) {
-            $this->gcRecursive($this->cachePath, $expiredOnly);
+        if (\random_int(0, 1000000) < $this->gcProbability) {
+            $this->removeCacheFiles($this->cachePath, true);
         }
     }
 
@@ -254,7 +227,7 @@ class FileCache extends SimpleCache
      * @param bool $expiredOnly whether to only remove expired cache files. If false, all files
      * under `$path` will be removed.
      */
-    protected function gcRecursive($path, $expiredOnly)
+    protected function removeCacheFiles(string $path, bool $expiredOnly): void
     {
         if (($handle = opendir($path)) !== false) {
             while (($file = readdir($handle)) !== false) {
@@ -263,7 +236,7 @@ class FileCache extends SimpleCache
                 }
                 $fullPath = $path . DIRECTORY_SEPARATOR . $file;
                 if (is_dir($fullPath)) {
-                    $this->gcRecursive($fullPath, $expiredOnly);
+                    $this->removeCacheFiles($fullPath, $expiredOnly);
                     if (!$expiredOnly && !@rmdir($fullPath)) {
                         $error = error_get_last();
                         throw new CacheException("Unable to remove directory '{$fullPath}': {$error['message']}");

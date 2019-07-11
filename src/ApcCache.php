@@ -35,15 +35,16 @@ class ApcCache extends SimpleCache
         return \apcu_exists($key);
     }
 
-    protected function getValue($key)
+    protected function getValue($key, $default = null)
     {
-        return \apcu_fetch($key);
+        $value = \apcu_fetch($key, $success);
+        return $success ? $value : $default;
     }
 
-    protected function getValues($keys): array
+    protected function getValues($keys, $default = null): array
     {
-        $values = \apcu_fetch($keys);
-        return \is_array($values) ? $values : [];
+        // TODO: test that all keys are returned
+        return \apcu_fetch($keys, $succses) ?: [];
     }
 
     protected function setValue($key, $value, $ttl): bool
