@@ -1,13 +1,13 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Cache\SimpleCache;
 
 /**
  * Dependency (abstract) tests.
  * @group caching
- * @author Boudewijn Vahrmeijer <vahrmeijer@gmail.com>
  */
 class DependencyTest extends TestCase
 {
@@ -15,15 +15,15 @@ class DependencyTest extends TestCase
     {
         $value = ['dummy'];
         $dependency = new MockDependency();
-        $this->setInaccessibleProperty($dependency, '_reusableData', $value, false);
-        $this->assertEquals($value, $this->getInaccessibleProperty($dependency, '_reusableData'));
+        $this->setInaccessibleProperty($dependency, 'reusableData', $value, false);
+        $this->assertEquals($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
 
         $dependency->resetReusableData();
 
-        $this->assertEquals([], $this->getInaccessibleProperty($dependency, '_reusableData'));
+        $this->assertEquals([], $this->getInaccessibleProperty($dependency, 'reusableData'));
     }
 
-    public function testGenerateReusableHash()
+    public function testGenerateReusableHash(): void
     {
         $dependency = $this->getMockForAbstractClass(Dependency::class);
         $dependency->data = 'dummy';
@@ -33,7 +33,7 @@ class DependencyTest extends TestCase
         $this->assertEquals(40, strlen($result));
     }
 
-    public function testIsChanged()
+    public function testIsChanged(): void
     {
         /* @var $dependency Dependency */
         /* @var $cache SimpleCache */
