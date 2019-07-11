@@ -1,8 +1,8 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
-use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\FileCache;
 
@@ -14,7 +14,7 @@ class FileCacheTest extends CacheTestCase
 {
     protected function createCacheInstance(): PsrCacheInterface
     {
-        return new FileCache(__DIR__ . '/runtime/cache');
+        return new FileCache(__DIR__ . '/runtime/cache', null, new NullLogger());
     }
 
     /**

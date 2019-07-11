@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
+use Psr\Log\NullLogger;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\TagDependency;
@@ -29,7 +30,7 @@ trait IntegrationTestTrait
     public function preparedIntegrationCacheProvider()
     {
         return [
-            [$this->prepare(new Cache($this->getTestScopeInstance()))]
+            [$this->prepare(new Cache($this->getTestScopeInstance(), new NullLogger()))]
         ];
     }
 
@@ -123,7 +124,7 @@ trait IntegrationTestTrait
      */
     public function testGetOrSetWithDependencies(PsrCacheInterface $cache)
     {
-        $cache = new Cache($cache);
+        $cache = new Cache($cache, new NullLogger());
         $dependency = new TagDependency('test');
 
         $expected = 'SilverFire';
