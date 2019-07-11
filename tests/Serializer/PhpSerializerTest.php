@@ -9,9 +9,6 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  */
 class PhpSerializerTest extends SerializerTest
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createSerializer(): SerializerInterface
     {
         return new PhpSerializer();

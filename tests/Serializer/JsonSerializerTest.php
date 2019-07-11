@@ -9,9 +9,6 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  */
 class JsonSerializerTest extends SerializerTest
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createSerializer(): SerializerInterface
     {
         return new JsonSerializer();

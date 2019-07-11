@@ -9,15 +9,10 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  */
 abstract class SerializerTest extends TestCase
 {
-    /**
-     * Creates serializer instance for the tests.
-     * @return SerializerInterface
-     */
     abstract protected function createSerializer(): SerializerInterface;
 
     /**
-     * Data provider for [[testSerialize()]]
-     * @return array test data.
+     * Data provider for {@see testSerialize()}
      */
     public function dataProviderSerialize(): array
     {
