@@ -76,7 +76,6 @@ abstract class SimpleCache implements CacheInterface
         $this->serializer = $serializer;
     }
 
-
     public function get($key, $default = null)
     {
         $key = $this->normalizeKey($key);
@@ -87,7 +86,6 @@ abstract class SimpleCache implements CacheInterface
 
         return $this->serializer->unserialize($value);
     }
-
 
     public function getMultiple($keys, $default = null)
     {
@@ -122,7 +120,6 @@ abstract class SimpleCache implements CacheInterface
         return $this->setValue($key, $value, $ttl);
     }
 
-
     public function setMultiple($values, $ttl = null): bool
     {
         $data = [];
@@ -134,13 +131,11 @@ abstract class SimpleCache implements CacheInterface
         return $this->setValues($data, $this->normalizeTtl($ttl));
     }
 
-
     public function delete($key): bool
     {
         $key = $this->normalizeKey($key);
         return $this->deleteValue($key);
     }
-
 
     public function deleteMultiple($keys): bool
     {

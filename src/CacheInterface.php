@@ -1,6 +1,8 @@
 <?php
 namespace Yiisoft\Cache;
 
+use Yiisoft\Cache\Dependencies\Dependency;
+
 /**
  * CacheInterface defines the common interface to be implemented by cache classes.
  * It extends [[\Psr\SimpleCache\CacheInterface]] adding ability for cache dependency specification.
@@ -45,12 +47,12 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param \Yiisoft\Cache\Dependencies\Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function set($key, $value, $ttl = null, $dependency = null): bool;
+    public function set($key, $value, $ttl = null, Dependency $dependency = null): bool;
 
     /**
      * Stores multiple items in cache. Each item contains a value identified by a key.
@@ -59,12 +61,12 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      *
      * @param array $items the items to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param \Yiisoft\Cache\Dependencies\Dependency $dependency dependency of the cached items. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool
      */
-    public function setMultiple($items, $ttl = null, $dependency = null): bool;
+    public function setMultiple($items, $ttl = null, Dependency $dependency = null): bool;
 
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
@@ -73,12 +75,12 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param \Yiisoft\Cache\Dependencies\Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool whether the value is successfully stored into cache
      */
-    public function add($key, $value, $ttl = 0, $dependency = null): bool;
+    public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool;
 
     /**
      * Stores multiple items in cache. Each item contains a value identified by a key.
@@ -86,12 +88,12 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      *
      * @param array $values the items to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param \Yiisoft\Cache\Dependencies\Dependency $dependency dependency of the cached items. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is false.
      * @return bool
      */
-    public function addMultiple($values, $ttl = 0, $dependency = null): bool;
+    public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool;
 
     /**
      * Method combines both [[set()]] and [[get()]] methods to retrieve value identified by a $key,
@@ -110,13 +112,13 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface, \ArrayAccess
      *
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
-     * @param callable|\Closure $callable the callable or closure that will be used to generate a value to be cached.
+     * @param callable $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param \Yiisoft\Cache\Dependencies\Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is `false`.
      * @return mixed result of $callable execution
      */
-    public function getOrSet($key, $callable, $ttl = null, $dependency = null);
+    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null);
 }

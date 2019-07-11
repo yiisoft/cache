@@ -176,6 +176,7 @@ class FileCache extends SimpleCache
                     throw new CacheException("Failed to truncate '$cacheFile");
                 }
 
+
                 if (file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
                     throw new CacheException("Failed to write data to '$cacheFile' totally");
                 }
