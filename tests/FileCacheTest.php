@@ -53,17 +53,17 @@ class FileCacheTest extends CacheTest
         $cache = $this->createCacheInstance();
 
         $cacheValue = uniqid('value_', false);
-        $cachePublicKey = uniqid('key_', false);
+        $cacheKey = uniqid('key_', false);
 
         static::$time = \time();
-        $this->assertTrue($cache->set($cachePublicKey, $cacheValue, 2));
-        $this->assertSame($cacheValue, $cache->get($cachePublicKey));
+        $this->assertTrue($cache->set($cacheKey, $cacheValue, 2));
+        $this->assertSame($cacheValue, $cache->get($cacheKey));
 
         // Override fileowner method so it always returns something not equal to the current user
-        $notCurrentEuid = function_exists('posix_geteuid') ? posix_geteuid() + 15 : 42;
-        $this->getFunctionMock('yii\cache', 'fileowner')->expects($this->any())->willReturn($notCurrentEuid);
-        $this->getFunctionMock('yii\cache', 'unlink')->expects($this->once());
+        $notCurrentEuid = posix_geteuid() + 15;
+        $this->getFunctionMock('Yiisoft\Cache', 'fileowner')->expects($this->any())->willReturn($notCurrentEuid);
+        $this->getFunctionMock('Yiisoft\Cache', 'unlink')->expects($this->once());
 
-        $this->assertTrue($cache->set($cachePublicKey, uniqid('value_2_', false), 2), 'Cannot rebuild cache on different file ownership');
+        $this->assertTrue($cache->set($cacheKey, uniqid('value_2_', false), 2), 'Cannot rebuild cache on different file ownership');
     }
 }
