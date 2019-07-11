@@ -30,7 +30,6 @@ namespace Yiisoft\Cache;
  */
 class ApcCache extends SimpleCache
 {
-
     public function hasValue($key): bool
     {
         return \apcu_exists($key);
