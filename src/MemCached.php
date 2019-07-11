@@ -252,7 +252,7 @@ final class MemCached extends SimpleCache
         return $this->cache->flush();
     }
 
-    protected function hasValue($key): bool
+    protected function hasValue(string $key): bool
     {
         $this->cache->get($key);
         return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
