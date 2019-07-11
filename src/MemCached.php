@@ -207,12 +207,10 @@ class MemCached extends SimpleCache
         return $this->cache->get($key);
     }
 
-
     protected function getValues($keys): array
     {
         return $this->cache->getMulti($keys);
     }
-
 
     protected function setValue($key, $value, $ttl): bool
     {
@@ -223,7 +221,6 @@ class MemCached extends SimpleCache
         return $this->cache->set($key, $value, $expire);
     }
 
-
     protected function setValues($values, $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
@@ -233,12 +230,10 @@ class MemCached extends SimpleCache
         return $this->cache->setMulti($values, $expire);
     }
 
-
     protected function deleteValue($key): bool
     {
         return $this->cache->delete($key, 0);
     }
-
 
     public function clear(): bool
     {

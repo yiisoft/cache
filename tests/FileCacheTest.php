@@ -17,11 +17,11 @@ class FileCacheTest extends CacheTest
         return new Cache(new FileCache(__DIR__ . '/runtime/cache'));
     }
 
-    /**
-     * @dataProvider cacheProvider
-     */
-    public function testExpire(\Psr\SimpleCache\CacheInterface $cache): void
+
+    public function testExpire(): void
     {
+        $cache = $this->createCacheInstance();
+
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         static::$time++;
@@ -30,11 +30,10 @@ class FileCacheTest extends CacheTest
         $this->assertNull($cache->get('expire_test'));
     }
 
-    /**
-     * @dataProvider cacheIntegrationProvider
-     */
-    public function testExpireAdd(CacheInterface $cache): void
+    public function testExpireAdd(): void
     {
+        $cache = $this->createCacheInstance();
+
         static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         static::$time++;
@@ -50,7 +49,7 @@ class FileCacheTest extends CacheTest
             $this->markTestSkipped('Travis second user not found');
         }
 
-        $cache = $this->getCacheInstance();
+        $cache = $this->createCacheInstance();
 
         $cacheValue = uniqid('value_');
         $cachePublicKey = uniqid('key_');
