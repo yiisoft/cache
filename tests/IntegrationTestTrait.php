@@ -5,6 +5,7 @@ use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\TagDependency;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+
 /**
  * Trait IntegrationTestTrait
  * This trait contains methods to test interaction of Cache + CacheInterface implementation

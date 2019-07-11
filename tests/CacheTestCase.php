@@ -57,7 +57,7 @@ abstract class CacheTestCase extends TestCase
     /**
      * Factory method to create particular implementation. Called once per test
      */
-    protected abstract function createCacheInstance() : PsrCacheInterface;
+    abstract protected function createCacheInstance() : PsrCacheInterface;
 
     protected function tearDown()
     {
