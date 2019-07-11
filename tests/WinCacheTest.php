@@ -18,8 +18,12 @@ class WinCacheTest extends CacheTest
             self::markTestSkipped('Required extension "wincache" is not loaded');
         }
 
+        if (!ini_get('wincache.enablecli')) {
+            self::markTestSkipped('Wincache is installed but not enabled. Enable with "wincache.enablecli" from php.ini. Skipping.');
+        }
+
         if (!ini_get('wincache.ucenabled')) {
-            self::markTestSkipped('Wincache user cache disabled. Skipping.');
+            self::markTestSkipped('Wincache user cache disabled. Enable with "wincache.ucenabled" from php.ini. Skipping.');
         }
     }
 

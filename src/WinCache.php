@@ -4,8 +4,8 @@ namespace Yiisoft\Cache;
 /**
  * WinCache provides Windows Cache caching in terms of an application component.
  *
- * To use this application component, the [WinCache PHP extension](http://www.iis.net/expand/wincacheforphp)
- * must be loaded. Also note that "wincache.ucenabled" should be set to "On" in your php.ini file.
+ * To use this application component, the [WinCache PHP extension](https://sourceforge.net/projects/wincache/)
+ * must be loaded. Also note that "wincache.ucenabled" should be set to "1" in your php.ini file.
  *
  * Application configuration example:
  *
@@ -30,59 +30,38 @@ namespace Yiisoft\Cache;
  */
 class WinCache extends SimpleCache
 {
-    /**
-     * {@inheritdoc}
-     */
     public function has($key): bool
     {
-        return wincache_ucache_exists($this->normalizeKey($key));
+        return \wincache_ucache_exists($this->normalizeKey($key));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValue($key)
     {
-        return wincache_ucache_get($key);
+        return \wincache_ucache_get($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValues($keys): array
     {
-        return wincache_ucache_get($keys);
+        return \wincache_ucache_get($keys);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setValue($key, $value, $ttl): bool
     {
-        return wincache_ucache_set($key, $value, $ttl);
+        return \wincache_ucache_set($key, $value, $ttl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setValues($values, $ttl): bool
     {
-        return wincache_ucache_set($values, null, $ttl);
+        return \wincache_ucache_set($values, null, $ttl) === [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function deleteValue($key): bool
     {
-        return wincache_ucache_delete($key);
+        return \wincache_ucache_delete($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): bool
     {
-        return wincache_ucache_clear();
+        return \wincache_ucache_clear();
     }
 }
