@@ -3,23 +3,6 @@ namespace Yiisoft\Cache\Tests;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-    public static $params;
-
-    /**
-     * Returns a test configuration param from /data/config.php.
-     * @param  string $name params name
-     * @param  mixed $default default value to use when param is not set.
-     * @return mixed  the value of the configuration param
-     */
-    public static function getParam($name, $default = null)
-    {
-        if (static::$params === null) {
-            static::$params = require dirname(__DIR__) . '/config/tests/params.php';
-        }
-
-        return static::$params[$name] ?? $default;
-    }
-
     /**
      * Invokes a inaccessible method.
      * @param $object

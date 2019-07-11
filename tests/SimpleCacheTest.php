@@ -14,10 +14,6 @@ class SimpleCacheTest extends TestCase
      */
     protected $cache;
 
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -27,9 +23,11 @@ class SimpleCacheTest extends TestCase
 
     /**
      * Data provider for [[testNormalizeTtl()]]
-     * @return array test data.
+     * @return array test data
+     *
+     * @throws \Exception
      */
-    public function dataProviderNormalizeTtl()
+    public function dataProviderNormalizeTtl(): array
     {
         return [
             [123, 123],
@@ -48,8 +46,9 @@ class SimpleCacheTest extends TestCase
      *
      * @param mixed $ttl
      * @param int $expectedResult
+     * @throws \ReflectionException
      */
-    public function testNormalizeTtl($ttl, $expectedResult)
+    public function testNormalizeTtl($ttl, $expectedResult): void
     {
         $this->cache->setDefaultTtl(9999);
         $this->assertEquals($expectedResult, $this->invokeMethod($this->cache, 'normalizeTtl', [$ttl]));
