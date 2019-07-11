@@ -25,7 +25,7 @@ final class ExpressionDependency extends Dependency
     public $expression = 'true';
     /**
      * @var mixed custom parameters associated with this dependency. You may get the value
-     * of this property in [[expression]] using `$this->params`.
+     * of this property in {@see expression} using `$this->params`.
      */
     public $params;
 

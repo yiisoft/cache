@@ -6,7 +6,7 @@ use Yiisoft\Cache\CacheInterface;
 /**
  * Dependency is the base class for cache dependency classes.
  *
- * Child classes should override its [[generateDependencyData()]] for generating
+ * Child classes should override its {@see generateDependencyData()} for generating
  * the actual dependency data.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).

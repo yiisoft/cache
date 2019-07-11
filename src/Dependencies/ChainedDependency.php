@@ -6,8 +6,8 @@ use Yiisoft\Cache\CacheInterface;
 /**
  * ChainedDependency represents a dependency which is composed of a list of other dependencies.
  *
- * When [[dependOnAll]] is true, if any of the dependencies has changed, this dependency is
- * considered changed; When [[dependOnAll]] is false, if one of the dependencies has NOT changed,
+ * When {@see dependOnAll} is true, if any of the dependencies has changed, this dependency is
+ * considered changed; When {@see dependOnAll} is false, if one of the dependencies has NOT changed,
  * this dependency is considered NOT changed.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
@@ -20,7 +20,7 @@ final class ChainedDependency extends Dependency
      */
     public $dependencies = [];
     /**
-     * @var bool whether this dependency is depending on every dependency in [[dependencies]].
+     * @var bool whether this dependency is depending on every dependency in {@see dependencies}.
      * Defaults to true, meaning if any of the dependencies has changed, this dependency is considered changed.
      * When it is set false, it means if one of the dependencies has NOT changed, this dependency
      * is considered NOT changed.

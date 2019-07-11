@@ -9,7 +9,7 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  * FileCache implements a cache handler using files.
  *
  * For each data value being cached, FileCache will store it in a separate file.
- * The cache files are placed under [[cachePath]]. FileCache will perform garbage collection
+ * The cache files are placed under {@see cachePath}. FileCache will perform garbage collection
  * automatically to remove expired cache files.
  *
  * Application configuration example:
@@ -30,7 +30,7 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  * ];
  * ```
  *
- * Please refer to [[\Psr\SimpleCache\CacheInterface]] for common cache operations that are supported by FileCache.
+ * Please refer to {@see \Psr\SimpleCache\CacheInterface} for common cache operations that are supported by FileCache.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
@@ -230,7 +230,7 @@ final class FileCache extends SimpleCache
 
     /**
      * Recursively removing expired cache files under a directory.
-     * This method is mainly used by [[gc()]].
+     * This method is mainly used by {@see gc()}.
      * @param string $path the directory under which expired cache files are removed.
      * @param bool $expiredOnly whether to only remove expired cache files. If false, all files
      * under `$path` will be removed.

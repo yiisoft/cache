@@ -9,10 +9,10 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  * MemCached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
  * extension.
  *
- * MemCached can be configured with a list of memcached servers by settings its [[servers]] property.
+ * MemCached can be configured with a list of memcached servers by settings its {@see servers} property.
  * By default, MemCached assumes there is a memcached server running on localhost at port 11211.
  *
- * See [[\Psr\SimpleCache\CacheInterface]] for common cache operations that MemCached supports.
+ * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that MemCached supports.
  *
  * Note, there is no security measure to protected data in memcached.
  * All data in memcached can be accessed by any process running in the system.
@@ -45,7 +45,7 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  * ```
  *
  * In the above, two memcached servers are used: server1 and server2. You can configure more properties of
- * each server, such as `persistent`, `weight`, `timeout`. Please see [[MemCacheServer]] for available options.
+ * each server, such as `persistent`, `weight`, `timeout`. Please see {@see MemCacheServer} for available options.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
