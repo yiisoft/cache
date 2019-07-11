@@ -139,7 +139,7 @@ final class Cache implements CacheInterface
      * this method will try to simulate it.
      * @param string[] $keys list of string keys identifying the cached values
      * @param mixed $default Default value to return for keys that do not exist.
-     * @return interable list of cached values corresponding to the specified keys. The array
+     * @return iterable list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
      * @throws InvalidArgumentException
