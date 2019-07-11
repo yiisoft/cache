@@ -4,7 +4,7 @@ namespace Yiisoft\Cache\Serializer;
 /**
  * CallbackSerializer serializes data via custom PHP callback.
  */
-class CallbackSerializer implements SerializerInterface
+final class CallbackSerializer implements SerializerInterface
 {
     /**
      * @var callable PHP callback, which should be used to serialize value.

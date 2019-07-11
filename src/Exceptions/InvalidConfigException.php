@@ -1,6 +1,6 @@
 <?php
 namespace Yiisoft\Cache\Exceptions;
 
-class InvalidConfigException extends CacheException
+final class InvalidConfigException extends CacheException
 {
 }

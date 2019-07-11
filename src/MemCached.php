@@ -48,7 +48,7 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class MemCached extends SimpleCache
+final class MemCached extends SimpleCache
 {
     /**
      * @var string an ID that identifies a Memcached instance.

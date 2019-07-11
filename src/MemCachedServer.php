@@ -9,7 +9,7 @@ namespace Yiisoft\Cache;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class MemCachedServer
+final class MemCachedServer
 {
     /**
      * @var string memcached server hostname or IP address

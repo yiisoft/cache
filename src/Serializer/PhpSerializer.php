@@ -4,7 +4,7 @@ namespace Yiisoft\Cache\Serializer;
 /**
  * PhpSerializer uses native PHP `serialize()` and `unserialize()` functions for the serialization.
  */
-class PhpSerializer implements SerializerInterface
+final class PhpSerializer implements SerializerInterface
 {
     public function serialize($value): string
     {

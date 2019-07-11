@@ -54,7 +54,7 @@ use Yiisoft\Cache\Exceptions\SetCacheException;
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
  */
-class Cache implements CacheInterface
+final class Cache implements CacheInterface
 {
     /**
      * @var \Psr\SimpleCache\CacheInterface actual cache handler.

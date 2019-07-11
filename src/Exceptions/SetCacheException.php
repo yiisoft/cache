@@ -3,7 +3,7 @@ namespace Yiisoft\Cache\Exceptions;
 
 use Yiisoft\Cache\CacheInterface;
 
-class SetCacheException extends CacheException
+final class SetCacheException extends CacheException
 {
     /**
      * @var string
