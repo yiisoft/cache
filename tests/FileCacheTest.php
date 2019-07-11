@@ -5,6 +5,7 @@ use Psr\Log\NullLogger;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\FileCache;
+use phpmock\phpunit\PHPMock;
 
 /**
  * Class for testing file cache backend.
@@ -12,6 +13,8 @@ use Yiisoft\Cache\FileCache;
  */
 class FileCacheTest extends CacheTest
 {
+    use PHPMock;
+
     protected function createCacheInstance(): CacheInterface
     {
         return new Cache(new FileCache(__DIR__ . '/runtime/cache', new NullLogger()));
@@ -43,36 +46,24 @@ class FileCacheTest extends CacheTest
 
     public function testCacheRenewalOnDifferentOwnership(): void
     {
-        $TRAVIS_SECOND_USER = getenv('TRAVIS_SECOND_USER');
-        if (empty($TRAVIS_SECOND_USER)) {
-            $this->markTestSkipped('Travis second user not found');
+        if (!function_exists('posix_geteuid')) {
+            $this->markTestSkipped('Can not test on non-POSIX OS.');
         }
 
         $cache = $this->createCacheInstance();
 
-        $cacheValue = uniqid('value_');
-        $cachePublicKey = uniqid('key_');
-        $cacheInternalKey = $this->invokeMethod($cache, 'buildKey', [$cachePublicKey]);
+        $cacheValue = uniqid('value_', false);
+        $cachePublicKey = uniqid('key_', false);
 
         static::$time = \time();
         $this->assertTrue($cache->set($cachePublicKey, $cacheValue, 2));
         $this->assertSame($cacheValue, $cache->get($cachePublicKey));
 
-        $refClass = new \ReflectionClass($cache->getHandler());
-        $refMethodGetCacheFile = $refClass->getMethod('getCacheFile');
-        $refMethodGetCacheFile->setAccessible(true);
-        $cacheFile = $refMethodGetCacheFile->invoke($cache->getHandler(), $cacheInternalKey);
-        $refMethodGetCacheFile->setAccessible(false);
+        // Override fileowner method so it always returns something not equal to the current user
+        $notCurrentEuid = function_exists('posix_geteuid') ? posix_geteuid() + 15 : 42;
+        $this->getFunctionMock('yii\cache', 'fileowner')->expects($this->any())->willReturn($notCurrentEuid);
+        $this->getFunctionMock('yii\cache', 'unlink')->expects($this->once());
 
-        $output = array();
-        $returnVar = null;
-        exec(sprintf('sudo chown %s %s',
-            escapeshellarg($TRAVIS_SECOND_USER),
-            escapeshellarg($cacheFile)
-        ), $output, $returnVar);
-
-        $this->assertSame(0, $returnVar, 'Cannot change ownership of cache file to test cache renewal');
-
-        $this->assertTrue($cache->set($cachePublicKey, uniqid('value_2_'), 2), 'Cannot rebuild cache on different file ownership');
+        $this->assertTrue($cache->set($cachePublicKey, uniqid('value_2_', false), 2), 'Cannot rebuild cache on different file ownership');
     }
 }
