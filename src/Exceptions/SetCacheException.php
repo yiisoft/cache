@@ -23,8 +23,7 @@ class SetCacheException extends CacheException
         $message = 'Could not store the value in the cache',
         $code = 0,
         \Throwable $previous = null
-    )
-    {
+    ) {
         $this->key = $key;
         $this->value = $value;
         $this->cache = $cache;
