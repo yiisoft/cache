@@ -392,7 +392,7 @@ class Cache implements CacheInterface
      * @throws SetCacheException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getOrSet($key, $callable, $ttl = null, $dependency = null)
+    public function getOrSet($key, $callable, $ttl = null, Dependency $dependency = null)
     {
         if (($value = $this->get($key)) !== null) {
             return $value;
