@@ -1,9 +1,9 @@
 <?php
 namespace Yiisoft\Cache;
 
+use Psr\Log\LoggerInterface;
 use Yiisoft\Cache\Dependencies\Dependency;
 use Yiisoft\Strings\StringHelper;
-use yii\helpers\Yii;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -62,13 +62,15 @@ class Cache implements CacheInterface
      */
     private $handler;
 
+    private $logger;
 
     /**
      * @param \Psr\SimpleCache\CacheInterface cache handler.
      */
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler = null, LoggerInterface $logger)
     {
         $this->setHandler($handler);
+        $this->logger = $logger;
     }
 
     public function getHandler(): \Psr\SimpleCache\CacheInterface
@@ -380,7 +382,7 @@ class Cache implements CacheInterface
      *
      * ```php
      * public function getTopProducts($count = 10) {
-     *     $cache = $this->cache; // Could be Yii::getApp()->cache
+     *     $cache = $this->cache;
      *     return $cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
      *         return Products::find()->mostPopular()->limit(10)->all();
      *     }, 1000);
@@ -405,7 +407,7 @@ class Cache implements CacheInterface
 
         $value = $callable($this);
         if (!$this->set($key, $value, $ttl, $dependency)) {
-            Yii::warning('Failed to set cache value for key ' . json_encode($key), __METHOD__);
+            $this->logger->warning('Failed to set cache value for key ' . json_encode($key));
         }
 
         return $value;
