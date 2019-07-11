@@ -1,6 +1,8 @@
 <?php
 namespace Yiisoft\Cache\Dependencies;
 
+use Yiisoft\Cache\CacheInterface;
+
 /**
  * Dependency is the base class for cache dependency classes.
  *
@@ -27,21 +29,21 @@ abstract class Dependency
     /**
      * @var array static storage of cached data for reusable dependencies.
      */
-    private static $_reusableData = [];
+    private static $reusableData = [];
 
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
      * This method is invoked by cache before writing data into it.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      */
     public function evaluateDependency($cache): void
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
-            if (!array_key_exists($hash, self::$_reusableData)) {
-                self::$_reusableData[$hash] = $this->generateDependencyData($cache);
+            if (!array_key_exists($hash, self::$reusableData)) {
+                self::$reusableData[$hash] = $this->generateDependencyData($cache);
             }
-            $this->data = self::$_reusableData[$hash];
+            $this->data = self::$reusableData[$hash];
         } else {
             $this->data = $this->generateDependencyData($cache);
         }
@@ -49,17 +51,17 @@ abstract class Dependency
 
     /**
      * Checks whether the dependency is changed.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return bool whether the dependency has changed.
      */
     public function isChanged($cache): bool
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
-            if (!array_key_exists($hash, self::$_reusableData)) {
-                self::$_reusableData[$hash] = $this->generateDependencyData($cache);
+            if (!array_key_exists($hash, self::$reusableData)) {
+                self::$reusableData[$hash] = $this->generateDependencyData($cache);
             }
-            $data = self::$_reusableData[$hash];
+            $data = self::$reusableData[$hash];
         } else {
             $data = $this->generateDependencyData($cache);
         }
@@ -72,7 +74,7 @@ abstract class Dependency
      */
     public static function resetReusableData(): void
     {
-        self::$_reusableData = [];
+        self::$reusableData = [];
     }
 
     /**
@@ -92,7 +94,7 @@ abstract class Dependency
     /**
      * Generates the data needed to determine if dependency is changed.
      * Derived classes should override this method to generate the actual dependency data.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      */
     abstract protected function generateDependencyData($cache);
