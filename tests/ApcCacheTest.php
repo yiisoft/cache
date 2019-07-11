@@ -13,7 +13,7 @@ use Yiisoft\Cache\CacheInterface;
  */
 class ApcCacheTest extends CacheTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!extension_loaded('apcu')) {
             self::markTestSkipped('Required extension "apcu" is not loaded');

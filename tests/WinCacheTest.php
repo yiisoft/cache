@@ -12,7 +12,7 @@ use Yiisoft\Cache\WinCache;
  */
 class WinCacheTest extends CacheTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!extension_loaded('wincache')) {
             self::markTestSkipped('Required extension "wincache" is not loaded');

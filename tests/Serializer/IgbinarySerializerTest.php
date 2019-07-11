@@ -9,7 +9,7 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  */
 class IgbinarySerializerTest extends SerializerTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!function_exists('igbinary_serialize')) {
             $this->markTestSkipped('igbinary extension is required.');

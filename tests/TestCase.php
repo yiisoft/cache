@@ -12,7 +12,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @return mixed
      * @throws \ReflectionException
      */
-    protected function invokeMethod($object, $method, $args = [], $revoke = true)
+    protected function invokeMethod($object, $method, array $args = [], bool $revoke = true)
     {
         $reflection = new \ReflectionObject($object);
         $method = $reflection->getMethod($method);
@@ -33,7 +33,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param bool $revoke whether to make property inaccessible after setting
      * @throws \ReflectionException
      */
-    protected function setInaccessibleProperty($object, $propertyName, $value, $revoke = true)
+    protected function setInaccessibleProperty($object, $propertyName, $value, bool $revoke = true): void
     {
         $class = new \ReflectionClass($object);
         while (!$class->hasProperty($propertyName)) {
@@ -56,7 +56,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @return mixed
      * @throws \ReflectionException
      */
-    protected function getInaccessibleProperty($object, $propertyName, $revoke = true)
+    protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
     {
         $class = new \ReflectionClass($object);
         while (!$class->hasProperty($propertyName)) {

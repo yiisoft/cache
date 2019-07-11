@@ -14,7 +14,7 @@ class SimpleCacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +48,7 @@ class SimpleCacheTest extends TestCase
      * @param int $expectedResult
      * @throws \ReflectionException
      */
-    public function testNormalizeTtl($ttl, $expectedResult): void
+    public function testNormalizeTtl($ttl, int $expectedResult): void
     {
         $this->cache->setDefaultTtl(9999);
         $this->assertEquals($expectedResult, $this->invokeMethod($this->cache, 'normalizeTtl', [$ttl]));
