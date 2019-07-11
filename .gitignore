@@ -20,5 +20,6 @@ composer.phar
 phpunit.phar
 # local phpunit config
 /phpunit.xml
+/.phpunit.result.cache
 
-tests/runtime
+/tests/runtime
