@@ -42,7 +42,7 @@ class ArrayCache extends SimpleCache
         return isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > microtime(true));
     }
 
-    protected function getValue($key, $default = null)
+    protected function getValue(string $key, $default = null)
     {
         if (isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > microtime(true))) {
             return $this->cache[$key][0];
@@ -51,13 +51,13 @@ class ArrayCache extends SimpleCache
         return $default;
     }
 
-    protected function setValue($key, $value, $ttl): bool
+    protected function setValue(string $key, $value, int $ttl): bool
     {
         $this->cache[$key] = [$value, $ttl === 0 ? 0 : microtime(true) + $ttl];
         return true;
     }
 
-    protected function deleteValue($key): bool
+    protected function deleteValue(string $key): bool
     {
         unset($this->cache[$key]);
         return true;

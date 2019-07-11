@@ -195,13 +195,6 @@ abstract class CacheTest extends TestCase
         $this->assertNull($cache->get('number_test'));
     }
 
-    public function testArrayAccess(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache['arrayaccess_test'] = new \stdClass();
-        $this->assertInstanceOf('stdClass', $cache['arrayaccess_test']);
-    }
-
     public function testExpireAdd(): void
     {
         $cache = $this->createCacheInstance();

@@ -1,6 +1,8 @@
 <?php
 namespace Yiisoft\Cache\Dependencies;
 
+use Yiisoft\Cache\CacheInterface;
+
 /**
  * ChainedDependency represents a dependency which is composed of a list of other dependencies.
  *
@@ -28,9 +30,9 @@ class ChainedDependency extends Dependency
 
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      */
-    public function evaluateDependency($cache): void
+    public function evaluateDependency(CacheInterface $cache): void
     {
         foreach ($this->dependencies as $dependency) {
             $dependency->evaluateDependency($cache);
@@ -40,16 +42,16 @@ class ChainedDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method does nothing in this class.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      */
-    protected function generateDependencyData($cache)
+    protected function generateDependencyData(CacheInterface $cache)
     {
         return null;
     }
 
 
-    public function isChanged($cache): bool
+    public function isChanged(CacheInterface $cache): bool
     {
         foreach ($this->dependencies as $dependency) {
             if ($this->dependOnAll && $dependency->isChanged($cache)) {

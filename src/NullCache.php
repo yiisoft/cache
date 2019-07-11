@@ -1,8 +1,10 @@
 <?php
 namespace Yiisoft\Cache;
 
+use Yiisoft\Cache\Dependencies\Dependency;
+
 /**
- * DummyCache is a placeholder cache component.
+ * NullCache is a placeholder cache component.
  *
  * Application configuration example:
  *
@@ -28,11 +30,21 @@ namespace Yiisoft\Cache;
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class NullCache implements \Psr\SimpleCache\CacheInterface
+class NullCache implements CacheInterface
 {
-    public function has($key): bool
+    public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool
     {
-        return false;
+        return true;
+    }
+
+    public function deleteMultiple($keys)
+    {
+        // do nothing
+    }
+
+    public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
+    {
+        return true;
     }
 
     public function get($key, $default = null)
@@ -40,33 +52,38 @@ class NullCache implements \Psr\SimpleCache\CacheInterface
         return $default;
     }
 
-    public function set($key, $value, $ttl = null): bool
-    {
-        return true;
-    }
-
-    public function delete($key): bool
-    {
-        return true;
-    }
-
-    public function clear(): bool
-    {
-        return true;
-    }
-
-    public function getMultiple($keys, $default = null): array
+    public function getMultiple($keys, $default = null)
     {
         return array_fill_keys($keys, $default);
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
     {
         return true;
     }
 
-    public function deleteMultiple($keys): bool
+    public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool
     {
         return true;
+    }
+
+    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null)
+    {
+        return $callable($this);
+    }
+
+    public function delete($key)
+    {
+        // do nothing
+    }
+
+    public function clear()
+    {
+        return true;
+    }
+
+    public function has($key)
+    {
+        return false;
     }
 }

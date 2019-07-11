@@ -1,6 +1,8 @@
 <?php
 namespace Yiisoft\Cache\Dependencies;
 
+use Yiisoft\Cache\CacheInterface;
+
 /**
  * ExpressionDependency represents a dependency based on the result of a PHP expression.
  *
@@ -31,10 +33,10 @@ class ExpressionDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method returns the result of the PHP expression.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      */
-    protected function generateDependencyData($cache)
+    protected function generateDependencyData(CacheInterface $cache)
     {
         return eval("return {$this->expression};");
     }

@@ -1,6 +1,7 @@
 <?php
 namespace Yiisoft\Cache\Dependencies;
 
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Exceptions\InvalidConfigException;
 
 /**
@@ -23,11 +24,11 @@ class FileDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * This method returns the file's last modification time.
-     * @param \Yiisoft\Cache\CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      * @throws InvalidConfigException if [[fileName]] is not set
      */
-    protected function generateDependencyData($cache)
+    protected function generateDependencyData(CacheInterface $cache)
     {
         if ($this->fileName === null) {
             throw new InvalidConfigException('FileDependency::fileName must be set');

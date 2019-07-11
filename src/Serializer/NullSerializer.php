@@ -11,7 +11,7 @@ class NullSerializer implements SerializerInterface
         return $value;
     }
 
-    public function unserialize(string $value)
+    public function unserialize(string $value): string
     {
         return $value;
     }

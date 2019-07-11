@@ -201,7 +201,7 @@ class MemCached extends SimpleCache
         $this->password = $password;
     }
 
-    protected function getValue($key, $default = null)
+    protected function getValue(string $key, $default = null)
     {
         $value = $this->cache->get($key);
 
@@ -212,7 +212,7 @@ class MemCached extends SimpleCache
         return $default;
     }
 
-    protected function getValues($keys, $default = null): array
+    protected function getValues(array $keys, $default = null): array
     {
         $values = $this->cache->getMulti($keys);
 
@@ -224,7 +224,7 @@ class MemCached extends SimpleCache
         return array_fill_keys($keys, $default);
     }
 
-    protected function setValue($key, $value, $ttl): bool
+    protected function setValue(string $key, $value, int $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
         // @see http://php.net/manual/en/memcached.expiration.php
@@ -233,7 +233,7 @@ class MemCached extends SimpleCache
         return $this->cache->set($key, $value, $expire);
     }
 
-    protected function setValues($values, $ttl): bool
+    protected function setValues(array $values, int $ttl): bool
     {
         // Use UNIX timestamp since it doesn't have any limitation
         // @see http://php.net/manual/en/memcached.expiration.php
@@ -242,7 +242,7 @@ class MemCached extends SimpleCache
         return $this->cache->setMulti($values, $expire);
     }
 
-    protected function deleteValue($key): bool
+    protected function deleteValue(string $key): bool
     {
         return $this->cache->delete($key);
     }
