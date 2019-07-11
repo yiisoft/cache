@@ -1,8 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
-use Psr\Log\LoggerInterface;
-use Yiisoft\Cache\Exceptions\Exception;
+use Yiisoft\Cache\Exceptions\CacheException;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 use Yiisoft\Strings\StringHelper;
 
@@ -22,7 +21,7 @@ use Yiisoft\Strings\StringHelper;
  *             '__class' => Yiisoft\Cache\Cache::class,
  *             'handler' => [
  *                 '__class' => Yiisoft\Cache\FileCache::class,
- *                 // 'cachePath' => '@runtime/cache',
+ *                 'cachePath' => Yiisoft\Aliases\Aliases::get('@runtime/cache'),
  *             ],
  *         ],
  *         // ...
@@ -39,7 +38,6 @@ class FileCache extends SimpleCache
 {
     /**
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.
-     * If not set, it will use the "cache" subdirectory under the application runtime path.
      */
     private $cachePath;
     /**
@@ -73,14 +71,11 @@ class FileCache extends SimpleCache
      */
     private $dirMode = 0775;
 
-    private $logger;
-
     private const NEGATIVE_TTL_REPLACEMENT = 60 * 60 * 24 * 365;
 
 
-    public function __construct(string $cachePath = '@runtime/cache', SerializerInterface $serializer = null, LoggerInterface $logger)
+    public function __construct(string $cachePath, SerializerInterface $serializer = null)
     {
-        $this->logger = $logger;
         $this->setCachePath($cachePath);
         parent::__construct($serializer);
     }
@@ -92,9 +87,7 @@ class FileCache extends SimpleCache
     public function setCachePath(string $cachePath)
     {
         $this->cachePath = $cachePath;
-        if (!is_dir($this->cachePath)) {
-            $this->createDirectory($this->cachePath, $this->dirMode, true);
-        }
+        $this->createDirectory($this->cachePath, $this->dirMode);
     }
 
     /**
@@ -168,12 +161,12 @@ class FileCache extends SimpleCache
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
-            $this->createDirectory(\dirname($cacheFile), $this->dirMode, true);
+            $this->createDirectory(\dirname($cacheFile), $this->dirMode);
         }
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
         // https://github.com/yiisoft/yii2/pull/16120
-        if (is_file($cacheFile) && \function_exists('posix_geteuid') && fileowner($cacheFile) !== posix_geteuid()) {
+        if (\function_exists('posix_geteuid') && is_file($cacheFile) && fileowner($cacheFile) !== posix_geteuid()) {
             @unlink($cacheFile);
         }
 
@@ -182,15 +175,15 @@ class FileCache extends SimpleCache
             // because it does not modify file content, if failed to read
             if ($fd = fopen($cacheFile, 'cb')) {
                 if (!flock($fd, LOCK_EX)) {
-                    throw new Exception("Failed to flock '$cacheFile'");
+                    throw new CacheException("Failed to flock '$cacheFile'");
                 }
 
                 if (!ftruncate($fd, 0)) {
-                    throw new Exception("Failed to truncate '$cacheFile");
+                    throw new CacheException("Failed to truncate '$cacheFile");
                 }
 
                 if (file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
-                    throw new Exception("Failed to write data to '$cacheFile' totally");
+                    throw new CacheException("Failed to write data to '$cacheFile' totally");
                 }
 
                 if ($ttl <= 0) {
@@ -198,7 +191,7 @@ class FileCache extends SimpleCache
                 }
                 $mtimeInstallationResult = touch($cacheFile, time() + $ttl);
                 if (!$mtimeInstallationResult) {
-                    throw new Exception("Failed to install mtime to file '$cacheFile'");
+                    throw new CacheException("Failed to install mtime to file '$cacheFile'");
                 }
                 flock($fd, LOCK_UN);
                 fclose($fd);
@@ -274,7 +267,7 @@ class FileCache extends SimpleCache
     {
         if (($handle = opendir($path)) !== false) {
             while (($file = readdir($handle)) !== false) {
-                if ($file[0] === '.') {
+                if (strpos($file, '.') === 0) {
                     continue;
                 }
                 $fullPath = $path . DIRECTORY_SEPARATOR . $file;
@@ -282,12 +275,12 @@ class FileCache extends SimpleCache
                     $this->gcRecursive($fullPath, $expiredOnly);
                     if (!$expiredOnly && !@rmdir($fullPath)) {
                         $error = error_get_last();
-                        $this->logger->warning("Unable to remove directory '{$fullPath}': {$error['message']}");
+                        throw new CacheException("Unable to remove directory '{$fullPath}': {$error['message']}");
                     }
                 } elseif (!$expiredOnly || ($expiredOnly && @filemtime($fullPath) < time())) {
                     if (!@unlink($fullPath)) {
                         $error = error_get_last();
-                        $this->logger->warning("Unable to remove file '{$fullPath}': {$error['message']}");
+                        throw new CacheException("Unable to remove file '{$fullPath}': {$error['message']}");
                     }
                 }
             }
@@ -295,29 +288,10 @@ class FileCache extends SimpleCache
         }
     }
 
-    private function createDirectory($path, $mode = 0775, $recursive = true): bool
+    private function createDirectory(string $cachePath, int $mode, bool $recursive = true): void
     {
-        if (is_dir($path)) {
-            return true;
-        }
-        $parentDir = \dirname($path);
-        // recurse if parent dir does not exist and we are not at the root of the file system.
-        if ($recursive && $parentDir !== $path && !is_dir($parentDir)) {
-            $this->createDirectory($parentDir, $mode, true);
-        }
-        try {
-            if (!mkdir($path, $mode) && !is_dir($path)) {
-                return false;
-            }
-        } catch (\Exception $e) {
-            if (!is_dir($path)) {// https://github.com/yiisoft/yii2/issues/9288
-                throw new \RuntimeException("Failed to create directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
-            }
-        }
-        try {
-            return chmod($path, $mode);
-        } catch (\Exception $e) {
-            throw new \RuntimeException("Failed to change permissions for directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
+        if (!is_dir($cachePath) && !mkdir($cachePath, $mode, $recursive) && !is_dir($cachePath)) {
+            throw new CacheException("Failed to create cache directory $cachePath");
         }
     }
 }

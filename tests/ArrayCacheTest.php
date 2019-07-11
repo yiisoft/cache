@@ -1,7 +1,6 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
-use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
@@ -21,7 +20,7 @@ class ArrayCacheTest extends CacheTestCase
     protected function getCacheInstance()
     {
         if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache(new ArrayCache(), new NullLogger());
+            $this->_cacheInstance = new Cache(new ArrayCache());
         }
 
         return $this->_cacheInstance;
