@@ -197,7 +197,7 @@ final class FileCache extends SimpleCache
      * @param string $key cache key
      * @return string the cache file path
      */
-    protected function getCacheFile(string $key): string
+    private function getCacheFile(string $key): string
     {
         if ($this->directoryLevel > 0) {
             $base = $this->cachePath;
@@ -237,11 +237,11 @@ final class FileCache extends SimpleCache
      * @param bool $expiredOnly whether to only remove expired cache files. If false, all files
      * under `$path` will be removed.
      */
-    protected function removeCacheFiles(string $path, bool $expiredOnly): void
+    private function removeCacheFiles(string $path, bool $expiredOnly): void
     {
         if (($handle = opendir($path)) !== false) {
             while (($file = readdir($handle)) !== false) {
-                if (strpos($file, '.') === 0) {
+                if (strncmp($file, '.', 1) === 0) {
                     continue;
                 }
                 $fullPath = $path . DIRECTORY_SEPARATOR . $file;

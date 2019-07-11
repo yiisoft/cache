@@ -40,7 +40,7 @@ abstract class Dependency
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
-            if (!array_key_exists($hash, self::$reusableData)) {
+            if (!\array_key_exists($hash, self::$reusableData)) {
                 self::$reusableData[$hash] = $this->generateDependencyData($cache);
             }
             $this->data = self::$reusableData[$hash];
@@ -58,7 +58,7 @@ abstract class Dependency
     {
         if ($this->reusable) {
             $hash = $this->generateReusableHash();
-            if (!array_key_exists($hash, self::$reusableData)) {
+            if (!\array_key_exists($hash, self::$reusableData)) {
                 self::$reusableData[$hash] = $this->generateDependencyData($cache);
             }
             $data = self::$reusableData[$hash];

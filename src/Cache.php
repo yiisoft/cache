@@ -97,9 +97,9 @@ final class Cache implements CacheInterface
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
      */
-    protected function buildKey($key): string
+    private function buildKey($key): string
     {
-        if (is_string($key)) {
+        if (\is_string($key)) {
             return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
         }
         return md5(json_encode($key));
@@ -115,7 +115,7 @@ final class Cache implements CacheInterface
             return $default;
         }
 
-        if (is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
+        if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
             if ($value[1]->isChanged($this)) {
                 return $default;
             }
@@ -156,7 +156,7 @@ final class Cache implements CacheInterface
             $results[$key] = $default;
             if (isset($values[$newKey])) {
                 $value = $values[$newKey];
-                if (is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
+                if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
                     if ($value[1]->isChanged($this)) {
                         continue;
                     }
@@ -225,7 +225,6 @@ final class Cache implements CacheInterface
 
         return $this->handler->setMultiple($data, $ttl);
     }
-
 
     public function deleteMultiple($keys): bool
     {
