@@ -7,7 +7,9 @@
 
 namespace Yiisoft\Cache\Tests;
 
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\FileCache;
 
 /**
@@ -16,24 +18,16 @@ use Yiisoft\Cache\FileCache;
  */
 class FileCacheTest extends CacheTestCase
 {
-    private $_cacheInstance = null;
-
-    /**
-     * @return Cache
-     */
-    protected function getCacheInstance()
+    protected function createCacheInstance(): PsrCacheInterface
     {
-        if ($this->_cacheInstance === null) {
-            $this->_cacheInstance = new Cache(new FileCache(__DIR__ . '/runtime/cache'));
-        }
-
-        return $this->_cacheInstance;
+        return new FileCache(__DIR__ . '/runtime/cache');
     }
 
-    public function testExpire()
+    /**
+     * @dataProvider ordinalCacheProvider
+     */
+    public function testExpire(\Psr\SimpleCache\CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         static::$time++;
@@ -42,10 +36,11 @@ class FileCacheTest extends CacheTestCase
         $this->assertNull($cache->get('expire_test'));
     }
 
-    public function testExpireAdd()
+    /**
+     * @dataProvider cacheIntegrationProvider
+     */
+    public function testExpireAdd(CacheInterface $cache)
     {
-        $cache = $this->getCacheInstance();
-
         static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         static::$time++;

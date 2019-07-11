@@ -9,6 +9,9 @@ namespace Yiisoft\Cache;
 
 use yii\helpers\FileHelper;
 use yii\helpers\Yii;
+use Yiisoft\Cache\Exceptions\Exception;
+use Yiisoft\Cache\Serializer\SerializerInterface;
+use Yiisoft\Strings\StringHelper;
 
 /**
  * FileCache implements a cache handler using files.
@@ -45,40 +48,42 @@ class FileCache extends SimpleCache
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.
      * If not set, it will use the "cache" subdirectory under the application runtime path.
      */
-    public $_cachePath;
+    private $cachePath;
     /**
      * @var string cache file suffix. Defaults to '.bin'.
      */
-    public $cacheFileSuffix = '.bin';
+    private $cacheFileSuffix = '.bin';
     /**
      * @var int the level of sub-directories to store cache files. Defaults to 1.
      * If the system has huge number of cache files (e.g. one million), you may use a bigger value
      * (usually no bigger than 3). Using sub-directories is mainly to ensure the file system
      * is not over burdened with a single directory having too many files.
      */
-    public $directoryLevel = 1;
+    private $directoryLevel = 1;
     /**
      * @var int the probability (parts per million) that garbage collection (GC) should be performed
      * when storing a piece of data in the cache. Defaults to 10, meaning 0.001% chance.
      * This number should be between 0 and 1000000. A value 0 means no GC will be performed at all.
      */
-    public $gcProbability = 10;
+    private $gcProbability = 10;
     /**
      * @var int the permission to be set for newly created cache files.
      * This value will be used by PHP chmod() function. No umask will be applied.
      * If not set, the permission will be determined by the current environment.
      */
-    public $fileMode;
+    private $fileMode;
     /**
      * @var int the permission to be set for newly created directories.
      * This value will be used by PHP chmod() function. No umask will be applied.
      * Defaults to 0775, meaning the directory is read-writable by owner and group,
      * but read-only for other users.
      */
-    public $dirMode = 0775;
+    private $dirMode = 0775;
+
+    private const NEGATIVE_TTL_REPLACEMENT = 60 * 60 * 24 * 365;
 
 
-    public function __construct(string $cachePath = '@runtime/cache', $serializer = null)
+    public function __construct(string $cachePath = '@runtime/cache', SerializerInterface $serializer = null)
     {
         $this->setCachePath($cachePath);
         parent::__construct($serializer);
@@ -104,6 +109,38 @@ class FileCache extends SimpleCache
         $cacheFile = $this->getCacheFile($this->normalizeKey($key));
 
         return @filemtime($cacheFile) > time();
+    }
+
+    /**
+     * @param string $cacheFileSuffix
+     */
+    public function setCacheFileSuffix(string $cacheFileSuffix): void
+    {
+        $this->cacheFileSuffix = $cacheFileSuffix;
+    }
+
+    /**
+     * @param int $gcProbability
+     */
+    public function setGcProbability(int $gcProbability): void
+    {
+        $this->gcProbability = $gcProbability;
+    }
+
+    /**
+     * @param int $fileMode
+     */
+    public function setFileMode(int $fileMode): void
+    {
+        $this->fileMode = $fileMode;
+    }
+
+    /**
+     * @param int $dirMode
+     */
+    public function setDirMode(int $dirMode): void
+    {
+        $this->dirMode = $dirMode;
     }
 
     /**
@@ -135,7 +172,11 @@ class FileCache extends SimpleCache
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
-            @FileHelper::createDirectory(\dirname($cacheFile), $this->dirMode, true);
+            try {
+                @FileHelper::createDirectory(\dirname($cacheFile), $this->dirMode, true);
+            } catch (\yii\exceptions\Exception $error) {
+                return false;
+            }
         }
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
@@ -143,19 +184,33 @@ class FileCache extends SimpleCache
         if (is_file($cacheFile) && \function_exists('posix_geteuid') && fileowner($cacheFile) !== posix_geteuid()) {
             @unlink($cacheFile);
         }
-        if (@file_put_contents($cacheFile, $value, LOCK_EX) !== false) {
-            if ($this->fileMode !== null) {
-                @chmod($cacheFile, $this->fileMode);
-            }
-            if ($ttl <= 0) {
-                $ttl = 31536000; // 1 year
-            }
 
-            return @touch($cacheFile, $ttl + time());
+        try {
+            // this implementation is more accurate than file_put_contents
+            // because it does not modify file content, if failed to read
+            if ($fd = fopen($cacheFile, 'cb'))
+            {
+                if (!flock($fd, LOCK_EX)) {
+                    throw new Exception("Failed to flock '$cacheFile'");
+                } else if(!ftruncate($fd, 0)) {
+                    throw new Exception("Failed to truncate '$cacheFile");
+                } else if(file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
+                    throw new Exception("Failed to write data to '$cacheFile' totally");
+                }
+                if ($ttl <= 0) {
+                    $ttl = self::NEGATIVE_TTL_REPLACEMENT;
+                }
+                $mtimeInstallationResult = touch($cacheFile, time() + $ttl);
+                if (!$mtimeInstallationResult) {
+                    throw new Exception("Failed to install mtime to file '$cacheFile'");
+                }
+                flock($fd, LOCK_UN);
+                fclose($fd);
+                return true;
+            }
+        } catch (Exception $error) {
+            unlink($cacheFile);
         }
-
-        $error = error_get_last();
-        Yii::warning("Unable to write cache file '{$cacheFile}': {$error['message']}", __METHOD__);
         return false;
     }
 

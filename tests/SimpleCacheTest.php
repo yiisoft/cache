@@ -57,7 +57,7 @@ class SimpleCacheTest extends TestCase
      */
     public function testNormalizeTtl($ttl, $expectedResult)
     {
-        $this->cache->defaultTtl = 9999;
+        $this->cache->setDefaultTtl(9999);
         $this->assertEquals($expectedResult, $this->invokeMethod($this->cache, 'normalizeTtl', [$ttl]));
     }
 }
