@@ -24,7 +24,7 @@ namespace Yiisoft\Cache;
  * ];
  * ```
  *
- * See [[\Psr\SimpleCache\CacheInterface]] for common cache operations that are supported by WinCache.
+ * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that are supported by WinCache.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */

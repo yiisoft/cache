@@ -12,10 +12,10 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * Derived classes should implement the following methods which do the actual cache storage operations:
  *
- * - [[getValue()]]: retrieve the value with a key (if any) from cache
- * - [[setValue()]]: store the value with a key into cache
- * - [[deleteValue()]]: delete the value with the specified key from cache
- * - [[clear()]]: delete all values from cache
+ * - {@see getValue()}: retrieve the value with a key (if any) from cache
+ * - {@see setValue()}: store the value with a key into cache
+ * - {@see deleteValue()}: delete the value with the specified key from cache
+ * - {@see clear()}: delete all values from cache
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
  * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
@@ -24,7 +24,7 @@ abstract class SimpleCache implements PsrCacheInterface
 {
     /**
      * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
-     * This value is used by [[set()]] and [[setMultiple()]], if the duration is not explicitly given.
+     * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
      */
     private $defaultTtl;
 
@@ -41,14 +41,14 @@ abstract class SimpleCache implements PsrCacheInterface
      * You can disable serialization by setting this property to `NullSerializer`,
      * data will be directly sent to and retrieved from the underlying
      * cache component without any serialization or deserialization. You should not turn off serialization if
-     * you are using [[Dependency|cache dependency]], because it relies on data serialization. Also, some
+     * you are using {@see Dependency|cache dependency}, because it relies on data serialization. Also, some
      * implementations of the cache can not correctly save and retrieve data different from a string type.
      */
     private $serializer;
 
     /**
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
-     * Serializer should be an instance of [[SerializerInterface]] or its DI compatible configuration.
+     * Serializer should be an instance of {@see SerializerInterface} or its DI compatible configuration.
      * @see setSerializer
      */
     public function __construct(SerializerInterface $serializer = null)

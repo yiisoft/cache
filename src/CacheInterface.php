@@ -5,13 +5,13 @@ use Yiisoft\Cache\Dependencies\Dependency;
 
 /**
  * CacheInterface defines the common interface to be implemented by cache classes.
- * It extends [[\Psr\SimpleCache\CacheInterface]] adding ability for cache dependency specification.
+ * It extends {@see \Psr\SimpleCache\CacheInterface} adding ability for cache dependency specification.
  *
- * A data item can be stored in the cache by calling [[set()]] and be retrieved back
- * later (in the same or different request) by [[get()]]. In both operations,
- * a key identifying the data item is required. An expiration time and/or a [[Dependency|dependency]]
- * can also be specified when calling [[set()]]. If the data item expires or the dependency
- * changes at the time of calling [[get()]], the cache will return no data.
+ * A data item can be stored in the cache by calling {@see set()} and be retrieved back
+ * later (in the same or different request) by {@see get()}. In both operations,
+ * a key identifying the data item is required. An expiration time and/or a {@see Dependency|dependency}
+ * can also be specified when calling {@see set()}. If the data item expires or the dependency
+ * changes at the time of calling {@see get()}, the cache will return no data.
  *
  * A typical usage pattern of cache is like the following:
  *
@@ -24,7 +24,7 @@ use Yiisoft\Cache\Dependencies\Dependency;
  * }
  * ```
  *
- * Because CacheInterface extends the [[\ArrayAccess]] interface, it can be used like an array. For example,
+ * Because CacheInterface extends the {@see \ArrayAccess} interface, it can be used like an array. For example,
  *
  * ```php
  * $cache['foo'] = 'some data';
@@ -48,8 +48,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool;
@@ -62,8 +62,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool
      */
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool;
@@ -76,8 +76,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
      */
     public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool;
@@ -89,14 +89,14 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool
      */
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool;
 
     /**
-     * Method combines both [[set()]] and [[get()]] methods to retrieve value identified by a $key,
+     * Method combines both {@see set()} and {@see get()} methods to retrieve value identified by a $key,
      * or to store the result of $callable execution if there is no cache available for the $key.
      *
      * Usage example:
@@ -116,8 +116,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is `false`.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is `false`.
      * @return mixed result of $callable execution
      */
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null);

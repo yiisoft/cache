@@ -7,7 +7,7 @@ use Yiisoft\Cache\Exceptions\SetCacheException;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
- * The actual data caching is performed via [[handler]], which should be configured to be [[\Psr\SimpleCache\CacheInterface]]
+ * The actual data caching is performed via {@see handler}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface}
  * instance.
  *
  * Application configuration example:
@@ -28,11 +28,11 @@ use Yiisoft\Cache\Exceptions\SetCacheException;
  * ];
  * ```
  *
- * A data item can be stored in the cache by calling [[set()]] and be retrieved back
- * later (in the same or different request) by [[get()]]. In both operations,
- * a key identifying the data item is required. An expiration time and/or a [[Dependency|dependency]]
- * can also be specified when calling [[set()]]. If the data item expires or the dependency
- * changes at the time of calling [[get()]], the cache will return no data.
+ * A data item can be stored in the cache by calling {@see set()} and be retrieved back
+ * later (in the same or different request) by {@see get()}. In both operations,
+ * a key identifying the data item is required. An expiration time and/or a {@see Dependency|dependency}
+ * can also be specified when calling {@see set()}. If the data item expires or the dependency
+ * changes at the time of calling {@see get()}, the cache will return no data.
  *
  * A typical usage pattern of cache is like the following:
  *
@@ -45,7 +45,7 @@ use Yiisoft\Cache\Exceptions\SetCacheException;
  * }
  * ```
  *
- * Because Cache implements the [[\ArrayAccess]] interface, it can be used like an array. For example,
+ * Because Cache implements the {@see \ArrayAccess} interface, it can be used like an array. For example,
  *
  * ```php
  * $cache['foo'] = 'some data';
@@ -180,8 +180,8 @@ final class Cache implements CacheInterface
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
      */
@@ -203,8 +203,8 @@ final class Cache implements CacheInterface
      * @param array $items the items to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool True on success and false on failure.
      * @throws InvalidArgumentException
      */
@@ -242,8 +242,8 @@ final class Cache implements CacheInterface
      * @param array $values the items to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached items. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool
      * @throws InvalidArgumentException
      */
@@ -280,8 +280,8 @@ final class Cache implements CacheInterface
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is false.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
      */
@@ -326,7 +326,7 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * Method combines both [[set()]] and [[get()]] methods to retrieve value identified by a $key,
+     * Method combines both {@see set()} and {@see get()} methods to retrieve value identified by a $key,
      * or to store the result of $callable execution if there is no cache available for the $key.
      *
      * Usage example:
@@ -346,8 +346,8 @@ final class Cache implements CacheInterface
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached item. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
-     * This parameter is ignored if [[serializer]] is `false`.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
+     * This parameter is ignored if {@see serializer} is `false`.
      * @return mixed result of $callable execution
      * @throws SetCacheException
      * @throws InvalidArgumentException

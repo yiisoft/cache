@@ -22,7 +22,7 @@ class SimpleCacheTest extends TestCase
     }
 
     /**
-     * Data provider for [[testNormalizeTtl()]]
+     * Data provider for {@see testNormalizeTtl()}
      * @return array test data
      *
      * @throws \Exception

@@ -5,9 +5,9 @@ use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\CacheInterface;
 
 /**
- * TagDependency associates a cached data item with one or multiple [[tags]].
+ * TagDependency associates a cached data item with one or multiple {@see tags}.
  *
- * By calling [[invalidate()]], you can invalidate all cached data items that are associated with the specified tag name(s).
+ * By calling {@see invalidate()}, you can invalidate all cached data items that are associated with the specified tag name(s).
  *
  * ```php
  * // setting multiple cache keys to store data forever and tagging them with "user-123"
@@ -68,7 +68,7 @@ final class TagDependency extends Dependency
     }
 
     /**
-     * Invalidates all of the cached data items that are associated with any of the specified [[tags]].
+     * Invalidates all of the cached data items that are associated with any of the specified {@see tags}.
      * @param CacheInterface $cache the cache component that caches the data items
      * @param string|array $tags
      */
