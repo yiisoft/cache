@@ -1,9 +1,9 @@
 <?php
 namespace Yiisoft\Cache;
 
+use Psr\Log\LoggerInterface;
 use Yiisoft\Cache\Exceptions\CacheException;
 use Yiisoft\Cache\Serializer\SerializerInterface;
-use Yiisoft\Strings\StringHelper;
 
 /**
  * FileCache implements a cache handler using files.
@@ -73,8 +73,11 @@ class FileCache extends SimpleCache
 
     private const NEGATIVE_TTL_REPLACEMENT = 31536000; // 1 year
 
-    public function __construct(string $cachePath, SerializerInterface $serializer = null)
+    private $logger;
+
+    public function __construct(string $cachePath, LoggerInterface $logger, SerializerInterface $serializer = null)
     {
+        $this->logger = $logger;
         $this->setCachePath($cachePath);
         parent::__construct($serializer);
     }
@@ -86,7 +89,10 @@ class FileCache extends SimpleCache
     public function setCachePath(string $cachePath): void
     {
         $this->cachePath = $cachePath;
-        $this->createDirectory($this->cachePath, $this->dirMode);
+
+        if (!$this->createDirectory($this->cachePath, $this->dirMode)) {
+            throw new CacheException('Failed to create cache directory "' . $this->cachePath . '"');
+        }
     }
 
 
@@ -152,7 +158,11 @@ class FileCache extends SimpleCache
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
-            $this->createDirectory(\dirname($cacheFile), $this->dirMode);
+            $directoryName = \dirname($cacheFile);
+            if (!$this->createDirectory($directoryName, $this->dirMode)) {
+                $this->logger->warning('Failed to create cache directory "' . $directoryName . '"');
+                return false;
+            }
         }
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
@@ -172,8 +182,8 @@ class FileCache extends SimpleCache
         }
 
         $error = error_get_last();
-        // log it instead
-        throw new CacheException("Failed to write data to \"$cacheFile\": " . $error['message']);
+        $this->logger->warning("Failed to write cache data to \"$cacheFile\": " . $error['message']);
+        return false;
     }
 
     protected function deleteValue($key): bool
@@ -252,10 +262,8 @@ class FileCache extends SimpleCache
         }
     }
 
-    private function createDirectory(string $cachePath, int $mode, bool $recursive = true): void
+    private function createDirectory(string $cachePath, int $mode, bool $recursive = true): bool
     {
-        if (!is_dir($cachePath) && !mkdir($cachePath, $mode, $recursive) && !is_dir($cachePath)) {
-            throw new CacheException("Failed to create cache directory $cachePath");
-        }
+        return is_dir($cachePath) || (mkdir($cachePath, $mode, $recursive) && is_dir($cachePath));
     }
 }
