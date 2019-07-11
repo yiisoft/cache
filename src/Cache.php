@@ -1,8 +1,8 @@
 <?php
 namespace Yiisoft\Cache;
 
-use Psr\Log\LoggerInterface;
 use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\Exceptions\SetCacheException;
 use Yiisoft\Strings\StringHelper;
 
 /**
@@ -62,15 +62,12 @@ class Cache implements CacheInterface
      */
     private $handler;
 
-    private $logger;
-
     /**
      * @param \Psr\SimpleCache\CacheInterface cache handler.
      */
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler = null, LoggerInterface $logger)
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
     {
         $this->setHandler($handler);
-        $this->logger = $logger;
     }
 
     public function getHandler(): \Psr\SimpleCache\CacheInterface
@@ -212,7 +209,7 @@ class Cache implements CacheInterface
      * This parameter is ignored if [[serializer]] is false.
      * @return array array of failed keys
      */
-    public function setMultiple($items, $ttl = 0, $dependency = null): bool
+    public function setMultiple($items, $ttl = null, $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -398,6 +395,8 @@ class Cache implements CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via [[get()]].
      * This parameter is ignored if [[serializer]] is `false`.
      * @return mixed result of $callable execution
+     * @throws SetCacheException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function getOrSet($key, $callable, $ttl = null, $dependency = null)
     {
@@ -407,7 +406,7 @@ class Cache implements CacheInterface
 
         $value = $callable($this);
         if (!$this->set($key, $value, $ttl, $dependency)) {
-            $this->logger->warning('Failed to set cache value for key ' . json_encode($key));
+            throw new SetCacheException($key, $value, $this);
         }
 
         return $value;

@@ -22,7 +22,6 @@ function microtime($float = false)
 
 namespace Yiisoft\Cache\Tests;
 
-use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\Cache;
 
@@ -149,7 +148,7 @@ abstract class CacheTestCase extends TestCase
      */
     public function testSetMultiple($expiry)
     {
-        $cache = new Cache($this->getTestScopeInstance(), new NullLogger());
+        $cache = new Cache($this->getTestScopeInstance());
         $cache->clear();
 
         $cache->setMultiple(

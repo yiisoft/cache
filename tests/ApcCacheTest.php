@@ -28,7 +28,7 @@ class ApcCacheTest extends CacheTestCase
     /**
      * @dataProvider ordinalCacheProvider
      */
-    public function testExpire(\Psr\SimpleCache\CacheInterface $cache)
+    public function testExpire(PsrCacheInterface $cache)
     {
         $this->markTestSkipped('APC keys are expiring only on the next request.');
     }
