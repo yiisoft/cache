@@ -13,6 +13,6 @@ class PhpSerializer implements SerializerInterface
 
     public function unserialize(string $value)
     {
-        return unserialize($value, true);
+        return unserialize($value);
     }
 }
