@@ -79,8 +79,8 @@ abstract class SimpleCache implements CacheInterface
     public function get($key, $default = null)
     {
         $key = $this->normalizeKey($key);
-        $value = $this->getValue($key);
-        if ($value === false) {
+        $value = $this->getValue($key, $default);
+        if ($value === $default) {
             return $default;
         }
 
@@ -90,15 +90,15 @@ abstract class SimpleCache implements CacheInterface
     public function getMultiple($keys, $default = null)
     {
         $keyMap = [];
-        foreach ($keys as $key) {
-            $keyMap[$key] = $this->normalizeKey($key);
+        foreach ($keys as $originalKey) {
+            $keyMap[$originalKey] = $this->normalizeKey($originalKey);
         }
-        $values = $this->getValues(array_values($keyMap));
+        $values = $this->getValues(array_values($keyMap), $default);
         $results = [];
-        foreach ($keyMap as $key => $newKey) {
-            $results[$key] = $default;
-            if (isset($values[$newKey]) && $values[$newKey] !== false) {
-                $results[$key] = $this->serializer->unserialize($values[$newKey]);
+        foreach ($keyMap as $originalKey => $normalizedKey) {
+            $results[$originalKey] = $default;
+            if (isset($values[$normalizedKey]) && $values[$normalizedKey] !== $default) {
+                $results[$originalKey] = $this->serializer->unserialize($values[$normalizedKey]);
             }
         }
         return $results;
@@ -188,10 +188,10 @@ abstract class SimpleCache implements CacheInterface
      * This method should be implemented by child classes to retrieve the data
      * from specific cache storage.
      * @param string $key a unique key identifying the cached value
-     * @return mixed|false the value stored in cache, `false` if the value is not in the cache or expired. Most often
+     * @return mixed the value stored in cache. $default is returned if the value is not in the cache or expired. Most often
      * value is a string. If you have disabled [[serializer]], it could be something else.
      */
-    abstract protected function getValue($key);
+    abstract protected function getValue($key, $default = null);
 
     /**
      * Stores a value identified by a key in cache.
@@ -219,13 +219,14 @@ abstract class SimpleCache implements CacheInterface
      * the cached values one by one. If the underlying cache storage supports multiget,
      * this method should be overridden to exploit that feature.
      * @param array $keys a list of keys identifying the cached values
+     * @param mixed $default default value to return if value is not in the cache or expired
      * @return array a list of cached values indexed by the keys
      */
-    protected function getValues($keys): array
+    protected function getValues($keys, $default = null): array
     {
         $results = [];
         foreach ($keys as $key) {
-            $value = $this->getValue($key);
+            $value = $this->getValue($key, $default);
             if ($value !== false) {
                 $results[$key] = $value;
             }

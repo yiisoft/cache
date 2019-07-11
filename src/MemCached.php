@@ -84,7 +84,7 @@ class MemCached extends SimpleCache
     private $servers;
 
     /**
-     * @param null $serializer
+     * @param SerializerInterface|null $serializer
      * @param array $servers
      * @throws InvalidConfigException
      * @see setSerializer
@@ -108,7 +108,7 @@ class MemCached extends SimpleCache
      * @param \Memcached $cache
      * @param MemCachedServer[] $servers
      */
-    protected function addServers($cache, $servers)
+    protected function addServers(\Memcached $cache, array $servers): void
     {
         $existingServers = [];
         if ($this->persistentId !== null) {
@@ -128,7 +128,7 @@ class MemCached extends SimpleCache
      * @return \Memcached the memcached object used by this cache component.
      * @throws InvalidConfigException if memcached extension is not loaded
      */
-    public function getMemcached()
+    public function getMemcached(): \Memcached
     {
         if ($this->cache === null) {
             if (!extension_loaded('memcached')) {
@@ -152,7 +152,7 @@ class MemCached extends SimpleCache
      * Returns the memcached server configurations.
      * @return MemCachedServer[] list of memcached server configurations.
      */
-    public function getServers()
+    public function getServers(): array
     {
         return $this->servers;
     }
@@ -162,7 +162,7 @@ class MemCached extends SimpleCache
      * with the following keys: host, port, persistent, weight, timeout, retryInterval, status.
      * @see http://php.net/manual/en/memcached.addserver.php
      */
-    public function setServers($config)
+    public function setServers(array $config): void
     {
         foreach ($config as $c) {
             $this->servers[] = new MemCachedServer($c);
@@ -201,15 +201,27 @@ class MemCached extends SimpleCache
         $this->password = $password;
     }
 
-
-    protected function getValue($key)
+    protected function getValue($key, $default = null)
     {
-        return $this->cache->get($key);
+        $value = $this->cache->get($key);
+
+        if ($this->cache->getResultCode() === \Memcached::RES_SUCCESS) {
+            return $value;
+        }
+
+        return $default;
     }
 
-    protected function getValues($keys): array
+    protected function getValues($keys, $default = null): array
     {
-        return $this->cache->getMulti($keys);
+        $values = $this->cache->getMulti($keys);
+
+        if ($this->cache->getResultCode() === \Memcached::RES_SUCCESS) {
+            // TODO: test that all fields are returned
+            return $values;
+        }
+
+        return array_fill_keys($keys, $default);
     }
 
     protected function setValue($key, $value, $ttl): bool
@@ -232,7 +244,7 @@ class MemCached extends SimpleCache
 
     protected function deleteValue($key): bool
     {
-        return $this->cache->delete($key, 0);
+        return $this->cache->delete($key);
     }
 
     public function clear(): bool
@@ -242,7 +254,7 @@ class MemCached extends SimpleCache
 
     protected function hasValue($key): bool
     {
-        $value = $this->getValue($key);
-        return $value !== false;
+        $this->cache->get($key);
+        return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
     }
 }
