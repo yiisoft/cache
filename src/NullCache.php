@@ -21,14 +21,14 @@ namespace Yiisoft\Cache;
  * ];
  * ```
  *
- * DummyCache does not cache anything. It is provided so that one can always configure
+ * NullCache does not cache anything. It is provided so that one can always configure
  * a 'cache' application component and save the check of existence of `\Yii::getApp()->cache`.
  * By replacing DummyCache with some other cache component, one can quickly switch from
  * non-caching mode to caching mode.
  *
  * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-class DummyCache implements \Psr\SimpleCache\CacheInterface
+class NullCache implements \Psr\SimpleCache\CacheInterface
 {
     public function has($key): bool
     {
