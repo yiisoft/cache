@@ -1,8 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
-use yii\helpers\FileHelper;
-use yii\helpers\Yii;
+use Psr\Log\LoggerInterface;
 use Yiisoft\Cache\Exceptions\Exception;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 use Yiisoft\Strings\StringHelper;
@@ -74,11 +73,14 @@ class FileCache extends SimpleCache
      */
     private $dirMode = 0775;
 
+    private $logger;
+
     private const NEGATIVE_TTL_REPLACEMENT = 60 * 60 * 24 * 365;
 
 
-    public function __construct(string $cachePath = '@runtime/cache', SerializerInterface $serializer = null)
+    public function __construct(string $cachePath = '@runtime/cache', SerializerInterface $serializer = null, LoggerInterface $logger)
     {
+        $this->logger = $logger;
         $this->setCachePath($cachePath);
         parent::__construct($serializer);
     }
@@ -91,7 +93,7 @@ class FileCache extends SimpleCache
     {
         $this->cachePath = $cachePath;
         if (!is_dir($this->cachePath)) {
-            FileHelper::createDirectory($this->cachePath, $this->dirMode, true);
+            $this->createDirectory($this->cachePath, $this->dirMode, true);
         }
     }
 
@@ -166,11 +168,7 @@ class FileCache extends SimpleCache
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
-            try {
-                @FileHelper::createDirectory(\dirname($cacheFile), $this->dirMode, true);
-            } catch (\yii\exceptions\Exception $error) {
-                return false;
-            }
+            $this->createDirectory(\dirname($cacheFile), $this->dirMode, true);
         }
         // If ownership differs the touch call will fail, so we try to
         // rebuild the file from scratch by deleting it first
@@ -182,15 +180,19 @@ class FileCache extends SimpleCache
         try {
             // this implementation is more accurate than file_put_contents
             // because it does not modify file content, if failed to read
-            if ($fd = fopen($cacheFile, 'cb'))
-            {
+            if ($fd = fopen($cacheFile, 'cb')) {
                 if (!flock($fd, LOCK_EX)) {
                     throw new Exception("Failed to flock '$cacheFile'");
-                } else if(!ftruncate($fd, 0)) {
+                }
+
+                if (!ftruncate($fd, 0)) {
                     throw new Exception("Failed to truncate '$cacheFile");
-                } else if(file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
+                }
+
+                if (file_put_contents($cacheFile, $value) !== StringHelper::byteLength($value)) {
                     throw new Exception("Failed to write data to '$cacheFile' totally");
                 }
+
                 if ($ttl <= 0) {
                     $ttl = self::NEGATIVE_TTL_REPLACEMENT;
                 }
@@ -280,16 +282,42 @@ class FileCache extends SimpleCache
                     $this->gcRecursive($fullPath, $expiredOnly);
                     if (!$expiredOnly && !@rmdir($fullPath)) {
                         $error = error_get_last();
-                        Yii::warning("Unable to remove directory '{$fullPath}': {$error['message']}", __METHOD__);
+                        $this->logger->warning("Unable to remove directory '{$fullPath}': {$error['message']}");
                     }
                 } elseif (!$expiredOnly || ($expiredOnly && @filemtime($fullPath) < time())) {
                     if (!@unlink($fullPath)) {
                         $error = error_get_last();
-                        Yii::warning("Unable to remove file '{$fullPath}': {$error['message']}", __METHOD__);
+                        $this->logger->warning("Unable to remove file '{$fullPath}': {$error['message']}");
                     }
                 }
             }
             closedir($handle);
+        }
+    }
+
+    private function createDirectory($path, $mode = 0775, $recursive = true): bool
+    {
+        if (is_dir($path)) {
+            return true;
+        }
+        $parentDir = \dirname($path);
+        // recurse if parent dir does not exist and we are not at the root of the file system.
+        if ($recursive && $parentDir !== $path && !is_dir($parentDir)) {
+            $this->createDirectory($parentDir, $mode, true);
+        }
+        try {
+            if (!mkdir($path, $mode) && !is_dir($path)) {
+                return false;
+            }
+        } catch (\Exception $e) {
+            if (!is_dir($path)) {// https://github.com/yiisoft/yii2/issues/9288
+                throw new \RuntimeException("Failed to create directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
+            }
+        }
+        try {
+            return chmod($path, $mode);
+        } catch (\Exception $e) {
+            throw new \RuntimeException("Failed to change permissions for directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 }
