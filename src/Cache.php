@@ -247,7 +247,7 @@ final class Cache implements CacheInterface
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function addMultiple(array $values, $ttl = 0, Dependency $dependency = null): bool
+    public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);

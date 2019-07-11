@@ -16,10 +16,10 @@ class TagDependencyTest extends TestCase
         $cache = new Cache(new FileCache('tests/runtime/cache', new NullLogger()));
 
         // single tag test
-        $cache->set('a1', 11, 0, new TagDependency('t1'));
-        $cache->set('a2', 12, 0, new TagDependency('t1'));
-        $cache->set('b1', 21, 0, new TagDependency('t2'));
-        $cache->set('b2', 22, 0, new TagDependency('t2'));
+        $cache->set('a1', 11, null, new TagDependency('t1'));
+        $cache->set('a2', 12, null, new TagDependency('t1'));
+        $cache->set('b1', 21, null, new TagDependency('t2'));
+        $cache->set('b2', 22, null, new TagDependency('t2'));
 
         $this->assertEquals(11, $cache->get('a1'));
         $this->assertEquals(12, $cache->get('a2'));
@@ -39,10 +39,10 @@ class TagDependencyTest extends TestCase
         $this->assertNull($cache->get('b2'));
 
         // multiple tag test
-        $cache->set('a1', 11, 0, new TagDependency(['t1', 't2']));
-        $cache->set('a2', 12, 0, new TagDependency('t1'));
-        $cache->set('b1', 21, 0, new TagDependency(['t1', 't2']));
-        $cache->set('b2', 22, 0, new TagDependency('t2'));
+        $cache->set('a1', 11, null, new TagDependency(['t1', 't2']));
+        $cache->set('a2', 12, null, new TagDependency('t1'));
+        $cache->set('b1', 21, null, new TagDependency(['t1', 't2']));
+        $cache->set('b2', 22, null, new TagDependency('t2'));
 
         $this->assertEquals(11, $cache->get('a1'));
         $this->assertEquals(12, $cache->get('a2'));
@@ -61,10 +61,10 @@ class TagDependencyTest extends TestCase
         $this->assertNull($cache->get('b1'));
         $this->assertNull($cache->get('b2'));
 
-        $cache->set('a1', 11, 0, new TagDependency(['t1', 't2']));
-        $cache->set('a2', 12, 0, new TagDependency('t1'));
-        $cache->set('b1', 21, 0, new TagDependency(['t1', 't2']));
-        $cache->set('b2', 22, 0, new TagDependency('t2'));
+        $cache->set('a1', 11, null, new TagDependency(['t1', 't2']));
+        $cache->set('a2', 12, null, new TagDependency('t1'));
+        $cache->set('b1', 21, null, new TagDependency(['t1', 't2']));
+        $cache->set('b2', 22, null, new TagDependency('t2'));
 
         $this->assertEquals(11, $cache->get('a1'));
         $this->assertEquals(12, $cache->get('a2'));

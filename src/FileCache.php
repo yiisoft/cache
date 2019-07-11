@@ -36,6 +36,8 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  */
 final class FileCache extends SimpleCache
 {
+    private const TTL_INFINITY = 31536000; // 1 year
+
     /**
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.
      */
@@ -70,8 +72,6 @@ final class FileCache extends SimpleCache
      * but read-only for other users.
      */
     private $dirMode = 0775;
-
-    private const NEGATIVE_TTL_REPLACEMENT = 31536000; // 1 year
 
     private $logger;
 
@@ -153,7 +153,7 @@ final class FileCache extends SimpleCache
         return $default;
     }
 
-    protected function setValue(string $key, $value, int $ttl): bool
+    protected function setValue(string $key, $value, ?int $ttl): bool
     {
         $this->gc();
         $cacheFile = $this->getCacheFile($key);
@@ -175,9 +175,7 @@ final class FileCache extends SimpleCache
             if ($this->fileMode !== null) {
                 @chmod($cacheFile, $this->fileMode);
             }
-            if ($ttl <= 0) {
-                $ttl = self::NEGATIVE_TTL_REPLACEMENT;
-            }
+            $ttl = $ttl ?? self::TTL_INFINITY;
             return @touch($cacheFile, $ttl + time());
         }
 

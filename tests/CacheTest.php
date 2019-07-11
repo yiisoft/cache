@@ -22,8 +22,7 @@ function microtime(bool $float = false): float
 
 namespace Yiisoft\Cache\Tests;
 
-use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
-use Yiisoft\Cache\Cache;
+use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependencies\TagDependency;
 
@@ -92,15 +91,15 @@ abstract class CacheTest extends TestCase
      */
     public function dataProviderSetMultiple(): array
     {
-        return [[0], [2]];
+        return [[null], [2]];
     }
 
     /**
      * @dataProvider dataProviderSetMultiple
-     * @param int $expiry
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @param int|null $ttl
+     * @throws InvalidArgumentException
      */
-    public function testSetMultiple(int $expiry): void
+    public function testSetMultiple(?int $ttl): void
     {
         $cache = $this->createCacheInstance();
         $cache->clear();
@@ -111,7 +110,7 @@ abstract class CacheTest extends TestCase
                 'number_test' => 42,
                 'array_test' => ['array_test' => 'array_test'],
             ],
-            $expiry
+            $ttl
         );
 
         $this->assertEquals('string_test', $cache->get('string_test'));

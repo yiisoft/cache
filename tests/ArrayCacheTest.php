@@ -1,7 +1,6 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
-use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
