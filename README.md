@@ -15,4 +15,5 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/cache/v/stable.png)](https://packagist.org/packages/yiisoft/cache)
 [![Total Downloads](https://poser.pugx.org/yiisoft/cache/downloads.png)](https://packagist.org/packages/yiisoft/cache)
 [![Build Status](https://travis-ci.com/yiisoft/cache.svg?branch=master)](https://travis-ci.com/yiisoft/cache)
-
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/cache/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/cache/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/cache/?branch=master)
