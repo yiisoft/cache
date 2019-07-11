@@ -44,15 +44,6 @@ trait IntegrationTestTrait
 
     /**
      * @dataProvider cacheIntegrationProvider
-     */
-    public function testDefaultTtl(Cache $cache)
-    {
-        /** @var Cache $cache */
-        $this->assertSame(0, $cache->getHandler()->getDefaultTtl());
-    }
-
-    /**
-     * @dataProvider cacheIntegrationProvider
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function testExpireAdd(CacheInterface $cache)
