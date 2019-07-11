@@ -1,8 +1,8 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
-use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\WinCache;
 
 /**
@@ -10,24 +10,21 @@ use Yiisoft\Cache\WinCache;
  * @group wincache
  * @group caching
  */
-class WinCacheTest extends CacheTestCase
+class WinCacheTest extends CacheTest
 {
-    protected static $requiredExtensions = ['wincache'];
-
     public static function setUpBeforeClass()
     {
-        parent::setUpBeforeClass();
+        if (!extension_loaded('wincache')) {
+            self::markTestSkipped('Required extension "wincache" is not loaded');
+        }
+
         if (!ini_get('wincache.ucenabled')) {
             self::markTestSkipped('Wincache user cache disabled. Skipping.');
         }
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    protected function createCacheInstance(): PsrCacheInterface
+    protected function createCacheInstance(): CacheInterface
     {
-        return new WinCache();
+        return new Cache(new WinCache());
     }
 }

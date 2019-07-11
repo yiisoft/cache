@@ -1,5 +1,4 @@
 <?php
-
 namespace Yiisoft\Cache;
 
 /**
@@ -8,7 +7,7 @@ namespace Yiisoft\Cache;
  */
 function time()
 {
-    return \Yiisoft\Cache\Tests\CacheTestCase::$time ?: \time();
+    return \Yiisoft\Cache\Tests\CacheTest::$time ?: \time();
 }
 
 /**
@@ -18,7 +17,7 @@ function time()
  */
 function microtime($float = false)
 {
-    return \Yiisoft\Cache\Tests\CacheTestCase::$microtime ?: \microtime($float);
+    return \Yiisoft\Cache\Tests\CacheTest::$microtime ?: \microtime($float);
 }
 
 namespace Yiisoft\Cache\Tests;
@@ -31,7 +30,7 @@ use Yiisoft\Cache\Dependencies\TagDependency;
 /**
  * Base class for testing cache backends.
  */
-abstract class CacheTestCase extends TestCase
+abstract class CacheTest extends TestCase
 {
     /**
      * @var int virtual time to be returned by mocked time() function.

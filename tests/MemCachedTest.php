@@ -11,13 +11,13 @@ use Yiisoft\Cache\MemCached;
  * @group memcached
  * @group caching
  */
-class MemCachedTest extends CacheTestCase
+class MemCachedTest extends CacheTest
 {
-    protected static $requiredExtensions = ['memcached'];
-
     public static function setUpBeforeClass()
     {
-        parent::setUpBeforeClass();
+        if (!extension_loaded('memcached')) {
+            self::markTestSkipped('Required extension "memcached" is not loaded');
+        }
 
         // check whether memcached is running and skip tests if not.
         if (!@stream_socket_client('127.0.0.1:11211', $errorNumber, $errorDescription, 0.5)) {
@@ -25,10 +25,15 @@ class MemCachedTest extends CacheTestCase
         }
     }
 
+    protected function createCacheInstance(): CacheInterface
+    {
+        return new Cache(new MemCached());
+    }
+
     /**
-     * @dataProvider ordinalCacheProvider
+     * @dataProvider cacheProvider
      */
-    public function testExpire(\Psr\SimpleCache\CacheInterface $cache)
+    public function testExpire(PsrCacheInterface $cache)
     {
         if (getenv('TRAVIS') == 'true') {
             $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
@@ -39,19 +44,11 @@ class MemCachedTest extends CacheTestCase
     /**
      * @dataProvider cacheIntegrationProvider
      */
-    public function testExpireAdd(CacheInterface $cache)
+    public function testExpireAdd(CacheInterface $cache): void
     {
-        if (getenv('TRAVIS') == 'true') {
+        if (getenv('TRAVIS') === 'true') {
             $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
         }
         parent::testExpireAdd($cache);
-    }
-
-    /**
-     * Factory method to create particular implementation. Called once per test
-     */
-    protected function createCacheInstance(): PsrCacheInterface
-    {
-        return new MemCached();
     }
 }

@@ -2,6 +2,7 @@
 namespace Yiisoft\Cache\Tests;
 
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
+use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\FileCache;
 
@@ -9,17 +10,17 @@ use Yiisoft\Cache\FileCache;
  * Class for testing file cache backend.
  * @group caching
  */
-class FileCacheTest extends CacheTestCase
+class FileCacheTest extends CacheTest
 {
-    protected function createCacheInstance(): PsrCacheInterface
+    protected function createCacheInstance(): CacheInterface
     {
-        return new FileCache(__DIR__ . '/runtime/cache');
+        return new Cache(new FileCache(__DIR__ . '/runtime/cache'));
     }
 
     /**
-     * @dataProvider ordinalCacheProvider
+     * @dataProvider cacheProvider
      */
-    public function testExpire(\Psr\SimpleCache\CacheInterface $cache)
+    public function testExpire(\Psr\SimpleCache\CacheInterface $cache): void
     {
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
@@ -32,7 +33,7 @@ class FileCacheTest extends CacheTestCase
     /**
      * @dataProvider cacheIntegrationProvider
      */
-    public function testExpireAdd(CacheInterface $cache)
+    public function testExpireAdd(CacheInterface $cache): void
     {
         static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
@@ -42,7 +43,7 @@ class FileCacheTest extends CacheTestCase
         $this->assertNull($cache->get('expire_testa'));
     }
 
-    public function testCacheRenewalOnDifferentOwnership()
+    public function testCacheRenewalOnDifferentOwnership(): void
     {
         $TRAVIS_SECOND_USER = getenv('TRAVIS_SECOND_USER');
         if (empty($TRAVIS_SECOND_USER)) {
