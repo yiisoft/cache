@@ -67,19 +67,7 @@ final class Cache implements CacheInterface
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
     {
-        $this->setHandler($handler);
-    }
-
-    /**
-     * @param \Psr\SimpleCache\CacheInterface|array cache handler.
-     */
-    public function setHandler(\Psr\SimpleCache\CacheInterface $handler = null): self
-    {
-        if ($handler) {
-            $this->handler = $handler;
-        }
-
-        return $this;
+        $this->handler = $handler;
     }
 
     /**
