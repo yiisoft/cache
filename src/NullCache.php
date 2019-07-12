@@ -39,7 +39,7 @@ final class NullCache implements CacheInterface
 
     public function deleteMultiple($keys)
     {
-        // do nothing
+        return true;
     }
 
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
@@ -74,7 +74,7 @@ final class NullCache implements CacheInterface
 
     public function delete($key)
     {
-        // do nothing
+        return true;
     }
 
     public function clear(): bool
