@@ -25,7 +25,7 @@ abstract class Dependency
      * to use the same cache dependency for multiple separate cache calls while generating the same
      * page without an overhead of re-evaluating dependency data each time. Defaults to false.
      */
-    protected $reusable = false;
+    protected $isReusable = false;
 
     /**
      * @var array static storage of cached data for reusable dependencies.
@@ -39,7 +39,7 @@ abstract class Dependency
      */
     public function markAsReusable(): void
     {
-        $this->reusable = true;
+        $this->isReusable = true;
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class Dependency
      */
     public function evaluateDependency(CacheInterface $cache): void
     {
-        if ($this->reusable) {
+        if ($this->isReusable) {
             $hash = $this->generateReusableHash();
             if (!\array_key_exists($hash, self::$reusableData)) {
                 self::$reusableData[$hash] = $this->generateDependencyData($cache);
@@ -67,7 +67,7 @@ abstract class Dependency
      */
     public function isChanged(CacheInterface $cache): bool
     {
-        if ($this->reusable) {
+        if ($this->isReusable) {
             $hash = $this->generateReusableHash();
             if (!\array_key_exists($hash, self::$reusableData)) {
                 self::$reusableData[$hash] = $this->generateDependencyData($cache);
@@ -91,7 +91,7 @@ abstract class Dependency
     /**
      * Generates a unique hash that can be used for retrieving reusable dependency data.
      * @return string a unique hash value for this cache dependency.
-     * @see reusable
+     * @see isReusable
      */
     protected function generateReusableHash(): string
     {
