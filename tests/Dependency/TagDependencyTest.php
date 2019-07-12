@@ -10,6 +10,8 @@ class TagDependencyTest extends DependencyTestCase
 {
     protected function createCache(): CacheInterface
     {
+        // isChanged of TagDependency needs cache access.
+        // Using real cache.
         return new Cache(new ArrayCache());
     }
 
