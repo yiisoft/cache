@@ -279,4 +279,26 @@ abstract class CacheTest extends TestCase
         $expected = 'SamDark';
         $this->assertEquals($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
     }
+
+    public function testWithArrayKeys(): void
+    {
+        $key = [42];
+        $cache = $this->createCacheInstance();
+        $this->assertNull($cache->get($key));
+
+        $cache->set($key, 42);
+        $this->assertSame(42, $cache->get($key));
+    }
+
+    public function testWithObjectKeys(): void
+    {
+        $key = new class {
+            public $value = 42;
+        };
+        $cache = $this->createCacheInstance();
+        $this->assertNull($cache->get($key));
+
+        $cache->set($key, 42);
+        $this->assertSame(42, $cache->get($key));
+    }
 }
