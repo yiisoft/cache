@@ -2,7 +2,7 @@
 namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\Dependency\Dependency;
 
 /**
  * Class MockDependency

@@ -2,8 +2,8 @@
 namespace Yiisoft\Cache;
 
 use Psr\SimpleCache\InvalidArgumentException;
-use Yiisoft\Cache\Dependencies\Dependency;
-use Yiisoft\Cache\Exceptions\SetCacheException;
+use Yiisoft\Cache\Dependency\Dependency;
+use Yiisoft\Cache\Exception\SetCacheException;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.

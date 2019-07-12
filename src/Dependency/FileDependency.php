@@ -1,8 +1,8 @@
 <?php
-namespace Yiisoft\Cache\Dependencies;
+namespace Yiisoft\Cache\Dependency;
 
 use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Cache\Exceptions\InvalidConfigException;
+use Yiisoft\Cache\Exception\InvalidConfigException;
 
 /**
  * FileDependency represents a dependency based on a file's last modification time.

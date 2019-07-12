@@ -1,7 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
-use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\Dependency\Dependency;
 
 /**
  * CacheInterface defines the common interface to be implemented by cache classes.

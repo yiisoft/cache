@@ -1,5 +1,5 @@
 <?php
-namespace Yiisoft\Cache\Exceptions;
+namespace Yiisoft\Cache\Exception;
 
 use Yiisoft\Cache\CacheInterface;
 

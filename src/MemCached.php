@@ -3,7 +3,7 @@ namespace Yiisoft\Cache;
 
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Yiisoft\Cache\Serializer\SerializerInterface;
-use Yiisoft\Cache\Exceptions\InvalidConfigException;
+use Yiisoft\Cache\Exception\InvalidConfigException;
 
 /**
  * MemCached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL

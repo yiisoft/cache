@@ -4,7 +4,7 @@ namespace Yiisoft\Cache\Tests;
 use Psr\Log\NullLogger;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\FileCache;
-use Yiisoft\Cache\Dependencies\TagDependency;
+use Yiisoft\Cache\Dependency\TagDependency;
 
 /**
  * @group caching
