@@ -25,10 +25,11 @@ class DependencyTest extends TestCase
     public function testGenerateReusableHash(): void
     {
         $dependency = $this->getMockForAbstractClass(Dependency::class);
-        $dependency->data = 'dummy';
+        $this->setInaccessibleProperty($dependency, 'data', 'dummy');
 
         $result = $this->invokeMethod($dependency, 'generateReusableHash');
-        $this->assertEquals(5, strlen($dependency->data));
+
+        $this->assertEquals(5, strlen($this->getInaccessibleProperty($dependency, 'data')));
         $this->assertEquals(40, strlen($result));
     }
 
@@ -42,7 +43,7 @@ class DependencyTest extends TestCase
         $result = $dependency->isChanged($cache);
         $this->assertFalse($result);
 
-        $dependency->data = 'changed';
+        $this->setInaccessibleProperty($dependency, 'data', 'changed');
         $result = $dependency->isChanged($cache);
         $this->assertTrue($result);
     }

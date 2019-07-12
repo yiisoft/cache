@@ -15,21 +15,32 @@ abstract class Dependency
 {
     /**
      * @var mixed the dependency data that is saved in cache and later is compared with the
-     * latest dependency data.
+     * latest dependency data
      */
-    public $data;
+    protected $data;
+
     /**
      * @var bool whether this dependency is reusable or not. True value means that dependent
      * data for this cache dependency will be generated only once per request. This allows you
      * to use the same cache dependency for multiple separate cache calls while generating the same
      * page without an overhead of re-evaluating dependency data each time. Defaults to false.
      */
-    public $reusable = false;
+    protected $reusable = false;
 
     /**
      * @var array static storage of cached data for reusable dependencies.
      */
     private static $reusableData = [];
+
+    /**
+     * Changes dependecy behavior so dependent data for this cache dependency will be generated only once per request.
+     *  This allows you to use the same cache dependency for multiple separate cache calls while generating the same
+      * page without an overhead of re-evaluating dependency data each time.
+     */
+    public function markAsReusable(): void
+    {
+        $this->reusable = true;
+    }
 
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.

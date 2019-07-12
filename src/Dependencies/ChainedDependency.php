@@ -15,18 +15,29 @@ use Yiisoft\Cache\CacheInterface;
 final class ChainedDependency extends Dependency
 {
     /**
-     * @var Dependency[] list of dependencies that this dependency is composed of.
-     * Each array element must be a dependency object.
+     * @var Dependency[]
      */
-    public $dependencies = [];
+    private $dependencies;
+
     /**
-     * @var bool whether this dependency is depending on every dependency in {@see dependencies}.
+     * @var bool
+     */
+    private $dependOnAll;
+
+    /**
+     * ChainedDependency constructor.
+     * @param Dependency[] $dependencies list of dependencies that this dependency is composed of.
+     * Each array element must be a dependency object.
+     * @param bool $dependOnAll whether this dependency is depending on every dependency in {@see dependencies}.
      * Defaults to true, meaning if any of the dependencies has changed, this dependency is considered changed.
      * When it is set false, it means if one of the dependencies has NOT changed, this dependency
      * is considered NOT changed.
      */
-    public $dependOnAll = true;
-
+    public function __construct(array $dependencies = [], bool $dependOnAll = true)
+    {
+        $this->dependencies = $dependencies;
+        $this->dependOnAll = $dependOnAll;
+    }
 
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
@@ -49,7 +60,6 @@ final class ChainedDependency extends Dependency
     {
         return null;
     }
-
 
     public function isChanged(CacheInterface $cache): bool
     {
