@@ -6,7 +6,7 @@ use Yiisoft\Cache\Dependency\Dependency;
 
 class CallbackDependencyTest extends DependencyTestCase
 {
-    private function getDependency(callable $callback, $dependencyData): Dependency
+    private function createDependency(callable $callback, $dependencyData): Dependency
     {
         $dependency = new CallbackDependency($callback);
         $this->setInaccessibleProperty($dependency, 'data', $dependencyData);
@@ -15,7 +15,7 @@ class CallbackDependencyTest extends DependencyTestCase
 
     public function testPlainClosure(): void
     {
-        $dependency = $this->getDependency(static function () {
+        $dependency = $this->createDependency(static function () {
             return true;
         }, true);
 
@@ -28,7 +28,7 @@ class CallbackDependencyTest extends DependencyTestCase
             public $value = 42;
         };
 
-        $dependency = $this->getDependency(static function () use ($dataObject) {
+        $dependency = $this->createDependency(static function () use ($dataObject) {
             return $dataObject->value;
         }, 42);
 
