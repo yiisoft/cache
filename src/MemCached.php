@@ -1,7 +1,6 @@
 <?php
 namespace Yiisoft\Cache;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 use Yiisoft\Cache\Exception\InvalidConfigException;
 
@@ -139,7 +138,7 @@ final class MemCached extends SimpleCache
                 throw new InvalidConfigException('MemCached requires PHP memcached extension to be loaded.');
             }
 
-            $this->cache = $this->persistentId !== null ? new \Memcached($this->persistentId) : new \Memcached;
+            $this->cache = $this->persistentId !== null ? new \Memcached($this->persistentId) : new \Memcached();
             if ($this->username !== null || $this->password !== null) {
                 $this->cache->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
                 $this->cache->setSaslAuthData($this->username, $this->password);
@@ -162,14 +161,14 @@ final class MemCached extends SimpleCache
     }
 
     /**
-     * @param array $config list of memcached server configurations. Each element must be an array
+     * @param array $configs list of memcached server configurations. Each element must be an array
      * with the following keys: host, port, persistent, weight, timeout, retryInterval, status.
      * @see http://php.net/manual/en/memcached.addserver.php
      */
-    public function setServers(array $config): void
+    public function setServers(array $configs): void
     {
-        foreach ($config as $c) {
-            $this->servers[] = new MemCachedServer($c);
+        foreach ($configs as $config) {
+            $this->servers[] = new MemCachedServer($config['host'], $config['port'], $config['weight']);
         }
     }
 

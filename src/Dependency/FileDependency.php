@@ -30,7 +30,6 @@ final class FileDependency extends Dependency
      * This method returns the file's last modification time.
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
-     * @throws InvalidConfigException if {@see fileName} is not set
      */
     protected function generateDependencyData(CacheInterface $cache)
     {
