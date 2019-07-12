@@ -22,13 +22,25 @@ final class ExpressionDependency extends Dependency
      * A PHP expression can be any PHP code that evaluates to a value. To learn more about what an expression is,
      * please refer to the [php manual](http://www.php.net/manual/en/language.expressions.php).
      */
-    public $expression = 'true';
+    private $expression;
     /**
      * @var mixed custom parameters associated with this dependency. You may get the value
      * of this property in {@see expression} using `$this->params`.
      */
-    public $params;
+    private $params;
 
+    /**
+     * @param string $expression the string representation of a PHP expression whose result is used to determine the dependency.
+     * A PHP expression can be any PHP code that evaluates to a value. To learn more about what an expression is,
+     * please refer to the [php manual](http://www.php.net/manual/en/language.expressions.php).
+     * @param mixed $params custom parameters associated with this dependency. You may get the value
+     * of this property in {@see expression} using `$this->params`.
+     */
+    public function __construct(string $expression, mixed $params = null)
+    {
+        $this->expression = $expression;
+        $this->params = $params;
+    }
 
     /**
      * Generates the data needed to determine if dependency has been changed.

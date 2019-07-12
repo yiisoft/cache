@@ -23,17 +23,16 @@ use Yiisoft\Cache\CacheInterface;
 final class TagDependency extends Dependency
 {
     /**
-     * @var string|array a list of tag names for this dependency. For a single tag, you may specify it as a string.
+     * @var array a list of tag names for this dependency
      */
-    public $tags;
-
+    private $tags;
 
     /**
-     * @param string|array $tags a list of tag names for this dependency. For a single tag, you may specify it as a string.
+     * @param string|array $tags a list of tag names for this dependency. For a single tag, you may specify it as a string
      */
     public function __construct($tags)
     {
-        $this->tags = $tags;
+        $this->tags = (array)$tags;
     }
 
     /**
@@ -45,7 +44,7 @@ final class TagDependency extends Dependency
      */
     protected function generateDependencyData(CacheInterface $cache): array
     {
-        $timestamps = $this->getTimestamps($cache, (array) $this->tags);
+        $timestamps = $this->getTimestamps($cache, $this->tags);
 
         $newKeys = [];
         foreach ($timestamps as $key => $timestamp) {
@@ -60,10 +59,9 @@ final class TagDependency extends Dependency
         return $timestamps;
     }
 
-
     public function isChanged(CacheInterface $cache): bool
     {
-        $timestamps = $this->getTimestamps($cache, (array) $this->tags);
+        $timestamps = $this->getTimestamps($cache, $this->tags);
         return $timestamps !== $this->data;
     }
 

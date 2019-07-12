@@ -14,12 +14,16 @@ use Yiisoft\Cache\Exceptions\InvalidConfigException;
  */
 final class FileDependency extends Dependency
 {
+    private $fileName;
+
     /**
-     * @var string the file path or [path alias](guide:concept-aliases) whose last modification time is used to
+     * @param string $fileName the file path or [path alias](guide:concept-aliases) whose last modification time is used to
      * check if the dependency has been changed.
      */
-    public $fileName;
-
+    public function __construct(string $fileName)
+    {
+        $this->fileName = $fileName;
+    }
 
     /**
      * Generates the data needed to determine if dependency has been changed.
