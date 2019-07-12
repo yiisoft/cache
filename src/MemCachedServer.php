@@ -39,7 +39,7 @@ final class MemCachedServer
     }
 
     /**
-     * @return memcached server hostname or IP address
+     * @return string memcached server hostname or IP address
      */
     public function getHost(): string
     {
