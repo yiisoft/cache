@@ -70,11 +70,6 @@ final class Cache implements CacheInterface
         $this->setHandler($handler);
     }
 
-    public function getHandler(): \Psr\SimpleCache\CacheInterface
-    {
-        return $this->handler;
-    }
-
     /**
      * @param \Psr\SimpleCache\CacheInterface|array cache handler.
      */
