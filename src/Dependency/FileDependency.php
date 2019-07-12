@@ -34,10 +34,6 @@ final class FileDependency extends Dependency
      */
     protected function generateDependencyData(CacheInterface $cache)
     {
-        if ($this->fileName === null) {
-            throw new InvalidConfigException('FileDependency::fileName must be set');
-        }
-
         clearstatcache(false, $this->fileName);
         return @filemtime($this->fileName);
     }
