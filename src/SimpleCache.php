@@ -2,7 +2,7 @@
 namespace Yiisoft\Cache;
 
 use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
-use Yiisoft\Cache\Exceptions\InvalidArgumentException;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 

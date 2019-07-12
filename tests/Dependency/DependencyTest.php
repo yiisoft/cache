@@ -1,7 +1,7 @@
 <?php
-namespace Yiisoft\Cache\Tests;
+namespace Yiisoft\Cache\Tests\Dependency;
 
-use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\NullCache;
 
 /**

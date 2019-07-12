@@ -1,7 +1,7 @@
 <?php
 namespace Yiisoft\Cache;
 
-use Yiisoft\Cache\Dependencies\Dependency;
+use Yiisoft\Cache\Dependency\Dependency;
 
 /**
  * NullCache is a placeholder cache component.

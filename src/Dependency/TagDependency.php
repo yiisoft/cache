@@ -1,5 +1,5 @@
 <?php
-namespace Yiisoft\Cache\Dependencies;
+namespace Yiisoft\Cache\Dependency;
 
 use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\CacheInterface;

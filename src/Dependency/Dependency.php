@@ -1,5 +1,5 @@
 <?php
-namespace Yiisoft\Cache\Dependencies;
+namespace Yiisoft\Cache\Dependency;
 
 use Yiisoft\Cache\CacheInterface;
 

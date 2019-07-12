@@ -24,7 +24,7 @@ namespace Yiisoft\Cache\Tests;
 
 use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Cache\Dependencies\TagDependency;
+use Yiisoft\Cache\Dependency\TagDependency;
 
 /**
  * Base class for testing cache backends.

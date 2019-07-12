@@ -2,7 +2,7 @@
 namespace Yiisoft\Cache;
 
 use Psr\Log\LoggerInterface;
-use Yiisoft\Cache\Exceptions\CacheException;
+use Yiisoft\Cache\Exception\CacheException;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
