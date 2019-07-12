@@ -11,7 +11,7 @@ class CallbackDependencyTest extends TestCase
     private function getDependency(callable $callback, $dependencyData): Dependency
     {
         $dependency = new CallbackDependency($callback);
-        $this->setInaccessibleProperty($dependency, 'data',  $dependencyData);
+        $this->setInaccessibleProperty($dependency, 'data', $dependencyData);
         return $dependency;
     }
 
