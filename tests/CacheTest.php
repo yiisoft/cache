@@ -185,6 +185,25 @@ abstract class CacheTest extends TestCase
         $this->assertNull($cache->get('number_test'));
     }
 
+    public function testDeleteMultiple(): void
+    {
+        $cache = $this->createCacheInstance();
+        $cache->clear();
+
+        $cache->setMultiple([
+            'a' => 1,
+            'b' => 2,
+        ]);
+
+
+        $this->assertEquals(1, $cache->get('a'));
+        $this->assertEquals(2, $cache->get('b'));
+
+        $this->assertTrue($cache->deleteMultiple(['a', 'b']));
+        $this->assertFalse($cache->has('a'));
+        $this->assertFalse($cache->has('b'));
+    }
+
     public function testClear(): void
     {
         $cache = $this->createCacheInstance();
