@@ -5,9 +5,9 @@ use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\CacheInterface;
 
 /**
- * TagDependency associates a cached data item with one or multiple {@see tags}.
+ * TagDependency associates a cached value with one or multiple {@see tags}.
  *
- * By calling {@see invalidate()}, you can invalidate all cached data items that are associated with the specified tag name(s).
+ * By calling {@see invalidate()}, you can invalidate all cached values that are associated with the specified tag name(s).
  *
  * ```php
  * // setting multiple cache keys to store data forever and tagging them with "user-123"
@@ -68,8 +68,8 @@ final class TagDependency extends Dependency
     }
 
     /**
-     * Invalidates all of the cached data items that are associated with any of the specified {@see tags}.
-     * @param CacheInterface $cache the cache component that caches the data items
+     * Invalidates all of the cached values that are associated with any of the specified {@see tags}.
+     * @param CacheInterface $cache the cache component that caches the values
      * @param string|array $tags
      */
     public static function invalidate(CacheInterface $cache, $tags): void
@@ -89,13 +89,13 @@ final class TagDependency extends Dependency
      */
     private static function touchKeys(CacheInterface $cache, array $keys): array
     {
-        $items = [];
+        $values = [];
         $time = microtime();
         foreach ($keys as $key) {
-            $items[$key] = $time;
+            $values[$key] = $time;
         }
-        $cache->setMultiple($items);
-        return $items;
+        $cache->setMultiple($values);
+        return $values;
     }
 
     /**

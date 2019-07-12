@@ -28,10 +28,10 @@ use Yiisoft\Cache\Exceptions\SetCacheException;
  * ];
  * ```
  *
- * A data item can be stored in the cache by calling {@see set()} and be retrieved back
+ * A value can be stored in the cache by calling {@see set()} and be retrieved back
  * later (in the same or different request) by {@see get()}. In both operations,
- * a key identifying the data item is required. An expiration time and/or a {@see Dependency|dependency}
- * can also be specified when calling {@see set()}. If the data item expires or the dependency
+ * a key identifying the value is required. An expiration time and/or a {@see Dependency|dependency}
+ * can also be specified when calling {@see set()}. If the value expires or the dependency
  * changes at the time of calling {@see get()}, the cache will return no data.
  *
  * A typical usage pattern of cache is like the following:
@@ -178,8 +178,8 @@ final class Cache implements CacheInterface
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
@@ -196,33 +196,21 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * Stores multiple items in cache. Each item contains a value identified by a key.
+     * Stores multiple values in cache. Each value contains a value identified by a key.
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param array $items the items to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
+     * @param array $values the values to be cached, as key-value pairs.
+     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
      * @return bool True on success and false on failure.
      * @throws InvalidArgumentException
      */
-    public function setMultiple($items, $ttl = null, Dependency $dependency = null): bool
+    public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
     {
-        if ($dependency !== null) {
-            $dependency->evaluateDependency($this);
-        }
-
-        $data = [];
-        foreach ($items as $key => $value) {
-            if ($dependency !== null) {
-                $value = [$value, $dependency];
-            }
-            $key = $this->buildKey($key);
-            $data[$key] = $value;
-        }
-
+        $data = $this->prepareDataForSetOrAddMultiple($values, $dependency);
         return $this->handler->setMultiple($data, $ttl);
     }
 
@@ -236,18 +224,30 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * Stores multiple items in cache. Each item contains a value identified by a key.
+     * Stores multiple values in cache. Each value contains a value identified by a key.
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
-     * @param array $values the items to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached items. If the dependency changes,
+     * @param array $values the values to be cached, as key-value pairs.
+     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
      * @return bool
      * @throws InvalidArgumentException
      */
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
+    {
+        $data = $this->prepareDataForSetOrAddMultiple($values, $dependency);
+        $existingValues = $this->handler->getMultiple(array_keys($data));
+        foreach ($existingValues as $key => $value) {
+            if ($value !== null) {
+                unset($data[$key]);
+            }
+        }
+        return $this->handler->setMultiple($data, $ttl);
+    }
+
+    private function prepareDataForSetOrAddMultiple(array $values, ?Dependency $dependency): array
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -263,13 +263,7 @@ final class Cache implements CacheInterface
             $data[$key] = $value;
         }
 
-        $existingValues = $this->handler->getMultiple(array_keys($data));
-        foreach ($existingValues as $key => $value) {
-            if ($value !== null) {
-                unset($data[$key]);
-            }
-        }
-        return $this->handler->setMultiple($data, $ttl);
+        return $data;
     }
 
     /**
@@ -278,8 +272,8 @@ final class Cache implements CacheInterface
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
@@ -344,8 +338,8 @@ final class Cache implements CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @param callable|\Closure $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is `false`.
      * @return mixed result of $callable execution
