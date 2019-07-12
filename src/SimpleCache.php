@@ -60,7 +60,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * Creates a default serializer, when nothing is given
      * @return PhpSerializer
      */
-    protected function createDefaultSerializer() : PhpSerializer
+    protected function createDefaultSerializer(): PhpSerializer
     {
         return new PhpSerializer();
     }
@@ -226,6 +226,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * The default implementation calls {@see getValue()} multiple times to retrieve
      * the cached values one by one. If the underlying cache storage supports multiget,
      * this method should be overridden to exploit that feature.
+     *
      * @param array $keys a list of keys identifying the cached values
      * @param mixed $default default value to return if value is not in the cache or expired
      * @return array a list of cached values indexed by the keys
@@ -246,6 +247,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * Stores multiple key-value pairs in cache.
      * The default implementation calls {@see setValue()} multiple times store values one by one. If the underlying cache
      * storage supports multi-set, this method should be overridden to exploit that feature.
+     *
      * @param array $values array where key corresponds to cache key while value is the value stored
      * @param int|null $ttl the number of seconds in which the cached values will expire. Null means infinity.
      * Negative value will result in deleting a value.

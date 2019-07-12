@@ -53,7 +53,7 @@ final class TagDependency extends Dependency
             }
         }
         if (!empty($newKeys)) {
-            $timestamps = array_merge($timestamps, static::touchKeys($cache, $newKeys));
+            $timestamps = array_merge($timestamps, self::touchKeys($cache, $newKeys));
         }
 
         return $timestamps;
@@ -74,9 +74,9 @@ final class TagDependency extends Dependency
     {
         $keys = [];
         foreach ((array) $tags as $tag) {
-            $keys[] = static::buildCacheKey($tag);
+            $keys[] = self::buildCacheKey($tag);
         }
-        static::touchKeys($cache, $keys);
+        self::touchKeys($cache, $keys);
     }
 
     /**
@@ -111,7 +111,7 @@ final class TagDependency extends Dependency
 
         $keys = [];
         foreach ($tags as $tag) {
-            $keys[] = static::buildCacheKey($tag);
+            $keys[] = self::buildCacheKey($tag);
         }
 
         return $cache->getMultiple($keys);
