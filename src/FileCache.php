@@ -260,8 +260,8 @@ final class FileCache extends SimpleCache
         }
     }
 
-    private function createDirectory(string $cachePath, int $mode, bool $recursive = true): bool
+    private function createDirectory(string $path, int $mode): bool
     {
-        return is_dir($cachePath) || (mkdir($cachePath, $mode, $recursive) && is_dir($cachePath));
+        return is_dir($path) || (mkdir($path, $mode, true) && is_dir($path));
     }
 }
