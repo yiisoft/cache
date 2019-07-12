@@ -7,10 +7,10 @@ use Yiisoft\Cache\Dependencies\Dependency;
  * CacheInterface defines the common interface to be implemented by cache classes.
  * It extends {@see \Psr\SimpleCache\CacheInterface} adding ability for cache dependency specification.
  *
- * A data item can be stored in the cache by calling {@see set()} and be retrieved back
+ * A value can be stored in the cache by calling {@see set()} and be retrieved back
  * later (in the same or different request) by {@see get()}. In both operations,
- * a key identifying the data item is required. An expiration time and/or a {@see Dependency|dependency}
- * can also be specified when calling {@see set()}. If the data item expires or the dependency
+ * a key identifying the value is required. An expiration time and/or a {@see Dependency|dependency}
+ * can also be specified when calling {@see set()}. If the value expires or the dependency
  * changes at the time of calling {@see get()}, the cache will return no data.
  *
  * A typical usage pattern of cache is like the following:
@@ -46,8 +46,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
@@ -55,12 +55,12 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool;
 
     /**
-     * Stores multiple values in cache. Each item contains a value identified by a key.
+     * Stores multiple values in cache. Each value is identified by a key.
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
      * @param array $values the values to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
+     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
@@ -74,8 +74,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param mixed $key a key identifying the value to be cached. This can be a simple string or
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
      * @return bool whether the value is successfully stored into cache
@@ -83,11 +83,11 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
     public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool;
 
     /**
-     * Stores multiple values in cache. Each item contains a value identified by a key.
+     * Stores multiple values in cache. Each value is identified by a key.
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
      * @param array $values the values to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
+     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is false.
@@ -114,8 +114,8 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @param callable $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
-     * @param null|int|\DateInterval $ttl the TTL value of this item. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached item. If the dependency changes,
+     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
+     * @param Dependency $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * This parameter is ignored if {@see serializer} is `false`.
      * @return mixed result of $callable execution
