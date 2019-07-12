@@ -3,6 +3,7 @@ namespace Yiisoft\Cache\Tests\Dependency;
 
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\NullCache;
+use Yiisoft\Cache\Tests\TestCase;
 
 /**
  * Dependency (abstract) tests.
