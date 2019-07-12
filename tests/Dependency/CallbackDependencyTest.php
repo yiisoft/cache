@@ -3,28 +3,14 @@ namespace Yiisoft\Cache\Tests\Dependency;
 
 use Yiisoft\Cache\Dependency\CallbackDependency;
 use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\NullCache;
-use Yiisoft\Cache\Tests\TestCase;
 
-class CallbackDependencyTest extends TestCase
+class CallbackDependencyTest extends DependencyTestCase
 {
     private function getDependency(callable $callback, $dependencyData): Dependency
     {
         $dependency = new CallbackDependency($callback);
         $this->setInaccessibleProperty($dependency, 'data', $dependencyData);
         return $dependency;
-    }
-
-    private function assertDependencyChanged(Dependency $dependency): void
-    {
-        $cache = new NullCache();
-        $this->assertTrue($dependency->isChanged($cache), 'Dependecy data was not changed');
-    }
-
-    private function assertDependencyNotChanged(Dependency $dependency): void
-    {
-        $cache = new NullCache();
-        $this->assertFalse($dependency->isChanged($cache), 'Dependecy data was changed');
     }
 
     public function testPlainClosure(): void

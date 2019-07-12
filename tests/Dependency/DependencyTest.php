@@ -2,14 +2,12 @@
 namespace Yiisoft\Cache\Tests\Dependency;
 
 use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\NullCache;
-use Yiisoft\Cache\Tests\TestCase;
 
 /**
  * Dependency (abstract) tests.
  * @group caching
  */
-class DependencyTest extends TestCase
+class DependencyTest extends DependencyTestCase
 {
     public function testResetReusableData(): void
     {
@@ -37,15 +35,11 @@ class DependencyTest extends TestCase
     public function testIsChanged(): void
     {
         /* @var $dependency Dependency */
-
         $dependency = $this->getMockForAbstractClass(Dependency::class);
-        $cache = new NullCache();
-
-        $result = $dependency->isChanged($cache);
-        $this->assertFalse($result);
+        $this->assertDependencyNotChanged($dependency);
 
         $this->setInaccessibleProperty($dependency, 'data', 'changed');
-        $result = $dependency->isChanged($cache);
-        $this->assertTrue($result);
+
+        $this->assertDependencyChanged($dependency);
     }
 }
