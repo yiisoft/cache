@@ -9,30 +9,10 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  * FileCache implements a cache handler using files.
  *
  * For each data value being cached, FileCache will store it in a separate file.
- * The cache files are placed under {@see cachePath}. FileCache will perform garbage collection
+ * The cache files are placed under {@see FileCache::$cachePath}. FileCache will perform garbage collection
  * automatically to remove expired cache files.
  *
- * Application configuration example:
- *
- * ```php
- * return [
- *     'components' => [
- *         'cache' => [
- *             '__class' => Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => Yiisoft\Cache\FileCache::class,
- *                 'cachePath' => Yiisoft\Aliases\Aliases::get('@runtime/cache'),
- *             ],
- *         ],
- *         // ...
- *     ],
- *     // ...
- * ];
- * ```
- *
  * Please refer to {@see \Psr\SimpleCache\CacheInterface} for common cache operations that are supported by FileCache.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 final class FileCache extends SimpleCache
 {
@@ -53,6 +33,7 @@ final class FileCache extends SimpleCache
      * is not over burdened with a single directory having too many files.
      */
     private $directoryLevel = 1;
+
     /**
      * @var int the probability (parts per million) that garbage collection (GC) should be performed
      * when storing a piece of data in the cache. Defaults to 10, meaning 0.001% chance.
@@ -95,7 +76,6 @@ final class FileCache extends SimpleCache
         }
     }
 
-
     public function hasValue(string $key): bool
     {
         $cacheFile = $this->getCacheFile($key);
@@ -104,7 +84,7 @@ final class FileCache extends SimpleCache
     }
 
     /**
-     * @param string $cacheFileSuffix
+     * @param string $cacheFileSuffix cache file suffix. Defaults to '.bin'.
      */
     public function setCacheFileSuffix(string $cacheFileSuffix): void
     {
@@ -112,7 +92,9 @@ final class FileCache extends SimpleCache
     }
 
     /**
-     * @param int $gcProbability
+     * @param int $gcProbability the probability (parts per million) that garbage collection (GC) should be performed
+     * when storing a piece of data in the cache. Defaults to 10, meaning 0.001% chance.
+     * This number should be between 0 and 1000000. A value 0 means no GC will be performed at all.
      */
     public function setGcProbability(int $gcProbability): void
     {
@@ -120,7 +102,9 @@ final class FileCache extends SimpleCache
     }
 
     /**
-     * @param int $fileMode
+     * @param int $fileMode the permission to be set for newly created cache files.
+     * This value will be used by PHP chmod() function. No umask will be applied.
+     * If not set, the permission will be determined by the current environment.
      */
     public function setFileMode(int $fileMode): void
     {
@@ -128,7 +112,10 @@ final class FileCache extends SimpleCache
     }
 
     /**
-     * @param int $dirMode
+     * @param int $dirMode the permission to be set for newly created directories.
+     * This value will be used by PHP chmod() function. No umask will be applied.
+     * Defaults to 0775, meaning the directory is read-writable by owner and group,
+     * but read-only for other users.
      */
     public function setDirMode(int $dirMode): void
     {
@@ -263,5 +250,17 @@ final class FileCache extends SimpleCache
     private function createDirectory(string $path, int $mode): bool
     {
         return is_dir($path) || (mkdir($path, $mode, true) && is_dir($path));
+    }
+
+    /**
+     * @param int $directoryLevel the level of sub-directories to store cache files. Defaults to 1.
+     * If the system has huge number of cache files (e.g. one million), you may use a bigger value
+     * (usually no bigger than 3). Using sub-directories is mainly to ensure the file system
+     * is not over burdened with a single directory having too many files.
+     *
+     */
+    public function setDirectoryLevel(int $directoryLevel): void
+    {
+        $this->directoryLevel = $directoryLevel;
     }
 }
