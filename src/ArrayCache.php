@@ -4,31 +4,7 @@ namespace Yiisoft\Cache;
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
  *
- * Application configuration example:
- *
- * ```php
- * return [
- *     'components' => [
- *         'cache' => [
- *             '__class' => Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => Yiisoft\Cache\ArrayCache::class,
- *             ],
- *         ],
- *         // ...
- *     ],
- *     // ...
- * ];
- * ```
- *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that ArrayCache supports.
- *
- * Unlike the {@see Cache}, ArrayCache allows the expire parameter of {@see set()} and {@see setMultiple()}  to
- * be a floating point number, so you may specify the time in milliseconds (e.g. 0.1 will be 100 milliseconds).
- *
- * For enhanced performance of ArrayCache, you can disable serialization of the stored data by setting {@see $serializer} to `false`.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 final class ArrayCache extends SimpleCache
 {
@@ -41,12 +17,12 @@ final class ArrayCache extends SimpleCache
 
     public function hasValue(string $key): bool
     {
-        return isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > microtime(true));
+        return isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > time());
     }
 
     protected function getValue(string $key, $default = null)
     {
-        if (isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > microtime(true))) {
+        if (isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > time())) {
             return $this->cache[$key][0];
         }
 
@@ -55,7 +31,7 @@ final class ArrayCache extends SimpleCache
 
     protected function setValue(string $key, $value, ?int $ttl): bool
     {
-        $this->cache[$key] = [$value, $ttl === null ? self::TTL_INFINITY : microtime(true) + $ttl];
+        $this->cache[$key] = [$value, $ttl === null ? self::TTL_INFINITY : time() + $ttl];
         return true;
     }
 
