@@ -13,7 +13,7 @@ final class WinCache extends SimpleCache
 {
     private const TTL_INFINITY = 0;
 
-    public function hasValue(string $key): bool
+    protected function hasValue(string $key): bool
     {
         return \wincache_ucache_exists($key);
     }
