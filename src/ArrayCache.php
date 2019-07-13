@@ -15,7 +15,7 @@ final class ArrayCache extends SimpleCache
      */
     private $cache = [];
 
-    public function hasValue(string $key): bool
+    protected function hasValue(string $key): bool
     {
         return isset($this->cache[$key]) && ($this->cache[$key][1] === 0 || $this->cache[$key][1] > time());
     }
