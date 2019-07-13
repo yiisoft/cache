@@ -10,16 +10,6 @@ function time(): int
     return \Yiisoft\Cache\Tests\CacheTest::$time ?: \time();
 }
 
-/**
- * Mock for the microtime() function for caching classes.
- * @param bool $float
- * @return float
- */
-function microtime(bool $float = false): float
-{
-    return \Yiisoft\Cache\Tests\CacheTest::$microtime ?: \microtime($float);
-}
-
 namespace Yiisoft\Cache\Tests;
 
 use Psr\SimpleCache\InvalidArgumentException;
@@ -36,18 +26,12 @@ abstract class CacheTest extends TestCase
      * Null means normal time() behavior.
      */
     public static $time;
-    /**
-     * @var float virtual time to be returned by mocked microtime() function.
-     * Null means normal microtime() behavior.
-     */
-    public static $microtime;
 
     abstract protected function createCacheInstance(): CacheInterface;
 
     protected function tearDown(): void
     {
         static::$time = null;
-        static::$microtime = null;
     }
 
     /**

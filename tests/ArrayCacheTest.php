@@ -20,11 +20,11 @@ class ArrayCacheTest extends CacheTest
     {
         $cache = $this->createCacheInstance();
 
-        static::$microtime = \microtime(true);
+        static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
-        static::$microtime++;
+        static::$time++;
         $this->assertEquals('expire_test', $cache->get('expire_test'));
-        static::$microtime++;
+        static::$time++;
         $this->assertNull($cache->get('expire_test'));
     }
 
@@ -32,11 +32,11 @@ class ArrayCacheTest extends CacheTest
     {
         $cache = $this->createCacheInstance();
 
-        static::$microtime = \microtime(true);
+        static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
-        static::$microtime++;
+        static::$time++;
         $this->assertEquals('expire_testa', $cache->get('expire_testa'));
-        static::$microtime++;
+        static::$time++;
         $this->assertNull($cache->get('expire_testa'));
     }
 }
