@@ -8,18 +8,15 @@ use Yiisoft\Cache\CacheInterface;
  * AnyDependency represents a dependency based on the result of a callback.
  *
  * The dependency is reported as changed if any sub-dependency is changed.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 class AnyDependency extends Dependency
 {
     /**
-         * @var Dependency[]
-         */
+     * @var Dependency[]
+     */
     private $dependencies;
 
     /**
-     * ChainedDependency constructor.
      * @param Dependency[] $dependencies list of dependencies that this dependency is composed of.
      * Each array element must be a dependency object.
      */

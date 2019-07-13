@@ -12,13 +12,20 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * Derived classes should implement the following methods which do the actual cache storage operations:
  *
- * - {@see getValue()}: retrieve the value with a key (if any) from cache
- * - {@see setValue()}: store the value with a key into cache
- * - {@see deleteValue()}: delete the value with the specified key from cache
- * - {@see clear()}: delete all values from cache
+ * - {@see SimpleCache::hasValue()}: check if value with a key exists in cache
+ * - {@see SimpleCache::getValue()}: retrieve the value with a key (if any) from cache
+ * - {@see SimpleCache::setValue()}: store the value with a key into cache
+ * - {@see SimpleCache::deleteValue()}: delete the value with the specified key from cache
+ * - {@see SimpleCache::clear()}: delete all values from cache
  *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
- * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
+ * Additionally, you may override the following methods in case backend supports getting any/or setting multiple keys
+ * at once:
+ *
+ * - {@see SimpleCache::getValues()}: retrieve multiple values from cache
+ * - {@see SimpleCache::setValues()}: store multiple values into cache
+ *
+ * Check [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md)
+ * before implementing your own backend.
  */
 abstract class SimpleCache implements PsrCacheInterface
 {
@@ -37,12 +44,6 @@ abstract class SimpleCache implements PsrCacheInterface
 
     /**
      * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
-     *
-     * You can disable serialization by setting this property to `NullSerializer`,
-     * data will be directly sent to and retrieved from the underlying
-     * cache component without any serialization or deserialization. You should not turn off serialization if
-     * you are using {@see Dependency|cache dependency}, because it relies on data serialization. Also, some
-     * implementations of the cache can not correctly save and retrieve data different from a string type.
      */
     private $serializer;
 
@@ -51,16 +52,16 @@ abstract class SimpleCache implements PsrCacheInterface
      * Serializer should be an instance of {@see SerializerInterface} or its DI compatible configuration.
      * @see setSerializer
      */
-    public function __construct(SerializerInterface $serializer = null)
+    public function __construct(?SerializerInterface $serializer = null)
     {
         $this->setSerializer($serializer ?? $this->createDefaultSerializer());
     }
 
     /**
      * Creates a default serializer, when nothing is given
-     * @return PhpSerializer
+     * @return SerializerInterface
      */
-    protected function createDefaultSerializer(): PhpSerializer
+    protected function createDefaultSerializer(): SerializerInterface
     {
         return new PhpSerializer();
     }
@@ -160,7 +161,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * The given key will be type-casted to string.
      * If the result string does not contain alphanumeric characters only or has more than 32 characters,
      * then the hash of the key will be used.
-     * The result key will be returned back prefixed with {@see keyPrefix}.
+     * The result key will be returned back prefixed with {@see $keyPrefix}.
      *
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
@@ -196,7 +197,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * @param string $key a unique key identifying the cached value
      * @param mixed $default default value to return if value is not in the cache or expired
      * @return mixed the value stored in cache. $default is returned if the value is not in the cache or expired. Most often
-     * value is a string. If you have disabled {@see serializer}}, it could be something else.
+     * value is a string. If you have disabled {@see $serializer}}, it could be something else.
      */
     abstract protected function getValue(string $key, $default = null);
 
@@ -205,7 +206,7 @@ abstract class SimpleCache implements PsrCacheInterface
      * This method should be implemented by child classes to store the data
      * in specific cache storage.
      * @param string $key the key identifying the value to be cached
-     * @param mixed $value the value to be cached. Most often it's a string. If you have disabled {@see serializer},
+     * @param mixed $value the value to be cached. Most often it's a string. If you have disabled {@see $serializer},
      * it could be something else.
      * @param int|null $ttl the number of seconds in which the cached value will expire. Null means infinity.
      * Negative value will result in deleting a value.

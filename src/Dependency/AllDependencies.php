@@ -7,8 +7,6 @@ use Yiisoft\Cache\CacheInterface;
  * AllDependencies represents a dependency which is composed of a list of other dependencies.
  *
  * The dependency is reported as changed if all sub-dependencies are changed.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 class AllDependencies extends Dependency
 {
@@ -18,7 +16,6 @@ class AllDependencies extends Dependency
     private $dependencies;
 
     /**
-     * ChainedDependency constructor.
      * @param Dependency[] $dependencies list of dependencies that this dependency is composed of.
      * Each array element must be a dependency object.
      */

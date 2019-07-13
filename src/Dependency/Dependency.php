@@ -6,10 +6,8 @@ use Yiisoft\Cache\CacheInterface;
 /**
  * Dependency is the base class for cache dependency classes.
  *
- * Child classes should override its {@see generateDependencyData()} for generating
+ * Child classes should override its {@see Dependency::generateDependencyData()} for generating
  * the actual dependency data.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 abstract class Dependency
 {
@@ -34,7 +32,7 @@ abstract class Dependency
 
     /**
      * Changes dependecy behavior so dependent data for this cache dependency will be generated only once per request.
-     *  This allows you to use the same cache dependency for multiple separate cache calls while generating the same
+     * This allows you to use the same cache dependency for multiple separate cache calls while generating the same
      * page without an overhead of re-evaluating dependency data each time.
      */
     public function markAsReusable(): void

@@ -7,32 +7,14 @@ use Yiisoft\Cache\Exception\SetCacheException;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
- * The actual data caching is performed via {@see handler}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface}
- * instance.
+ * The actual data caching is performed via {@see Cache::$handler}, which should be configured
+ * to be {@see \Psr\SimpleCache\CacheInterface} instance.
  *
- * Application configuration example:
- *
- * ```php
- * return [
- *     'components' => [
- *         'cache' => [
- *             '__class' => Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => Yiisoft\Cache\FileCache::class,
- *                 'cachePath' => '@runtime/cache',
- *             ],
- *         ],
- *         // ...
- *     ],
- *     // ...
- * ];
- * ```
- *
- * A value can be stored in the cache by calling {@see set()} and be retrieved back
- * later (in the same or different request) by {@see get()}. In both operations,
- * a key identifying the value is required. An expiration time and/or a {@see Dependency|dependency}
- * can also be specified when calling {@see set()}. If the value expires or the dependency
- * changes at the time of calling {@see get()}, the cache will return no data.
+ * A value can be stored in the cache by calling {@see CacheInterface::set()} and be retrieved back
+ * later (in the same or different request) by {@see CacheInterface::get()}. In both operations,
+ * a key identifying the value is required. An expiration time and/or a {@see Dependency}
+ * can also be specified when calling {@see CacheInterface::set()}. If the value expires or the dependency
+ * changes at the time of calling {@see CacheInterface::get()}, the cache will return no data.
  *
  * A typical usage pattern of cache is like the following:
  *
@@ -41,19 +23,12 @@ use Yiisoft\Cache\Exception\SetCacheException;
  * $data = $cache->get($key);
  * if ($data === null) {
  *     // ...generate $data here...
- *     $cache->set($key, $data, $duration, $dependency);
+ *     $cache->set($key, $data, $ttl, $dependency);
  * }
  * ```
  *
- * Because Cache implements the {@see \ArrayAccess} interface, it can be used like an array. For example,
- *
- * ```php
- * $cache['foo'] = 'some data';
- * echo $cache['foo'];
- * ```
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview)
- * and [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
+ * For more details and usage information on Cache, see
+ * [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
  */
 final class Cache implements CacheInterface
 {
@@ -117,7 +92,7 @@ final class Cache implements CacheInterface
 
     /**
      * Retrieves multiple values from cache with the specified keys.
-     * Some caches (such as memcache, apc) allow retrieving multiple cached values at the same time,
+     * Some caches, such as memcached or apcu, allow retrieving multiple cached values at the same time,
      * which may improve the performance. In case a cache does not support this feature natively,
      * this method will try to simulate it.
      * @param string[] $keys list of string keys identifying the cached values
@@ -163,8 +138,7 @@ final class Cache implements CacheInterface
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
-     * This parameter is ignored if {@see serializer} is false.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
      */
@@ -186,8 +160,7 @@ final class Cache implements CacheInterface
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
-     * This parameter is ignored if {@see serializer} is false.
+     * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool True on success and false on failure.
      * @throws InvalidArgumentException
      */
@@ -213,8 +186,7 @@ final class Cache implements CacheInterface
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via {@see get()}.
-     * This parameter is ignored if {@see serializer} is false.
+     * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool
      * @throws InvalidArgumentException
      */
@@ -257,8 +229,7 @@ final class Cache implements CacheInterface
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
-     * This parameter is ignored if {@see serializer} is false.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
      */
@@ -303,8 +274,9 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * Method combines both {@see set()} and {@see get()} methods to retrieve value identified by a $key,
-     * or to store the result of $callable execution if there is no cache available for the $key.
+     * Method combines both {@see CacheInterface::set()} and {@see CacheInterface::get()} methods to retrieve
+     * value identified by a $key, or to store the result of $callable execution if there is no cache available
+     * for the $key.
      *
      * Usage example:
      *
@@ -312,7 +284,7 @@ final class Cache implements CacheInterface
      * public function getTopProducts($count = 10) {
      *     $cache = $this->cache;
      *     return $cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
-     *         return Products::find()->mostPopular()->limit(10)->all();
+     *         return $this->getTopNProductsFromDatabase($count);
      *     }, 1000);
      * }
      * ```
@@ -323,8 +295,7 @@ final class Cache implements CacheInterface
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency $dependency dependency of the cached value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
-     * This parameter is ignored if {@see serializer} is `false`.
+     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return mixed result of $callable execution
      * @throws SetCacheException
      * @throws InvalidArgumentException

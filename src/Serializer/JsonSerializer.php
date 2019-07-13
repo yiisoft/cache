@@ -1,8 +1,6 @@
 <?php
 namespace Yiisoft\Cache\Serializer;
 
-//use yii\helpers\Json;
-
 /**
  * JsonSerializer serializes data in JSON format.
  */
@@ -24,11 +22,11 @@ final class JsonSerializer implements SerializerInterface
 
     public function serialize($value): string
     {
-        return json_encode($value, $this->options); //FIXME: Json::encode($value, $this->options);
+        return json_encode($value, $this->options);
     }
 
     public function unserialize(string $value)
     {
-        return json_decode($value, true); //FIXME: Json::decode($value);
+        return json_decode($value, true);
     }
 }
