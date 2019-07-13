@@ -4,7 +4,7 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\NullCache;
 
-class TestNullCache extends TestCase
+class NullCacheTest extends TestCase
 {
     private function getCache(): NullCache
     {
