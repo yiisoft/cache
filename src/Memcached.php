@@ -1,14 +1,15 @@
 <?php
+
 namespace Yiisoft\Cache;
 
-use Yiisoft\Cache\Serializer\SerializerInterface;
 use Yiisoft\Cache\Exception\InvalidConfigException;
+use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
- * MemCached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
+ * Memcached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
  * extension.
  *
- * MemCached can be configured with a list of memcached servers by settings its {@see servers} property.
+ * Memcached can be configured with a list of memcached servers by settings its {@see Memcached::$servers} property.
  * By default, MemCached assumes there is a memcached server running on localhost at port 11211.
  *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that MemCached supports.
@@ -16,39 +17,10 @@ use Yiisoft\Cache\Exception\InvalidConfigException;
  * Note, there is no security measure to protected data in memcached.
  * All data in memcached can be accessed by any process running in the system.
  *
- * To use MemCached as the cache application component, configure the application as follows,
- *
- * ```php
- * [
- *     'components' => [
- *         'cache' => [
- *             '__class' => \Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => \Yiisoft\Cache\MemCached::class,
- *                 'servers' => [
- *                     [
- *                         'host' => 'server1',
- *                         'port' => 11211,
- *                         'weight' => 60,
- *                     ],
- *                     [
- *                         'host' => 'server2',
- *                         'port' => 11211,
- *                         'weight' => 40,
- *                     ],
- *                 ],
- *             ],
- *         ],
- *     ],
- * ]
- * ```
- *
- * In the above, two memcached servers are used: server1 and server2. You can configure more properties of
- * each server, such as `persistent`, `weight`, `timeout`. Please see {@see MemCacheServer} for available options.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
+ * You can configure more properties of each server, such as `persistent`, `weight`, `timeout`.
+ * Please see {@see MemcachedServer} for available options.
  */
-final class MemCached extends SimpleCache
+final class Memcached extends SimpleCache
 {
     private const TTL_INFINITY = 0;
 
@@ -87,7 +59,7 @@ final class MemCached extends SimpleCache
 
     /**
      * @param SerializerInterface|null $serializer
-     * @param array $servers
+     * @param MemcachedServer[] $servers list of memcached server configurations
      * @throws InvalidConfigException
      * @see setSerializer
      */
@@ -96,7 +68,7 @@ final class MemCached extends SimpleCache
         parent::__construct($serializer);
 
         if (empty($servers)) {
-            $servers = [new MemCachedServer('127.0.0.1')];
+            $servers = [new MemcachedServer('127.0.0.1')];
         }
 
         $this->servers = $servers;
@@ -108,7 +80,7 @@ final class MemCached extends SimpleCache
      * Add servers to the server pool of the cache specified
      *
      * @param \Memcached $cache
-     * @param MemCachedServer[] $servers
+     * @param MemcachedServer[] $servers
      */
     private function addServers(\Memcached $cache, array $servers): void
     {
@@ -153,7 +125,7 @@ final class MemCached extends SimpleCache
 
     /**
      * Returns the memcached server configurations.
-     * @return MemCachedServer[] list of memcached server configurations.
+     * @return MemcachedServer[] list of memcached server configurations.
      */
     public function getServers(): array
     {
@@ -162,18 +134,22 @@ final class MemCached extends SimpleCache
 
     /**
      * @param array $configs list of memcached server configurations. Each element must be an array
-     * with the following keys: host, port, persistent, weight, timeout, retryInterval, status.
+     * with the following keys: host, port, weight.
      * @see http://php.net/manual/en/memcached.addserver.php
      */
     public function setServers(array $configs): void
     {
         foreach ($configs as $config) {
-            $this->servers[] = new MemCachedServer($config['host'], $config['port'], $config['weight']);
+            $this->servers[] = new MemcachedServer($config['host'], $config['port'], $config['weight']);
         }
     }
 
     /**
-     * @param string $persistentId
+     * @param string $persistentId an ID that identifies a Memcached instance.
+     * By default the Memcached instances are destroyed at the end of the request. To create an instance that
+     * persists between requests, you may specify a unique ID for the instance. All instances created with the
+     * same ID will share the same connection.
+     * @see http://ca2.php.net/manual/en/memcached.construct.php
      */
     public function setPersistentId(string $persistentId): void
     {
@@ -181,7 +157,8 @@ final class MemCached extends SimpleCache
     }
 
     /**
-     * @param array $options
+     * @param array $options options for Memcached.
+     * @see http://ca2.php.net/manual/en/memcached.setoptions.php
      */
     public function setOptions(array $options): void
     {
@@ -189,7 +166,8 @@ final class MemCached extends SimpleCache
     }
 
     /**
-     * @param string $username
+     * @param string $username memcached sasl username.
+     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
      */
     public function setUsername(string $username): void
     {
@@ -197,7 +175,8 @@ final class MemCached extends SimpleCache
     }
 
     /**
-     * @param string $password
+     * @param string $password memcached sasl password.
+     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
      */
     public function setPassword(string $password): void
     {
@@ -220,7 +199,6 @@ final class MemCached extends SimpleCache
         $values = $this->cache->getMulti($keys);
 
         if ($this->cache->getResultCode() === \Memcached::RES_SUCCESS) {
-            // TODO: test that all fields are returned
             return $values;
         }
 

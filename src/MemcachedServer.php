@@ -2,14 +2,12 @@
 namespace Yiisoft\Cache;
 
 /**
- * MemCachedServer represents the configuration data for a single memcached server.
+ * MemcachedServer represents the configuration data for a single memcached server.
  *
  * See [PHP manual](http://php.net/manual/en/memcached.addserver.php) for detailed explanation
  * of each configuration property.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
-final class MemCachedServer
+final class MemcachedServer
 {
     /**
      * @var string memcached server hostname or IP address

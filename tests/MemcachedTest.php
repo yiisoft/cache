@@ -3,14 +3,14 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Cache\MemCached;
+use Yiisoft\Cache\Memcached;
 
 /**
  * Class for testing memcached cache backend.
  * @group memcached
  * @group caching
  */
-class MemCachedTest extends CacheTest
+class MemcachedTest extends CacheTest
 {
     public static function setUpBeforeClass(): void
     {
@@ -26,7 +26,7 @@ class MemCachedTest extends CacheTest
 
     protected function createCacheInstance(): CacheInterface
     {
-        return new Cache(new MemCached());
+        return new Cache(new Memcached());
     }
 
     public function testExpire(): void
