@@ -4,31 +4,10 @@ namespace Yiisoft\Cache;
 use Yiisoft\Cache\Dependency\Dependency;
 
 /**
- * NullCache is a placeholder cache component.
+ * NullCache does not cache anything reporting success for all methods calls.
  *
- * Application configuration example:
- *
- * ```php
- * return [
- *     'components' => [
- *         'cache' => [
- *             '__class' => Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => Yiisoft\Cache\DummyCache::class,
- *             ],
- *         ],
- *         // ...
- *     ],
- *     // ...
- * ];
- * ```
- *
- * NullCache does not cache anything. It is provided so that one can always configure
- * a 'cache' application component and save the check of existence of `\Yii::getApp()->cache`.
- * By replacing DummyCache with some other cache component, one can quickly switch from
+ * By replacing it with some other cache component, one can quickly switch from
  * non-caching mode to caching mode.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 final class NullCache implements CacheInterface
 {
@@ -37,7 +16,7 @@ final class NullCache implements CacheInterface
         return true;
     }
 
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         return true;
     }
@@ -72,7 +51,7 @@ final class NullCache implements CacheInterface
         return $callable($this);
     }
 
-    public function delete($key)
+    public function delete($key): bool
     {
         return true;
     }

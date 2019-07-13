@@ -7,26 +7,7 @@ namespace Yiisoft\Cache;
  * To use this application component, the [WinCache PHP extension](https://sourceforge.net/projects/wincache/)
  * must be loaded. Also note that "wincache.ucenabled" should be set to "1" in your php.ini file.
  *
- * Application configuration example:
- *
- * ```php
- * return [
- *     'components' => [
- *         'cache' => [
- *             '__class' => Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => Yiisoft\Cache\WinCache::class,
- *             ],
- *         ],
- *         // ...
- *     ],
- *     // ...
- * ];
- * ```
- *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that are supported by WinCache.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 final class WinCache extends SimpleCache
 {

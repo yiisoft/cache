@@ -25,8 +25,6 @@ namespace Yiisoft\Cache;
  * ```
  *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that ApcCache supports.
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 final class ApcCache extends SimpleCache
 {
@@ -45,7 +43,6 @@ final class ApcCache extends SimpleCache
 
     protected function getValues(array $keys, $default = null): array
     {
-        // TODO: test that all keys are returned
         return \apcu_fetch($keys, $succses) ?: [];
     }
 

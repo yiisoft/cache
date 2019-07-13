@@ -5,20 +5,18 @@ use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\CacheInterface;
 
 /**
- * TagDependency associates a cached value with one or multiple {@see tags}.
+ * TagDependency associates a cached value with one or multiple {@see TagDependency::$tags}.
  *
- * By calling {@see invalidate()}, you can invalidate all cached values that are associated with the specified tag name(s).
+ * By calling {@see TagDependency::invalidate()}, you can invalidate all cached values that are associated with the specified tag name(s).
  *
  * ```php
  * // setting multiple cache keys to store data forever and tagging them with "user-123"
- * Yii::getApp()->cache->set('user_42_profile', '', 0, new TagDependency(['tags' => 'user-123']));
- * Yii::getApp()->cache->set('user_42_stats', '', 0, new TagDependency(['tags' => 'user-123']));
+ * $cache->set('user_42_profile', '', 0, new TagDependency('user-123'));
+ * $cache->set('user_42_stats', '', 0, new TagDependency('user-123'));
  *
  * // invalidating all keys tagged with "user-123"
- * TagDependency::invalidate(Yii::getApp()->cache, 'user-123');
+ * TagDependency::invalidate($cache, 'user-123');
  * ```
- *
- * For more details and usage information on Cache, see the [guide article on caching](guide:caching-overview).
  */
 final class TagDependency extends Dependency
 {
