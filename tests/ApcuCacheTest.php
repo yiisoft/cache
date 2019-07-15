@@ -1,7 +1,7 @@
 <?php
 namespace Yiisoft\Cache\Tests;
 
-use Yiisoft\Cache\ApcCache;
+use Yiisoft\Cache\ApcuCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 
@@ -10,7 +10,7 @@ use Yiisoft\Cache\CacheInterface;
  * @group apc
  * @group caching
  */
-class ApcCacheTest extends CacheTest
+class ApcuCacheTest extends CacheTest
 {
     public static function setUpBeforeClass(): void
     {
@@ -25,7 +25,7 @@ class ApcCacheTest extends CacheTest
 
     protected function createCacheInstance(): CacheInterface
     {
-        return new Cache(new ApcCache());
+        return new Cache(new ApcuCache());
     }
 
     public function testExpire(): void
