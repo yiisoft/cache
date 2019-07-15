@@ -23,6 +23,7 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * - {@see SimpleCache::getValues()}: retrieve multiple values from cache
  * - {@see SimpleCache::setValues()}: store multiple values into cache
+ * - {@see SimpleCache::deleteValues()}: delete multiple values from cache
  *
  * Check [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md)
  * before implementing your own backend.
@@ -86,7 +87,7 @@ abstract class SimpleCache implements PsrCacheInterface
         return $this->serializer->unserialize($value);
     }
 
-    public function getMultiple($keys, $default = null): array
+    public function getMultiple($keys, $default = null): iterable
     {
         $keyMap = [];
         foreach ($keys as $originalKey) {
@@ -146,13 +147,12 @@ abstract class SimpleCache implements PsrCacheInterface
 
     public function deleteMultiple($keys): bool
     {
-        $result = true;
+        $normalizedKeys = [];
         foreach ($keys as $key) {
-            if (!$this->delete($key)) {
-                $result = false;
-            }
+            $normalizedKeys[] = $this->normalizeKey($key);
         }
-        return $result;
+
+        return $this->deleteValues($normalizedKeys);
     }
 
     /**
@@ -223,16 +223,32 @@ abstract class SimpleCache implements PsrCacheInterface
     abstract protected function deleteValue(string $key): bool;
 
     /**
+     * Deletes multiple values from cache
+     * This method should be overridden by child classes in case storage supports efficient deletion of multiple keys
+     * @param iterable $keys
+     * @return bool if no error happens during deletion
+     */
+    protected function deleteValues(iterable $keys): bool
+    {
+        foreach ($keys as $key) {
+            if (!$this->deleteValue($key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Retrieves multiple values from cache with the specified keys.
      * The default implementation calls {@see getValue()} multiple times to retrieve
      * the cached values one by one. If the underlying cache storage supports multiget,
      * this method should be overridden to exploit that feature.
      *
-     * @param array $keys a list of keys identifying the cached values
+     * @param iterable $keys a list of keys identifying the cached values
      * @param mixed $default default value to return if value is not in the cache or expired
-     * @return array a list of cached values indexed by the keys
+     * @return iterable a list of cached values indexed by the keys
      */
-    protected function getValues(array $keys, $default = null): array
+    protected function getValues(iterable $keys, $default = null): iterable
     {
         $results = [];
         foreach ($keys as $key) {
@@ -249,12 +265,12 @@ abstract class SimpleCache implements PsrCacheInterface
      * The default implementation calls {@see setValue()} multiple times store values one by one. If the underlying cache
      * storage supports multi-set, this method should be overridden to exploit that feature.
      *
-     * @param array $values array where key corresponds to cache key while value is the value stored
+     * @param iterable $values a list where key corresponds to cache key while value is the value stored
      * @param int|null $ttl the number of seconds in which the cached values will expire. Null means infinity.
      * Negative value will result in deleting a value.
      * @return bool `true` on success and `false` on failure.
      */
-    protected function setValues(array $values, ?int $ttl): bool
+    protected function setValues(iterable $values, ?int $ttl): bool
     {
         $result = true;
         foreach ($values as $key => $value) {

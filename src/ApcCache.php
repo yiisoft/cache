@@ -41,9 +41,9 @@ final class ApcCache extends SimpleCache
         return $success ? $value : $default;
     }
 
-    protected function getValues(array $keys, $default = null): array
+    protected function getValues(iterable $keys, $default = null): iterable
     {
-        return \apcu_fetch($keys, $succses) ?: [];
+        return \apcu_fetch($keys, $success) ?: [];
     }
 
     protected function setValue(string $key, $value, ?int $ttl): bool
@@ -51,7 +51,7 @@ final class ApcCache extends SimpleCache
         return \apcu_store($key, $value, $ttl ?? self::TTL_INFINITY);
     }
 
-    protected function setValues(array $values, ?int $ttl): bool
+    protected function setValues(iterable $values, ?int $ttl): bool
     {
         return \apcu_store($values, null, $ttl ?? self::TTL_INFINITY) === [];
     }
@@ -64,5 +64,10 @@ final class ApcCache extends SimpleCache
     public function clear(): bool
     {
         return \apcu_clear_cache();
+    }
+
+    public function deleteValues(iterable $keys): bool
+    {
+        return \apcu_delete($keys) === [];
     }
 }
