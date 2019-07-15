@@ -8,7 +8,9 @@
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
-    stopOnFailure="false">
+    stopOnFailure="false"
+    executionOrder="random"
+    resolveDependencies="true">
     <testsuites>
         <testsuite name="Yii Cache tests">
             <directory>./tests</directory>
