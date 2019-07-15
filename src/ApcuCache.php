@@ -7,23 +7,6 @@ namespace Yiisoft\Cache;
  * To use this application component, the [APCu PHP extension](http://www.php.net/apcu) must be loaded.
  * In order to enable APCu for CLI you should add "apc.enable_cli = 1" to your php.ini.
  *
- * Application configuration example:
- *
- * ```php
- * return [
- *     'components' => [
- *         'cache' => [
- *             '__class' => Yiisoft\Cache\Cache::class,
- *             'handler' => [
- *                 '__class' => Yiisoft\Cache\ApcCache::class,
- *             ],
- *         ],
- *         // ...
- *     ],
- *     // ...
- * ];
- * ```
- *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that ApcCache supports.
  */
 final class ApcuCache extends SimpleCache
