@@ -244,7 +244,7 @@ final class Memcached extends SimpleCache
     public function deleteValues(iterable $keys): bool
     {
         foreach ($this->cache->deleteMulti($keys) as $result) {
-            if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
+            if ($result === false) {
                 return false;
             }
         }
