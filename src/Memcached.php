@@ -194,7 +194,7 @@ final class Memcached extends SimpleCache
         return $default;
     }
 
-    protected function getValues(array $keys, $default = null): array
+    protected function getValues(iterable $keys, $default = null): iterable
     {
         $values = $this->cache->getMulti($keys);
 
@@ -215,7 +215,7 @@ final class Memcached extends SimpleCache
         return $this->cache->set($key, $value, $ttl);
     }
 
-    protected function setValues(array $values, ?int $ttl): bool
+    protected function setValues(iterable $values, ?int $ttl): bool
     {
         if ($ttl === null) {
             $ttl = self::TTL_INFINITY;
@@ -239,5 +239,15 @@ final class Memcached extends SimpleCache
     {
         $this->cache->get($key);
         return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
+    }
+
+    public function deleteValues(iterable $keys): bool
+    {
+        foreach ($this->cache->deleteMulti($keys) as $result) {
+            if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
+                return false;
+            }
+        }
+        return true;
     }
 }

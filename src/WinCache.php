@@ -24,7 +24,7 @@ final class WinCache extends SimpleCache
         return $success ? $value : $default;
     }
 
-    protected function getValues(array $keys, $default = null): array
+    protected function getValues(iterable $keys, $default = null): iterable
     {
         $defaultValues = array_fill_keys($keys, $default);
         return array_merge($defaultValues, \wincache_ucache_get($keys));
@@ -35,7 +35,7 @@ final class WinCache extends SimpleCache
         return \wincache_ucache_set($key, $value, $ttl ?? self::TTL_INFINITY);
     }
 
-    protected function setValues(array $values, ?int $ttl): bool
+    protected function setValues(iterable $values, ?int $ttl): bool
     {
         return \wincache_ucache_set($values, null, $ttl ?? self::TTL_INFINITY) === [];
     }
@@ -48,5 +48,16 @@ final class WinCache extends SimpleCache
     public function clear(): bool
     {
         return \wincache_ucache_clear();
+    }
+
+    public function deleteValues(iterable $keys): bool
+    {
+        $deleted = array_flip(\wincache_ucache_delete($keys));
+        foreach ($keys as $expectedKey) {
+            if (!isset($deleted[$expectedKey])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
