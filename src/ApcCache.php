@@ -32,7 +32,7 @@ final class ApcCache extends SimpleCache
 
     protected function hasValue(string $key): bool
     {
-        return (bool)\apcu_exists($key);
+        return \apcu_exists($key);
     }
 
     protected function getValue(string $key, $default = null)
@@ -48,7 +48,7 @@ final class ApcCache extends SimpleCache
 
     protected function setValue(string $key, $value, ?int $ttl): bool
     {
-        return (bool)\apcu_store($key, $value, $ttl ?? self::TTL_INFINITY);
+        return \apcu_store($key, $value, $ttl ?? self::TTL_INFINITY);
     }
 
     protected function setValues(array $values, ?int $ttl): bool
@@ -58,7 +58,7 @@ final class ApcCache extends SimpleCache
 
     protected function deleteValue(string $key): bool
     {
-        return (bool)\apcu_delete($key);
+        return \apcu_delete($key);
     }
 
     public function clear(): bool
