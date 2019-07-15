@@ -50,6 +50,8 @@ abstract class CacheTest extends TestCase
     public function testSet(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
+
         for ($i = 0; $i < 2; $i++) {
             $this->assertTrue($cache->set('string_test', 'string_test'));
             $this->assertTrue($cache->set('number_test', 42));
@@ -122,12 +124,15 @@ abstract class CacheTest extends TestCase
     public function testGetNonExistent(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
+
         $this->assertNull($cache->get('non_existent_key'));
     }
 
     public function testStoreSpecialValues(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
 
         $this->assertTrue($cache->set('null_value', null));
         $this->assertNull($cache->get('null_value'));
@@ -151,6 +156,7 @@ abstract class CacheTest extends TestCase
     public function testExpire(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
 
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
         usleep(500000);
@@ -200,6 +206,7 @@ abstract class CacheTest extends TestCase
     public function testExpireAdd(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
 
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
         usleep(500000);
@@ -287,6 +294,8 @@ abstract class CacheTest extends TestCase
     {
         $key = [42];
         $cache = $this->createCacheInstance();
+        $cache->clear();
+
         $this->assertNull($cache->get($key));
 
         $cache->set($key, 42);
@@ -299,6 +308,8 @@ abstract class CacheTest extends TestCase
             public $value = 42;
         };
         $cache = $this->createCacheInstance();
+        $cache->clear();
+
         $this->assertNull($cache->get($key));
 
         $cache->set($key, 42);
