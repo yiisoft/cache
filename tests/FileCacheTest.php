@@ -46,10 +46,15 @@ class FileCacheTest extends CacheTest
         $this->assertNull($cache->get('expire_testa'));
     }
 
+    /**
+     * We have to on separate process because of PHPMock not being able to mock a function that
+     * was already called.
+     * @runInSeparateProcess
+     */
     public function testCacheRenewalOnDifferentOwnership(): void
     {
         if (!function_exists('posix_geteuid')) {
-            $this->markTestSkipped('Can not test on non-POSIX OS.');
+            $this->markTestSkipped('Can not test without posix extension installed.');
         }
 
         $cache = $this->createCacheInstance();
