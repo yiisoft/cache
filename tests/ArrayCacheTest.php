@@ -19,6 +19,7 @@ class ArrayCacheTest extends CacheTest
     public function testExpire(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
 
         static::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
@@ -35,6 +36,7 @@ class ArrayCacheTest extends CacheTest
     public function testExpireAdd(): void
     {
         $cache = $this->createCacheInstance();
+        $cache->clear();
 
         static::$time = \time();
         $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
