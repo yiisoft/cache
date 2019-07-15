@@ -25,7 +25,7 @@ It is used in [Yii Framework] but is usable separately.
 - Customizable way of serializing data. Out of the box PHP, JSON, Igbinary and custom callbacks are supported.
 - Supports non-string keys.
 - Ability to set default TTL and key prefix per cache instance.
-- Easy to implement your own cache backends existing from `SimpleCache`.
+- Easy to implement your own cache backends extending from `SimpleCache`.
 - Adds cache invalidation dependencies on top of PSR-16. Out of the box supports invalidation by tag and invalidation by 
   file modification time.
 - Adds support for `add()` and `addMultiple()` operations additionally to PSR-16.
