@@ -103,7 +103,7 @@ When using extended cache i.e. PSR-16 cache wrapped with `\Yiisoft\Cache\Cache`,
 is less repetitive:
 
 ```php
-$parameters = ['user_id => 42];
+$parameters = ['user_id' => 42];
 $data = $cache->getOrSet($key, function () use ($parameters) {
     return $this->calculateSomething($parameters);
 }, 3600);
