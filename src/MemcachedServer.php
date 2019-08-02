@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Cache;
 
 /**
@@ -9,6 +10,16 @@ namespace Yiisoft\Cache;
  */
 final class MemcachedServer
 {
+    /**
+     * Default memcached server IP address
+     */
+    public const DEFAULT_HOST = '127.0.0.1';
+
+    /**
+     * Default memcached server port
+     */
+    public const DEFAULT_PORT = 11211;
+
     /**
      * @var string memcached server hostname or IP address
      */
@@ -29,7 +40,7 @@ final class MemcachedServer
      * @param int $port memcached server port
      * @param int $weight probability of using this server among all servers
      */
-    public function __construct(string $host, int $port = 11211, int $weight = 1)
+    public function __construct(string $host = self::DEFAULT_HOST, int $port = self::DEFAULT_PORT, int $weight = 1)
     {
         $this->host = $host;
         $this->port = $port;

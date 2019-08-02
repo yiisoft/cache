@@ -68,7 +68,7 @@ final class Memcached extends SimpleCache
         parent::__construct($serializer);
 
         if (empty($servers)) {
-            $servers = [new MemcachedServer('127.0.0.1')];
+            $servers = [new MemcachedServer()];
         }
 
         $this->servers = $servers;
