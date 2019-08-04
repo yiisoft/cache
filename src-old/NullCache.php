@@ -1,9 +1,7 @@
 <?php
+namespace Yiisoft\CacheOld;
 
-namespace Yiisoft\Cache;
-
-use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\Serializer\SerializerInterface;
+use Yiisoft\CacheOld\DependencyOld\Dependency;
 
 /**
  * NullCache does not cache anything reporting success for all methods calls.
@@ -35,7 +33,7 @@ final class NullCache implements CacheInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
-        return array_fill_keys((array)$keys, $default);
+        return array_fill_keys($keys, $default);
     }
 
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
@@ -66,21 +64,5 @@ final class NullCache implements CacheInterface
     public function has($key): bool
     {
         return false;
-    }
-
-    public function enableKeyNormalization(): void
-    {
-    }
-
-    public function disableKeyNormalization(): void
-    {
-    }
-
-    public function setKeyPrefix(string $keyPrefix): void
-    {
-    }
-
-    public function setSerializer(?SerializerInterface $serializer): void
-    {
     }
 }

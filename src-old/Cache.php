@@ -1,12 +1,9 @@
 <?php
-
-namespace Yiisoft\Cache;
+namespace Yiisoft\CacheOld;
 
 use Psr\SimpleCache\InvalidArgumentException;
-use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\Exception\SetCacheException;
-use Yiisoft\Cache\Serializer\PhpSerializer;
-use Yiisoft\Cache\Serializer\SerializerInterface;
+use Yiisoft\CacheOld\DependencyOld\Dependency;
+use Yiisoft\CacheOld\Exception\SetCacheException;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -41,26 +38,11 @@ final class Cache implements CacheInterface
     private $handler;
 
     /**
-     * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
-     * It is recommended that you set a unique cache key prefix for each application if the same cache
-     * storage is being used by different applications.
-     */
-    private $keyPrefix = '';
-
-    /**
-     * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
-     */
-    private $serializer;
-
-    private $keyNormalization = true;
-
-    /**
      * @param \Psr\SimpleCache\CacheInterface cache handler.
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
     {
         $this->handler = $handler;
-        $this->initSerializer();
     }
 
     /**
@@ -73,39 +55,38 @@ final class Cache implements CacheInterface
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
      */
-    private function normalizeKey($key): string
+    private function buildKey($key): string
     {
-        if (!$this->keyNormalization) {
-            $normalizedKey = $key;
-        } elseif (\is_string($key)) {
-            $normalizedKey = ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
-        } else {
-            $normalizedKey = $this->keyPrefix . md5(json_encode($key));
+        if (\is_string($key)) {
+            return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
         }
-
-        return $this->keyPrefix . $normalizedKey;
+        return md5(json_encode($key));
     }
 
 
     public function get($key, $default = null)
     {
-        $key = $this->normalizeKey($key);
-        $value = $this->handler->get($key, $default);
+        $key = $this->buildKey($key);
+        $value = $this->handler->get($key);
+
+        if ($value === null) {
+            return $default;
+        }
 
         if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
             if ($value[1]->isChanged($this)) {
                 return $default;
             }
-            $value = $value[0];
+            return $value[0];
         }
 
-        return $this->prepareReturnValue($value, $default);
+        return $value;
     }
 
 
     public function has($key): bool
     {
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
         return $this->handler->has($key);
     }
 
@@ -123,16 +104,15 @@ final class Cache implements CacheInterface
      */
     public function getMultiple($keys, $default = null): iterable
     {
-        // TODO refactor
         $keyMap = [];
         foreach ($keys as $key) {
-            $keyMap[$key] = $this->normalizeKey($key);
+            $keyMap[$key] = $this->buildKey($key);
         }
-        $values = $this->handler->getMultiple(array_values($keyMap), $default);
+        $values = $this->handler->getMultiple(array_values($keyMap));
         $results = [];
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
-            if (array_key_exists($newKey, (array)$values)) {
+            if (isset($values[$newKey])) {
                 $value = $values[$newKey];
                 if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
                     if ($value[1]->isChanged($this)) {
@@ -141,7 +121,6 @@ final class Cache implements CacheInterface
 
                     $value = $value[0];
                 }
-                $value = $this->prepareReturnValue($value, $default);
                 $results[$key] = $value;
             }
         }
@@ -165,14 +144,11 @@ final class Cache implements CacheInterface
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
-        $value = $this->serialize($value);
-
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
             $value = [$value, $dependency];
         }
-        $key = $this->normalizeKey($key);
-
+        $key = $this->buildKey($key);
         return $this->handler->set($key, $value, $ttl);
     }
 
@@ -198,7 +174,7 @@ final class Cache implements CacheInterface
     {
         $actualKeys = [];
         foreach ($keys as $key) {
-            $actualKeys[] = $this->normalizeKey($key);
+            $actualKeys[] = $this->buildKey($key);
         }
         return $this->handler->deleteMultiple($actualKeys);
     }
@@ -234,12 +210,11 @@ final class Cache implements CacheInterface
 
         $data = [];
         foreach ($values as $key => $value) {
-            $value = $this->serialize($value);
             if ($dependency !== null) {
                 $value = [$value, $dependency];
             }
 
-            $key = $this->normalizeKey($key);
+            $key = $this->buildKey($key);
             $data[$key] = $value;
         }
 
@@ -265,13 +240,11 @@ final class Cache implements CacheInterface
             $value = [$value, $dependency];
         }
 
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
 
         if ($this->handler->has($key)) {
             return false;
         }
-
-        $value = $this->serialize($value);
 
         return $this->handler->set($key, $value, $ttl);
     }
@@ -285,7 +258,7 @@ final class Cache implements CacheInterface
      */
     public function delete($key): bool
     {
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
 
         return $this->handler->delete($key);
     }
@@ -339,69 +312,5 @@ final class Cache implements CacheInterface
         }
 
         return $value;
-    }
-
-    public function __call($name, $arguments)
-    {
-        return call_user_func_array([$this->handler, $name], $arguments);
-    }
-
-    public function enableKeyNormalization(): void
-    {
-        $this->keyNormalization = true;
-    }
-
-    public function disableKeyNormalization(): void
-    {
-        $this->keyNormalization = false;
-    }
-
-    /**
-     * @param string $keyPrefix a string prefixed to every cache key so that it is unique globally in the whole cache storage.
-     * It is recommended that you set a unique cache key prefix for each application if the same cache
-     * storage is being used by different applications.
-     */
-    public function setKeyPrefix(string $keyPrefix): void
-    {
-        if ($keyPrefix != '' && !ctype_alnum($keyPrefix)) {
-            throw new Exception\InvalidArgumentException('Cache key prefix should be alphanumeric');
-        }
-        $this->keyPrefix = $keyPrefix;
-    }
-
-    private function initSerializer()
-    {
-        $this->serializer = new PhpSerializer();
-    }
-
-    /**
-     * @param SerializerInterface $serializer
-     */
-    public function setSerializer(?SerializerInterface $serializer): void
-    {
-        $this->serializer = $serializer;
-    }
-
-    private function unserialize($value)
-    {
-        if ($this->serializer === null) {
-            return $value;
-        }
-
-        return $this->serializer->unserialize($value);
-    }
-
-    private function serialize($value)
-    {
-        if ($this->serializer === null) {
-            return $value;
-        }
-
-        return $this->serializer->serialize($value);
-    }
-
-    private function prepareReturnValue($value, $default)
-    {
-        return $value === $default ? $value : $this->unserialize($value);
     }
 }

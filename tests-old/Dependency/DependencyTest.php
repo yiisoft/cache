@@ -1,7 +1,7 @@
 <?php
-namespace Yiisoft\Cache\Tests\Dependency;
+namespace Yiisoft\CacheOld\Tests\Dependency;
 
-use Yiisoft\Cache\Dependency\Dependency;
+use Yiisoft\CacheOld\Dependency\Dependency;
 
 /**
  * Dependency (abstract) tests.
@@ -14,11 +14,11 @@ class DependencyTest extends DependencyTestCase
         $value = ['dummy'];
         $dependency = new MockDependency();
         $this->setInaccessibleProperty($dependency, 'reusableData', $value, false);
-        $this->assertSameExceptObject($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
+        $this->assertEquals($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
 
         $dependency->resetReusableData();
 
-        $this->assertSameExceptObject([], $this->getInaccessibleProperty($dependency, 'reusableData'));
+        $this->assertEquals([], $this->getInaccessibleProperty($dependency, 'reusableData'));
     }
 
     public function testGenerateReusableHash(): void
@@ -28,8 +28,8 @@ class DependencyTest extends DependencyTestCase
 
         $result = $this->invokeMethod($dependency, 'generateReusableHash');
 
-        $this->assertSameExceptObject(5, strlen($this->getInaccessibleProperty($dependency, 'data')));
-        $this->assertSameExceptObject(40, strlen($result));
+        $this->assertEquals(5, strlen($this->getInaccessibleProperty($dependency, 'data')));
+        $this->assertEquals(40, strlen($result));
     }
 
     public function testIsChanged(): void
