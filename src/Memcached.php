@@ -2,191 +2,35 @@
 
 namespace Yiisoft\Cache;
 
-use Yiisoft\Cache\Exception\InvalidConfigException;
-use Yiisoft\Cache\Serializer\SerializerInterface;
-
-/**
- * Memcached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
- * extension.
- *
- * Memcached can be configured with a list of memcached servers by settings its {@see Memcached::$servers} property.
- * By default, MemCached assumes there is a memcached server running on localhost at port 11211.
- *
- * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that MemCached supports.
- *
- * Note, there is no security measure to protected data in memcached.
- * All data in memcached can be accessed by any process running in the system.
- *
- * You can configure more properties of each server, such as `persistent`, `weight`, `timeout`.
- * Please see {@see MemcachedServer} for available options.
- */
-final class Memcached extends SimpleCache
+final class Memcached extends BaseCache
 {
-    private const TTL_INFINITY = 0;
-
     /**
-     * @var string an ID that identifies a Memcached instance.
-     * By default the Memcached instances are destroyed at the end of the request. To create an instance that
-     * persists between requests, you may specify a unique ID for the instance. All instances created with the
-     * same ID will share the same connection.
-     * @see http://ca2.php.net/manual/en/memcached.construct.php
-     */
-    private $persistentId;
-    /**
-     * @var array options for Memcached.
-     * @see http://ca2.php.net/manual/en/memcached.setoptions.php
-     */
-    private $options;
-    /**
-     * @var string memcached sasl username.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    private $username;
-    /**
-     * @var string memcached sasl password.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    private $password;
-
-    /**
-     * @var \Memcached the Memcached instance
+     * @var \Memcached
      */
     private $cache;
-    /**
-     * @var array list of memcached server configurations
-     */
-    private $servers;
 
-    /**
-     * @param SerializerInterface|null $serializer
-     * @param MemcachedServer[] $servers list of memcached server configurations
-     * @throws InvalidConfigException
-     * @see setSerializer
-     */
-    public function __construct(?SerializerInterface $serializer = null, array $servers = [])
+    public function __construct()
     {
-        parent::__construct($serializer);
-
-        if (empty($servers)) {
-            $servers = [new MemcachedServer('127.0.0.1')];
-        }
-
-        $this->servers = $servers;
-
-        $this->addServers($this->getMemcached(), $this->servers);
+        $this->initCache();
+        parent::__construct();
     }
 
     /**
-     * Add servers to the server pool of the cache specified
+     * Fetches a value from the cache.
      *
-     * @param \Memcached $cache
-     * @param MemcachedServer[] $servers
+     * @param string $key The unique key of this item in the cache.
+     * @param mixed $default Default value to return if the key does not exist.
+     *
+     * @return mixed The value of the item from the cache, or $default in case of cache miss.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if the $key string is not a legal value.
      */
-    private function addServers(\Memcached $cache, array $servers): void
-    {
-        $existingServers = [];
-        if ($this->persistentId !== null) {
-            foreach ($cache->getServerList() as $s) {
-                $existingServers[$s['host'] . ':' . $s['port']] = true;
-            }
-        }
-        foreach ($servers as $server) {
-            $serverAddress = $server->getHost() . ':' . $server->getPort();
-            if (empty($existingServers) || !isset($existingServers[$serverAddress])) {
-                $cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
-            }
-        }
-    }
-
-    /**
-     * Returns the underlying memcached object.
-     * @return \Memcached the memcached object used by this cache component.
-     * @throws InvalidConfigException if memcached extension is not loaded
-     */
-    public function getMemcached(): \Memcached
-    {
-        if ($this->cache === null) {
-            if (!\extension_loaded('memcached')) {
-                throw new InvalidConfigException('MemCached requires PHP memcached extension to be loaded.');
-            }
-
-            $this->cache = $this->persistentId !== null ? new \Memcached($this->persistentId) : new \Memcached();
-            if ($this->username !== null || $this->password !== null) {
-                $this->cache->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
-                $this->cache->setSaslAuthData($this->username, $this->password);
-            }
-            if (!empty($this->options)) {
-                $this->cache->setOptions($this->options);
-            }
-        }
-
-        return $this->cache;
-    }
-
-    /**
-     * Returns the memcached server configurations.
-     * @return MemcachedServer[] list of memcached server configurations.
-     */
-    public function getServers(): array
-    {
-        return $this->servers;
-    }
-
-    /**
-     * @param array $configs list of memcached server configurations. Each element must be an array
-     * with the following keys: host, port, weight.
-     * @see http://php.net/manual/en/memcached.addserver.php
-     */
-    public function setServers(array $configs): void
-    {
-        foreach ($configs as $config) {
-            $this->servers[] = new MemcachedServer($config['host'], $config['port'], $config['weight']);
-        }
-    }
-
-    /**
-     * @param string $persistentId an ID that identifies a Memcached instance.
-     * By default the Memcached instances are destroyed at the end of the request. To create an instance that
-     * persists between requests, you may specify a unique ID for the instance. All instances created with the
-     * same ID will share the same connection.
-     * @see http://ca2.php.net/manual/en/memcached.construct.php
-     */
-    public function setPersistentId(string $persistentId): void
-    {
-        $this->persistentId = $persistentId;
-    }
-
-    /**
-     * @param array $options options for Memcached.
-     * @see http://ca2.php.net/manual/en/memcached.setoptions.php
-     */
-    public function setOptions(array $options): void
-    {
-        $this->options = $options;
-    }
-
-    /**
-     * @param string $username memcached sasl username.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    public function setUsername(string $username): void
-    {
-        $this->username = $username;
-    }
-
-    /**
-     * @param string $password memcached sasl password.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    public function setPassword(string $password): void
-    {
-        $this->password = $password;
-    }
-
-    protected function getValue(string $key, $default = null)
+    public function get($key, $default = null)
     {
         $value = $this->cache->get($key);
 
+        // TODO store error message
         if ($this->cache->getResultCode() === \Memcached::RES_SUCCESS) {
             return $value;
         }
@@ -194,60 +38,144 @@ final class Memcached extends SimpleCache
         return $default;
     }
 
-    protected function getValues(iterable $keys, $default = null): iterable
+    /**
+     * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
+     *
+     * @param string $key The key of the item to store.
+     * @param mixed $value The value of the item to store, must be serializable.
+     * @param null|int|\DateInterval $ttl Optional. The TTL value of this item. If no value is sent and
+     *                                      the driver supports TTL then the library may set a default value
+     *                                      for it or let the driver take care of that.
+     *
+     * @return bool True on success and false on failure.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if the $key string is not a legal value.
+     */
+    public function set($key, $value, $ttl = null)
     {
-        $values = $this->cache->getMulti($keys);
-
-        if ($this->cache->getResultCode() === \Memcached::RES_SUCCESS) {
-            return $values;
+        $expiration = $this->ttlToExpiration($ttl);
+        if ($expiration < 0) {
+            return $this->delete($key);
         }
-
-        return array_fill_keys($keys, $default);
+        return $this->cache->set($key, $value, $expiration);
     }
 
-    protected function setValue(string $key, $value, ?int $ttl): bool
-    {
-        if ($ttl === null) {
-            $ttl = self::TTL_INFINITY;
-        } else {
-            $ttl += time();
-        }
-        return $this->cache->set($key, $value, $ttl);
-    }
-
-    protected function setValues(iterable $values, ?int $ttl): bool
-    {
-        if ($ttl === null) {
-            $ttl = self::TTL_INFINITY;
-        } else {
-            $ttl += time();
-        }
-        return $this->cache->setMulti($values, $ttl);
-    }
-
-    protected function deleteValue(string $key): bool
+    /**
+     * Delete an item from the cache by its unique key.
+     *
+     * @param string $key The unique cache key of the item to delete.
+     *
+     * @return bool True if the item was successfully removed. False if there was an error.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if the $key string is not a legal value.
+     */
+    public function delete($key)
     {
         return $this->cache->delete($key);
     }
 
-    public function clear(): bool
+    /**
+     * Wipes clean the entire cache's keys.
+     *
+     * @return bool True on success and false on failure.
+     */
+    public function clear()
     {
         return $this->cache->flush();
     }
 
-    protected function hasValue(string $key): bool
+    /**
+     * Obtains multiple cache items by their unique keys.
+     *
+     * @param iterable $keys A list of keys that can obtained in a single operation.
+     * @param mixed $default Default value to return for keys that do not exist.
+     *
+     * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if $keys is neither an array nor a Traversable,
+     *   or if any of the $keys are not a legal value.
+     */
+    public function getMultiple($keys, $default = null)
     {
-        $this->cache->get($key);
-        return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
+        $values = $this->cache->getMulti((array)$keys);
+        return array_merge(array_fill_keys((array)$keys, $default), $values);
     }
 
-    public function deleteValues(iterable $keys): bool
+    /**
+     * Persists a set of key => value pairs in the cache, with an optional TTL.
+     *
+     * @param iterable $values A list of key => value pairs for a multiple-set operation.
+     * @param null|int|\DateInterval $ttl Optional. The TTL value of this item. If no value is sent and
+     *                                       the driver supports TTL then the library may set a default value
+     *                                       for it or let the driver take care of that.
+     *
+     * @return bool True on success and false on failure.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if $values is neither an array nor a Traversable,
+     *   or if any of the $values are not a legal value.
+     */
+    public function setMultiple($values, $ttl = null)
     {
-        foreach ($this->cache->deleteMulti($keys) as $result) {
+        $expiration = $this->ttlToExpiration($ttl);
+        return $this->cache->setMulti((array)$values, $expiration);
+    }
+
+    /**
+     * Deletes multiple cache items in a single operation.
+     *
+     * @param iterable $keys A list of string-based keys to be deleted.
+     *
+     * @return bool True if the items were successfully removed. False if there was an error.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if $keys is neither an array nor a Traversable,
+     *   or if any of the $keys are not a legal value.
+     */
+    public function deleteMultiple($keys)
+    {
+        foreach ($this->cache->deleteMulti((array)$keys) as $result) {
             if ($result === false) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Determines whether an item is present in the cache.
+     *
+     * NOTE: It is recommended that has() is only to be used for cache warming type purposes
+     * and not to be used within your live applications operations for get/set, as this method
+     * is subject to a race condition where your has() will return true and immediately after,
+     * another script can remove it making the state of your app out of date.
+     *
+     * @param string $key The cache item key.
+     *
+     * @return bool
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     *   MUST be thrown if the $key string is not a legal value.
+     */
+    public function has($key)
+    {
+        $this->cache->get($key);
+        return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
+    }
+
+    private function initCache()
+    {
+        $this->cache = new \Memcached();
+    }
+
+    /**
+     * @param MemcachedServer $server
+     */
+    public function addServer(MemcachedServer $server)
+    {
+        $this->cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
     }
 }

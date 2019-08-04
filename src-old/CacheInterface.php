@@ -1,9 +1,7 @@
 <?php
+namespace Yiisoft\CacheOld;
 
-namespace Yiisoft\Cache;
-
-use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\Serializer\SerializerInterface;
+use Yiisoft\CacheOld\DependencyOld\Dependency;
 
 /**
  * CacheInterface defines the common interface to be implemented by cache classes.
@@ -111,12 +109,4 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @return mixed result of $callable execution
      */
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null);
-
-    public function enableKeyNormalization(): void;
-
-    public function disableKeyNormalization(): void;
-
-    public function setKeyPrefix(string $keyPrefix): void;
-
-    public function setSerializer(?SerializerInterface $serializer): void;
 }
