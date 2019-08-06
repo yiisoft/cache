@@ -103,7 +103,7 @@ When using extended cache i.e. PSR-16 cache wrapped with `\Yiisoft\Cache\Cache`,
 is less repetitive:
 
 ```php
-$user_id = 42;
+$parameters = ['user_id' => 42];
 $data = $cache->getOrSet($key, function () use ($parameters) {
     return $this->calculateSomething($parameters);
 }, 3600);
@@ -138,7 +138,7 @@ You may combine multiple dependencies using `AnyDependency` or `AllDependencies`
 ## Implementing your own cache backend
 
 There are two ways to implement cache backend. You can start from scratch by implementing `\Psr\SimpleCache\CacheInterface`
-or you can inherit from `\Yiisoft\Cache\SimpleCache`. In latter case you have to implement the follwing methods:
+or you can inherit from `\Yiisoft\Cache\SimpleCache`. In the latter case you have to implement the following methods:
 
 - `hasValue()` - check if value with a key exists in cache.
 - `getValue()` - retrieve the value with a key (if any) from cache
