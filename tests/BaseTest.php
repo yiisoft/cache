@@ -305,4 +305,52 @@ abstract class BaseTest extends TestCase
             [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600],
         ];
     }
+
+
+    /**
+     * @dataProvider iterableProvider
+     * @param array $array
+     * @param iterable $iterable
+     * @throws InvalidArgumentException
+     */
+    public function testValuesAsIterable(array $array, iterable $iterable): void
+    {
+        $cache = $this->createCacheInstance();
+        $cache->clear();
+
+        $cache->setMultiple($iterable);
+
+        $this->assertSameExceptObject($array, $cache->getMultiple(array_keys($array)));
+    }
+
+    public function iterableProvider(): array
+    {
+        return [
+            'array' => [
+                ['a' => 1, 'b' => 2,],
+                ['a' => 1, 'b' => 2,],
+            ],
+            'ArrayIterator' => [
+                ['a' => 1, 'b' => 2,],
+                new \ArrayIterator(['a' => 1, 'b' => 2,]),
+            ],
+            'IteratorAggregate' => [
+                ['a' => 1, 'b' => 2,],
+                new class() implements \IteratorAggregate
+                {
+                    public function getIterator()
+                    {
+                        return new \ArrayIterator(['a' => 1, 'b' => 2,]);
+                    }
+                }
+            ],
+            'Generator instance' => [
+                ['a' => 1, 'b' => 2,],
+                (static function () {
+                    yield 'a' => 1;
+                    yield 'b' => 2;
+                })()
+            ]
+        ];
+    }
 }
