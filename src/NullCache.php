@@ -35,7 +35,7 @@ final class NullCache implements CacheInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
-        return array_fill_keys((array)$keys, $default);
+        return array_fill_keys($this->iterableToArray($keys), $default);
     }
 
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
@@ -82,5 +82,10 @@ final class NullCache implements CacheInterface
 
     public function setSerializer(?SerializerInterface $serializer): void
     {
+    }
+
+    private function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 }

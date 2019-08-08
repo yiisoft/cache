@@ -2,6 +2,9 @@
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
+use DateTime;
+use Exception;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -17,10 +20,6 @@ abstract class BaseCache implements CacheInterface
      */
     private $defaultTtl;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @return int|null
      */
@@ -30,8 +29,7 @@ abstract class BaseCache implements CacheInterface
     }
 
     /**
-     * @param int|\DateInterval|null $defaultTtl
-     * @throws \Exception
+     * @param int|DateInterval|null $defaultTtl
      */
     public function setDefaultTtl($defaultTtl): void
     {
@@ -41,7 +39,6 @@ abstract class BaseCache implements CacheInterface
     /**
      * @param $ttl
      * @return int
-     * @throws \Exception
      */
     protected function ttlToExpiration($ttl): int
     {
@@ -59,10 +56,9 @@ abstract class BaseCache implements CacheInterface
     }
 
     /**
-     * Normalizes cache TTL handling `null` value and {@see \DateInterval} objects.
-     * @param int|\DateInterval|null $ttl raw TTL.
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
+     * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
-     * @throws \Exception
      */
     protected function normalizeTtl($ttl): ?int
     {
@@ -70,10 +66,19 @@ abstract class BaseCache implements CacheInterface
             return $this->defaultTtl;
         }
 
-        if ($ttl instanceof \DateInterval) {
-            return (new \DateTime('@0'))->add($ttl)->getTimestamp();
+        if ($ttl instanceof DateInterval) {
+            try {
+                return (new DateTime('@0'))->add($ttl)->getTimestamp();
+            } catch (Exception $e) {
+                return $this->defaultTtl;
+            }
         }
 
         return $ttl;
+    }
+
+    protected function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 }
