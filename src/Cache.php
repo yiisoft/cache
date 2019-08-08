@@ -8,8 +8,6 @@ use Exception;
 use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\SetCacheException;
-use Yiisoft\Cache\Serializer\PhpSerializer;
-use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -50,11 +48,6 @@ final class Cache implements CacheInterface
      */
     private $keyPrefix = '';
 
-    /**
-     * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
-     */
-    private $serializer;
-
     private $keyNormalization = true;
 
     /**
@@ -69,7 +62,6 @@ final class Cache implements CacheInterface
     public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
     {
         $this->handler = $handler;
-        $this->initSerializer();
     }
 
     /**
@@ -108,7 +100,7 @@ final class Cache implements CacheInterface
             $value = $value[0];
         }
 
-        return $this->prepareReturnValue($value, $default);
+        return $value;
     }
 
 
@@ -132,7 +124,6 @@ final class Cache implements CacheInterface
      */
     public function getMultiple($keys, $default = null): iterable
     {
-        // TODO refactor
         $keyMap = [];
         foreach ($keys as $key) {
             $keyMap[$key] = $this->normalizeKey($key);
@@ -150,7 +141,6 @@ final class Cache implements CacheInterface
 
                     $value = $value[0];
                 }
-                $value = $this->prepareReturnValue($value, $default);
                 $results[$key] = $value;
             }
         }
@@ -174,7 +164,6 @@ final class Cache implements CacheInterface
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
-        $value = $this->serialize($value);
         $ttl = $this->normalizeTtl($ttl);
 
         if ($dependency !== null) {
@@ -246,7 +235,6 @@ final class Cache implements CacheInterface
 
         $data = [];
         foreach ($values as $key => $value) {
-            $value = $this->serialize($value);
             if ($dependency !== null) {
                 $value = [$value, $dependency];
             }
@@ -283,7 +271,6 @@ final class Cache implements CacheInterface
             return false;
         }
 
-        $value = $this->serialize($value);
         $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
@@ -383,28 +370,6 @@ final class Cache implements CacheInterface
         $this->keyPrefix = $keyPrefix;
     }
 
-    private function initSerializer()
-    {
-        $this->serializer = new PhpSerializer();
-    }
-
-    /**
-     * @param SerializerInterface $serializer
-     */
-    public function setSerializer(?SerializerInterface $serializer): void
-    {
-        $this->serializer = $serializer;
-    }
-
-    private function unserialize($value)
-    {
-        if ($this->serializer === null) {
-            return $value;
-        }
-
-        return $this->serializer->unserialize($value);
-    }
-
     /**
      * @return int|null
      */
@@ -419,20 +384,6 @@ final class Cache implements CacheInterface
     public function setDefaultTtl($defaultTtl): void
     {
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
-    }
-
-    private function serialize($value)
-    {
-        if ($this->serializer === null) {
-            return $value;
-        }
-
-        return $this->serializer->serialize($value);
-    }
-
-    private function prepareReturnValue($value, $default)
-    {
-        return $value === $default ? $value : $this->unserialize($value);
     }
 
     /**

@@ -117,6 +117,4 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
     public function disableKeyNormalization(): void;
 
     public function setKeyPrefix(string $keyPrefix): void;
-
-    public function setSerializer(?SerializerInterface $serializer): void;
 }
