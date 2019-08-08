@@ -2,6 +2,9 @@
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
+use DateTime;
+use Exception;
 use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\SetCacheException;
@@ -53,6 +56,12 @@ final class Cache implements CacheInterface
     private $serializer;
 
     private $keyNormalization = true;
+
+    /**
+     * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
+     * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
+     */
+    private $defaultTtl;
 
     /**
      * @param \Psr\SimpleCache\CacheInterface cache handler.
@@ -166,6 +175,7 @@ final class Cache implements CacheInterface
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
         $value = $this->serialize($value);
+        $ttl = $this->normalizeTtl($ttl);
 
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -191,6 +201,7 @@ final class Cache implements CacheInterface
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
     {
         $data = $this->prepareDataForSetOrAddMultiple($values, $dependency);
+        $ttl = $this->normalizeTtl($ttl);
         return $this->handler->setMultiple($data, $ttl);
     }
 
@@ -217,6 +228,7 @@ final class Cache implements CacheInterface
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
     {
         $data = $this->prepareDataForSetOrAddMultiple($values, $dependency);
+        $ttl = $this->normalizeTtl($ttl);
         $existingValues = $this->handler->getMultiple(array_keys($data));
         foreach ($existingValues as $key => $value) {
             if ($value !== null) {
@@ -272,6 +284,7 @@ final class Cache implements CacheInterface
         }
 
         $value = $this->serialize($value);
+        $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
     }
@@ -334,6 +347,7 @@ final class Cache implements CacheInterface
         }
 
         $value = $callable($this);
+        $ttl = $this->normalizeTtl($ttl);
         if (!$this->set($key, $value, $ttl, $dependency)) {
             throw new SetCacheException($key, $value, $this);
         }
@@ -391,6 +405,22 @@ final class Cache implements CacheInterface
         return $this->serializer->unserialize($value);
     }
 
+    /**
+     * @return int|null
+     */
+    public function getDefaultTtl(): ?int
+    {
+        return $this->defaultTtl;
+    }
+
+    /**
+     * @param int|DateInterval|null $defaultTtl
+     */
+    public function setDefaultTtl($defaultTtl): void
+    {
+        $this->defaultTtl = $this->normalizeTtl($defaultTtl);
+    }
+
     private function serialize($value)
     {
         if ($this->serializer === null) {
@@ -403,5 +433,27 @@ final class Cache implements CacheInterface
     private function prepareReturnValue($value, $default)
     {
         return $value === $default ? $value : $this->unserialize($value);
+    }
+
+    /**
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
+     * @param int|DateInterval|null $ttl raw TTL.
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     */
+    protected function normalizeTtl($ttl): ?int
+    {
+        if ($ttl === null) {
+            return $this->defaultTtl;
+        }
+
+        if ($ttl instanceof DateInterval) {
+            try {
+                return (new DateTime('@0'))->add($ttl)->getTimestamp();
+            } catch (Exception $e) {
+                return $this->defaultTtl;
+            }
+        }
+
+        return $ttl;
     }
 }

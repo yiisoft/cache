@@ -14,27 +14,6 @@ use Psr\SimpleCache\CacheInterface;
 abstract class BaseCache implements CacheInterface
 {
     public const EXPIRATION_INFINITY = 0;
-    /**
-     * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
-     * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
-     */
-    private $defaultTtl;
-
-    /**
-     * @return int|null
-     */
-    public function getDefaultTtl(): ?int
-    {
-        return $this->defaultTtl;
-    }
-
-    /**
-     * @param int|DateInterval|null $defaultTtl
-     */
-    public function setDefaultTtl($defaultTtl): void
-    {
-        $this->defaultTtl = $this->normalizeTtl($defaultTtl);
-    }
 
     /**
      * @param $ttl
@@ -62,15 +41,11 @@ abstract class BaseCache implements CacheInterface
      */
     protected function normalizeTtl($ttl): ?int
     {
-        if ($ttl === null) {
-            return $this->defaultTtl;
-        }
-
         if ($ttl instanceof DateInterval) {
             try {
                 return (new DateTime('@0'))->add($ttl)->getTimestamp();
             } catch (Exception $e) {
-                return $this->defaultTtl;
+                return null;
             }
         }
 

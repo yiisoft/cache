@@ -254,37 +254,17 @@ abstract class BaseTest extends TestCase
         $this->assertFalse($cache->has('b'));
     }
 
-    public function testDefaultTtl(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-        /** @var BaseCache $cache */
-        $cache->setDefaultTtl(2);
-        $this->assertSameExceptObject(2, $cache->getDefaultTtl());
-    }
-
-    public function testDateIntervalTtl(): void
-    {
-        $interval = new DateInterval('PT3S');
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-        /** @var BaseCache $cache */
-        $cache->setDefaultTtl($interval);
-        $this->assertSameExceptObject(3, $cache->getDefaultTtl());
-    }
-
     /**
      * @dataProvider dataProviderNormalizeTtl
      * @covers       \Yiisoft\Cache\BaseCache::normalizeTtl()
      * @param mixed $ttl
-     * @param int $expectedResult
+     * @param mixed $expectedResult
      * @throws ReflectionException
      */
-    public function testNormalizeTtl($ttl, int $expectedResult): void
+    public function testNormalizeTtl($ttl, $expectedResult): void
     {
         /** @var BaseCache $cache */
         $cache = $this->getMockBuilder(BaseCache::class)->getMockForAbstractClass();
-        $cache->setDefaultTtl(9999);
         $this->assertSameExceptObject($expectedResult, $this->invokeMethod($cache, 'normalizeTtl', [$ttl]));
     }
 
@@ -299,7 +279,7 @@ abstract class BaseTest extends TestCase
         return [
             [123, 123],
             ['123', 123],
-            [null, 9999],
+            [null, null],
             [0, 0],
             [new DateInterval('PT6H8M'), 6 * 3600 + 8 * 60],
             [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600],
@@ -344,7 +324,7 @@ abstract class BaseTest extends TestCase
                     }
                 }
             ],
-            'Generator instance' => [
+            'generator' => [
                 ['a' => 1, 'b' => 2,],
                 (static function () {
                     yield 'a' => 1;
