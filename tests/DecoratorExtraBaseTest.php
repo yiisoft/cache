@@ -4,6 +4,7 @@
 namespace Yiisoft\Cache\Tests;
 
 
+use DateInterval;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
@@ -249,5 +250,24 @@ abstract class DecoratorExtraBaseTest extends TestCase
 
         $this->assertSameExceptObject($data, $cache->getMultiple(array_keys($data)));
         $this->assertSameExceptObject($dataWithDefault, $cache->getMultiple(array_keys($data), 'default'));
+    }
+
+    public function testDefaultTtl(): void
+    {
+        $cache = $this->createCacheInstance();
+        $cache->clear();
+        /** @var Cache $cache */
+        $cache->setDefaultTtl(2);
+        $this->assertSameExceptObject(2, $cache->getDefaultTtl());
+    }
+
+    public function testDateIntervalTtl(): void
+    {
+        $interval = new DateInterval('PT3S');
+        $cache = $this->createCacheInstance();
+        $cache->clear();
+        /** @var Cache $cache */
+        $cache->setDefaultTtl($interval);
+        $this->assertSameExceptObject(3, $cache->getDefaultTtl());
     }
 }
