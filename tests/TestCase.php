@@ -89,6 +89,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             'object' => ['test_object', $object],
             'array' => ['test_array', ['test_key' => 'test_value']],
             'null' => ['test_null', null],
+            'supported_key_characters' => ['AZaz09_.', 'b'],
+            '64_characters_key_max' => ['bVGEIeslJXtDPrtK.hgo6HL25_.1BGmzo4VA25YKHveHh7v9tUP8r5BNCyLhx4zy', 'c'],
         ];
     }
 

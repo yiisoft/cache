@@ -226,7 +226,7 @@ final class Cache implements CacheInterface
         return $this->handler->setMultiple($data, $ttl);
     }
 
-    private function prepareDataForSetOrAddMultiple(array $values, ?Dependency $dependency): array
+    private function prepareDataForSetOrAddMultiple(iterable $values, ?Dependency $dependency): array
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
