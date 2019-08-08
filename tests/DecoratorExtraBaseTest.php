@@ -8,7 +8,6 @@ use DateInterval;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
-use Yiisoft\Cache\Serializer\PhpSerializer;
 
 abstract class DecoratorExtraBaseTest extends TestCase
 {
@@ -179,26 +178,6 @@ abstract class DecoratorExtraBaseTest extends TestCase
         $this->assertSameExceptObject(2, $cache->get('test_without_prefix'));
     }
 
-    public function testSerializer(): void
-    {
-        /** @var Cache $cache */
-        $cache = $this->createCacheInstance();
-        $cache->setSerializer(new PhpSerializer());
-
-        $cache->set('test_serialized', 1);
-
-        $cache->setSerializer(null);
-
-        $cache->set('test_not_serialized', 2);
-
-        $this->assertSameExceptObject('i:1;', $cache->get('test_serialized'));
-        $this->assertSameExceptObject(2, $cache->get('test_not_serialized'));
-
-        $cache->setSerializer(new PhpSerializer());
-
-        $this->assertSameExceptObject(1, $cache->get('test_serialized'));
-    }
-
     /**
      * @dataProvider featuresProvider
      * @param $features
@@ -208,20 +187,19 @@ abstract class DecoratorExtraBaseTest extends TestCase
         /** @var Cache $cache */
         $cache = $this->createCacheInstance();
         $cache->setKeyPrefix($features[0]);
-        $cache->setSerializer($features[1]);
-        $features[2] ? $cache->enableKeyNormalization() : $cache->disableKeyNormalization();
+        $features[1] ? $cache->enableKeyNormalization() : $cache->disableKeyNormalization();
 
         $this->featuresTest($cache);
     }
 
     public function featuresProvider()
     {
-        // [prefix, serializer, normalization]
+        // [prefix, normalization]
         return [
-            [['', null, false]],
-            [['testprefix', null, false]],
-            [['', new PhpSerializer(), false]],
-            [['', null, true]],
+            [['', false]],
+            [['testprefix', false]],
+            [['testprefix', true]],
+            [['', true]],
         ];
     }
 
