@@ -18,7 +18,6 @@ use DateInterval;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
-use Yiisoft\Cache\BaseCache;
 use Yiisoft\Cache\Cache;
 
 abstract class BaseTest extends TestCase
@@ -256,15 +255,16 @@ abstract class BaseTest extends TestCase
 
     /**
      * @dataProvider dataProviderNormalizeTtl
-     * @covers       \Yiisoft\Cache\BaseCache::normalizeTtl()
+     * @covers       \Yiisoft\Cache\ArrayCache::normalizeTtl()
+     * @covers       \Yiisoft\Cache\Memcached::normalizeTtl()
+     * @covers       \Yiisoft\Cache\Cache::normalizeTtl()
      * @param mixed $ttl
      * @param mixed $expectedResult
      * @throws ReflectionException
      */
     public function testNormalizeTtl($ttl, $expectedResult): void
     {
-        /** @var BaseCache $cache */
-        $cache = $this->getMockBuilder(BaseCache::class)->getMockForAbstractClass();
+        $cache = $this->createCacheInstance();
         $this->assertSameExceptObject($expectedResult, $this->invokeMethod($cache, 'normalizeTtl', [$ttl]));
     }
 

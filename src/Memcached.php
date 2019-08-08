@@ -2,6 +2,11 @@
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
+use DateTime;
+use Exception;
+use Psr\SimpleCache\CacheInterface;
+
 /**
  * Memcached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
  * extension.
@@ -14,8 +19,10 @@ namespace Yiisoft\Cache;
  * Note, there is no security measure to protected data in memcached.
  * All data in memcached can be accessed by any process running in the system.
  */
-final class Memcached extends BaseCache
+final class Memcached implements CacheInterface
 {
+    public const EXPIRATION_INFINITY = 0;
+
     /**
      * @var \Memcached the Memcached instance
      */
@@ -99,5 +106,53 @@ final class Memcached extends BaseCache
     public function addServer(MemcachedServer $server): void
     {
         $this->cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
+    }
+
+    /**
+     * Converts TTL to expiration
+     * @param $ttl
+     * @return int
+     */
+    protected function ttlToExpiration($ttl): int
+    {
+        $ttl = $this->normalizeTtl($ttl);
+
+        if ($ttl === null) {
+            $expiration = static::EXPIRATION_INFINITY;
+        } elseif ($ttl <= 0) {
+            $expiration = -1;
+        } else {
+            $expiration = $ttl + time();
+        }
+
+        return $expiration;
+    }
+
+    /**
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
+     * @param int|DateInterval|null $ttl raw TTL.
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     */
+    protected function normalizeTtl($ttl): ?int
+    {
+        if ($ttl instanceof DateInterval) {
+            try {
+                return (new DateTime('@0'))->add($ttl)->getTimestamp();
+            } catch (Exception $e) {
+                return null;
+            }
+        }
+
+        return $ttl;
+    }
+
+    /**
+     * Converts iterable to array
+     * @param iterable $iterable
+     * @return array
+     */
+    protected function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 }
