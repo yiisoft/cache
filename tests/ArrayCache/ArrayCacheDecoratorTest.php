@@ -1,15 +1,12 @@
 <?php
 
-
 namespace Yiisoft\Cache\Tests\ArrayCache;
-
 
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
-use Yiisoft\Cache\Tests\BaseTest;
 
-class ArrayCacheDecoratorTest extends BaseTest
+class ArrayCacheDecoratorTest extends ArrayCacheTest
 {
     protected function createCacheInstance(): CacheInterface
     {
