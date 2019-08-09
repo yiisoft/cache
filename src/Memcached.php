@@ -6,12 +6,13 @@ use DateInterval;
 use DateTime;
 use Exception;
 use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\Exception\InvalidConfigException;
 
 /**
  * Memcached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
  * extension.
  *
- * Memcached can be configured with a list of memcached servers by settings its {@see Memcached::$servers} property.
+ * Memcached can be configured with a list of memcached servers passed to the constructor.
  * By default, Memcached assumes there is a memcached server running on localhost at port 11211.
  *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that MemCached supports.
@@ -22,15 +23,37 @@ use Psr\SimpleCache\CacheInterface;
 final class Memcached implements CacheInterface
 {
     public const EXPIRATION_INFINITY = 0;
+    public const DEFAULT_SERVER_HOST = '127.0.0.1';
+    public const DEFAULT_SERVER_PORT = 11211;
+    public const DEFAULT_SERVER_WEIGHT = 1;
 
     /**
      * @var \Memcached the Memcached instance
      */
     private $cache;
 
-    public function __construct()
+    /**
+     * @var string an ID that identifies a Memcached instance.
+     * By default the Memcached instances are destroyed at the end of the request. To create an instance that
+     * persists between requests, you may specify a unique ID for the instance. All instances created with the
+     * same ID will share the same connection.
+     * @see https://www.php.net/manual/en/memcached.construct.php
+     */
+    private $persistentId;
+
+    /**
+     * @param string $persistentId By default the Memcached instances are destroyed at the end of the request. To create an
+     * instance that persists between requests, use persistent_id to specify a unique ID for the instance. All instances
+     * created with the same persistent_id will share the same connection.
+     * @param array $servers list of memcached servers that will be added to the server pool
+     * @see https://www.php.net/manual/en/memcached.construct.php
+     * @see https://www.php.net/manual/en/memcached.addservers.php
+     */
+    public function __construct($persistentId = '', array $servers = [])
     {
+        $this->persistentId = $persistentId;
         $this->initCache();
+        $this->initServers($servers);
     }
 
     public function get($key, $default = null)
@@ -92,20 +115,20 @@ final class Memcached implements CacheInterface
     }
 
     /**
+     * Returns underlying \Memcached instance
+     * @return \Memcached
+     */
+    public function getCache(): \Memcached
+    {
+        return $this->cache;
+    }
+
+    /**
      * Inits Memcached instance
      */
     private function initCache(): void
     {
-        $this->cache = new \Memcached();
-    }
-
-    /**
-     * Adds a server to the Memcached server pool
-     * @param MemcachedServer $server
-     */
-    public function addServer(MemcachedServer $server): void
-    {
-        $this->cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
+        $this->cache = new \Memcached($this->persistentId);
     }
 
     /**
@@ -113,7 +136,7 @@ final class Memcached implements CacheInterface
      * @param $ttl
      * @return int
      */
-    protected function ttlToExpiration($ttl): int
+    private function ttlToExpiration($ttl): int
     {
         $ttl = $this->normalizeTtl($ttl);
 
@@ -133,7 +156,7 @@ final class Memcached implements CacheInterface
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      */
-    protected function normalizeTtl($ttl): ?int
+    private function normalizeTtl($ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
             try {
@@ -151,8 +174,53 @@ final class Memcached implements CacheInterface
      * @param iterable $iterable
      * @return array
      */
-    protected function iterableToArray(iterable $iterable): array
+    private function iterableToArray(iterable $iterable): array
     {
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+    }
+
+    /**
+     * @param array $servers
+     */
+    private function initServers(array $servers): void
+    {
+        if (empty($servers)) {
+            $servers = [
+                [self::DEFAULT_SERVER_HOST, self::DEFAULT_SERVER_PORT, self::DEFAULT_SERVER_WEIGHT],
+            ];
+        }
+
+        if ($this->persistentId !== '') {
+            $servers = $this->getNewServers($servers);
+        }
+
+        $success = $this->cache->addServers($servers);
+
+        if (!$success) {
+            throw new InvalidConfigException('An error occurred while adding servers to the server pool.');
+        }
+    }
+
+    /**
+     * Returns the list of the servers that are not in the pool.
+     * @param array $servers
+     * @return array
+     */
+    private function getNewServers(array $servers): array
+    {
+        $existingServers = [];
+        foreach ($this->cache->getServerList() as $existingServer) {
+            $existingServers[$existingServer['host'] . ':' . $existingServer['port']] = true;
+        }
+
+        $newServers = [];
+        foreach ($servers as $server) {
+            $serverAddress = $server[0] . ':' . $server[1];
+            if (!array_key_exists($serverAddress, $existingServers)) {
+                $newServers[] = $server;
+            }
+        }
+
+        return $newServers;
     }
 }

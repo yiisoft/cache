@@ -74,7 +74,7 @@ final class Cache implements CacheInterface
      * @param mixed $key the key to be normalized
      * @return string the generated cache key
      */
-    private function normalizeKey($key): string
+    private function buildKey($key): string
     {
         if (!$this->keyNormalization) {
             $normalizedKey = $key;
@@ -90,7 +90,7 @@ final class Cache implements CacheInterface
 
     public function get($key, $default = null)
     {
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
         $value = $this->handler->get($key, $default);
 
         if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
@@ -106,7 +106,7 @@ final class Cache implements CacheInterface
 
     public function has($key): bool
     {
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
         return $this->handler->has($key);
     }
 
@@ -126,13 +126,13 @@ final class Cache implements CacheInterface
     {
         $keyMap = [];
         foreach ($keys as $key) {
-            $keyMap[$key] = $this->normalizeKey($key);
+            $keyMap[$key] = $this->buildKey($key);
         }
         $values = $this->handler->getMultiple(array_values($keyMap), $default);
         $results = [];
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
-            if (array_key_exists($newKey, (array)$values)) {
+            if (array_key_exists($newKey, $this->iterableToArray($values))) {
                 $value = $values[$newKey];
                 if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
                     if ($value[1]->isChanged($this)) {
@@ -170,7 +170,7 @@ final class Cache implements CacheInterface
             $dependency->evaluateDependency($this);
             $value = [$value, $dependency];
         }
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
 
         return $this->handler->set($key, $value, $ttl);
     }
@@ -198,7 +198,7 @@ final class Cache implements CacheInterface
     {
         $actualKeys = [];
         foreach ($keys as $key) {
-            $actualKeys[] = $this->normalizeKey($key);
+            $actualKeys[] = $this->buildKey($key);
         }
         return $this->handler->deleteMultiple($actualKeys);
     }
@@ -239,7 +239,7 @@ final class Cache implements CacheInterface
                 $value = [$value, $dependency];
             }
 
-            $key = $this->normalizeKey($key);
+            $key = $this->buildKey($key);
             $data[$key] = $value;
         }
 
@@ -265,7 +265,7 @@ final class Cache implements CacheInterface
             $value = [$value, $dependency];
         }
 
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
 
         if ($this->handler->has($key)) {
             return false;
@@ -285,7 +285,7 @@ final class Cache implements CacheInterface
      */
     public function delete($key): bool
     {
-        $key = $this->normalizeKey($key);
+        $key = $this->buildKey($key);
 
         return $this->handler->delete($key);
     }
@@ -340,11 +340,6 @@ final class Cache implements CacheInterface
         }
 
         return $value;
-    }
-
-    public function __call($name, $arguments)
-    {
-        return call_user_func_array([$this->handler, $name], $arguments);
     }
 
     public function enableKeyNormalization(): void
@@ -406,5 +401,15 @@ final class Cache implements CacheInterface
         }
 
         return $ttl;
+    }
+
+    /**
+     * Converts iterable to array
+     * @param iterable $iterable
+     * @return array
+     */
+    private function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 }
