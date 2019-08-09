@@ -6,7 +6,6 @@ namespace Yiisoft\Cache\Tests\Memcached;
 
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Memcached;
-use Yiisoft\Cache\MemcachedServer;
 use Yiisoft\Cache\Tests\BaseTest;
 
 class MemcachedTest extends BaseTest
@@ -25,9 +24,7 @@ class MemcachedTest extends BaseTest
 
     protected function createCacheInstance(): CacheInterface
     {
-        $cache = new Memcached();
-        $cache->addServer(new MemcachedServer('127.0.0.1'));
-        return $cache;
+        return new Memcached();
     }
 
     public function testDeleteMultipleReturnsFalse(): void

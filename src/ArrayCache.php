@@ -103,7 +103,7 @@ final class ArrayCache implements CacheInterface
      * @param $ttl
      * @return int
      */
-    protected function ttlToExpiration($ttl): int
+    private function ttlToExpiration($ttl): int
     {
         $ttl = $this->normalizeTtl($ttl);
 
@@ -123,7 +123,7 @@ final class ArrayCache implements CacheInterface
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      */
-    protected function normalizeTtl($ttl): ?int
+    private function normalizeTtl($ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
             try {
