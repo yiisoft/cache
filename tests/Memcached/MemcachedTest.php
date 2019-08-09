@@ -9,6 +9,7 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\Exception\InvalidConfigException;
 use Yiisoft\Cache\Memcached;
 use Yiisoft\Cache\Tests\TestCase;
 
@@ -349,6 +350,83 @@ class MemcachedTest extends TestCase
                     yield 'b' => 2;
                 })()
             ]
+        ];
+    }
+
+    public function testGetCache()
+    {
+        $cache = new Memcached();
+        $memcached = $cache->getCache();
+        $this->assertInstanceOf(\Memcached::class, $memcached);
+    }
+
+    public function testPersistentId()
+    {
+        $cache1 = new Memcached();
+        $memcached1 = $cache1->getCache();
+        $this->assertFalse($memcached1->isPersistent());
+
+        $cache2 = new Memcached(microtime() . __METHOD__);
+        $memcached2 = $cache2->getCache();
+        $this->assertTrue($memcached2->isPersistent());
+    }
+
+    public function testGetNewServers(): void
+    {
+        $cache = new Memcached();
+
+        $memcachedStub = $this->createMock(\Memcached::class);
+        $memcachedStub->method('getServerList')->willReturn([['host' => '1.1.1.1', 'port' => 11211]]);
+
+        $this->setInaccessibleProperty($cache, 'cache', $memcachedStub);
+
+        $newServers = $this->invokeMethod($cache, 'getNewServers', [
+            [
+                ['1.1.1.1', 11211, 1],
+                ['2.2.2.2', 11211, 1],
+            ],
+        ]);
+
+        $this->assertEquals([['2.2.2.2', 11211, 1]], $newServers);
+    }
+
+    public function testThatServerWeightIsOptional()
+    {
+        $cache = new Memcached(microtime() . __METHOD__, [
+            ['1.1.1.1', 11211, 1],
+            ['2.2.2.2', 11211],
+        ]);
+
+        $memcached = $cache->getCache();
+        $this->assertEquals([
+            [
+                'host' => '1.1.1.1',
+                'port' => 11211,
+                'type' => 'TCP',
+            ],
+            [
+                'host' => '2.2.2.2',
+                'port' => 11211,
+                'type' => 'TCP',
+            ],
+        ], $memcached->getServerList());
+    }
+
+    /**
+     * @dataProvider invalidServersConfigProvider
+     * @param $servers
+     */
+    public function testInvalidServersConfig($servers)
+    {
+        $this->expectException(InvalidConfigException::class);
+        $cache = new Memcached('', $servers);
+    }
+
+    public function invalidServersConfigProvider()
+    {
+        return [
+            [[[]]],
+            [[['1.1.1.1']]],
         ];
     }
 }

@@ -51,6 +51,7 @@ final class Memcached implements CacheInterface
      */
     public function __construct($persistentId = '', array $servers = [])
     {
+        $this->validateServers($servers);
         $this->persistentId = $persistentId;
         $this->initCache();
         $this->initServers($servers);
@@ -222,5 +223,14 @@ final class Memcached implements CacheInterface
         }
 
         return $newServers;
+    }
+
+    private function validateServers(array $servers)
+    {
+        foreach ($servers as $server) {
+            if (!is_array($server) || !isset($server[0], $server[1])) {
+                throw new InvalidConfigException('Each entry in servers parameter is supposed to be an array containing hostname, port, and, optionally, weight of the server.');
+            }
+        }
     }
 }
