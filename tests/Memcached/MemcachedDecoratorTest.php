@@ -1,15 +1,12 @@
 <?php
 
-
 namespace Yiisoft\Cache\Tests\Memcached;
-
 
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Memcached;
-use Yiisoft\Cache\Tests\BaseTest;
 
-class MemcachedDecoratorTest extends BaseTest
+class MemcachedDecoratorTest extends MemcachedTest
 {
     protected function createCacheInstance(): CacheInterface
     {
