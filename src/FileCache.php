@@ -5,7 +5,6 @@ namespace Yiisoft\Cache;
 use DateInterval;
 use DateTime;
 use Exception;
-use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Exception\CacheException;
 use Yiisoft\Cache\Serializer\PhpSerializer;
