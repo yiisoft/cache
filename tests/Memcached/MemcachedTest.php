@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Yiisoft\Cache\Tests\Memcached;
 
+require_once __DIR__ . '/../functions_mocks.php';
 
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
@@ -11,6 +11,7 @@ use ReflectionException;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Exception\InvalidConfigException;
 use Yiisoft\Cache\Memcached;
+use Yiisoft\Cache\MockHelper;
 use Yiisoft\Cache\Tests\TestCase;
 
 class MemcachedTest extends TestCase
@@ -25,6 +26,11 @@ class MemcachedTest extends TestCase
         if (!@stream_socket_client('127.0.0.1:11211', $errorNumber, $errorDescription, 0.5)) {
             self::markTestSkipped('No memcached server running at ' . '127.0.0.1:11211' . ' : ' . $errorNumber . ' - ' . $errorDescription);
         }
+    }
+
+    protected function tearDown(): void
+    {
+        MockHelper::$time = null;
     }
 
     protected function createCacheInstance(): CacheInterface
@@ -46,26 +52,23 @@ class MemcachedTest extends TestCase
 
     public function testExpire(): void
     {
-        if (getenv('TRAVIS') === 'true') {
-            $this->markTestSkipped('Can not reliably test memcached expiry on travis-ci.');
-        }
-        // TODO
-        $this->assertTrue(true);
-        //parent::testExpire();
+        $ttl = 2;
+        MockHelper::$time = \time();
+        $expiration = MockHelper::$time + $ttl;
+
+        $cache = new Memcached();
+
+        $memcached = $this->createMock(\Memcached::class);
+
+        $memcached->expects($this->once())
+            ->method('set')
+            ->with($this->equalTo('key'), $this->equalTo('value'), $expiration)
+            ->willReturn(true);
+
+        $this->setInaccessibleProperty($cache, 'cache', $memcached);
+
+        $cache->set('key', 'value', $ttl);
     }
-
-    // TODO
-    /*public function testExpire(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
-        usleep(500000);
-        $this->assertSameExceptObject('expire_test', $cache->get('expire_test'));
-        usleep(2500000);
-        $this->assertNull($cache->get('expire_test'));
-    }*/
 
     /**
      * @dataProvider dataProvider
@@ -274,9 +277,6 @@ class MemcachedTest extends TestCase
 
     /**
      * @dataProvider dataProviderNormalizeTtl
-     * @covers       \Yiisoft\Cache\ArrayCache::normalizeTtl()
-     * @covers       \Yiisoft\Cache\Memcached::normalizeTtl()
-     * @covers       \Yiisoft\Cache\Cache::normalizeTtl()
      * @param mixed $ttl
      * @param mixed $expectedResult
      * @throws ReflectionException
@@ -305,6 +305,30 @@ class MemcachedTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider ttlToExpirationProvider
+     * @param mixed $ttl
+     * @param mixed $expected
+     * @throws ReflectionException
+     */
+    public function testTtlToExpiration($ttl, $expected): void
+    {
+        if ($expected === 'calculate_expiration') {
+            MockHelper::$time = \time();
+            $expected = MockHelper::$time + $ttl;
+        }
+        $cache = new Memcached();
+        $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));
+    }
+
+    public function ttlToExpirationProvider(): array
+    {
+        return [
+            [3, 'calculate_expiration'],
+            [null, 0],
+            [-5, -1],
+        ];
+    }
 
     /**
      * @dataProvider iterableProvider

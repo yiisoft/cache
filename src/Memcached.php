@@ -26,6 +26,7 @@ final class Memcached implements CacheInterface
     private const DEFAULT_SERVER_HOST = '127.0.0.1';
     private const DEFAULT_SERVER_PORT = 11211;
     private const DEFAULT_SERVER_WEIGHT = 1;
+    private const EXPIRATION_EXPIRED = -1;
 
     /**
      * @var \Memcached the Memcached instance
@@ -144,7 +145,7 @@ final class Memcached implements CacheInterface
         if ($ttl === null) {
             $expiration = static::EXPIRATION_INFINITY;
         } elseif ($ttl <= 0) {
-            $expiration = -1;
+            $expiration = static::EXPIRATION_EXPIRED;
         } else {
             $expiration = $ttl + time();
         }
