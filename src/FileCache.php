@@ -74,10 +74,8 @@ final class FileCache implements CacheInterface
 
     public function get($key, $default = null)
     {
-        $cacheFile = $this->getCacheFile($key);
-
-        if (@filemtime($cacheFile) > time()) {
-            $fp = @fopen($cacheFile, 'rb');
+        if ($this->existsAndNotExpired($key)) {
+            $fp = @fopen($this->getCacheFile($key), 'rb');
             if ($fp !== false) {
                 @flock($fp, LOCK_SH);
                 $cacheValue = @stream_get_contents($fp);
@@ -165,10 +163,7 @@ final class FileCache implements CacheInterface
 
     public function has($key)
     {
-        // TODO extract expired
-        $cacheFile = $this->getCacheFile($key);
-
-        return @filemtime($cacheFile) > time();
+        return $this->existsAndNotExpired($key);
     }
 
     /**
@@ -337,5 +332,10 @@ final class FileCache implements CacheInterface
     public function setDirectoryLevel(int $directoryLevel): void
     {
         $this->directoryLevel = $directoryLevel;
+    }
+
+    private function existsAndNotExpired(string $key)
+    {
+        return @filemtime($this->getCacheFile($key)) > time();
     }
 }
