@@ -360,7 +360,7 @@ final class Cache implements CacheInterface
     public function setKeyPrefix(string $keyPrefix): void
     {
         if ($keyPrefix != '' && !ctype_alnum($keyPrefix)) {
-            throw new Exception\InvalidArgumentException('Cache key prefix should be alphanumeric');
+            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Cache key prefix should be alphanumeric');
         }
         $this->keyPrefix = $keyPrefix;
     }

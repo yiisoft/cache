@@ -226,6 +226,10 @@ final class Memcached implements CacheInterface
         return $newServers;
     }
 
+    /**
+     * Validates servers format
+     * @param array $servers
+     */
     private function validateServers(array $servers)
     {
         foreach ($servers as $server) {

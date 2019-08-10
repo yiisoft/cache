@@ -1,19 +1,21 @@
 <?php
 
-namespace Yiisoft\Cache\Tests\ArrayCache;
+namespace Yiisoft\Cache\Tests\FileCache;
 
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
-use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\FileCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
 use Yiisoft\Cache\Tests\TestCase;
 
-class ArrayCacheDecoratorExtraTest extends TestCase
+class FileCacheDecoratorExtraTest extends TestCase
 {
+    protected const CACHE_DIRECTORY = __DIR__ . '/runtime/cache';
+
     protected function createCacheInstance(): CacheInterface
     {
-        return new Cache(new ArrayCache());
+        return new Cache(new FileCache(static::CACHE_DIRECTORY));
     }
 
     public function testAdd(): void
