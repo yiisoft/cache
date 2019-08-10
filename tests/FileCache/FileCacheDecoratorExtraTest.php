@@ -11,9 +11,11 @@ use Yiisoft\Cache\Tests\TestCase;
 
 class FileCacheDecoratorExtraTest extends TestCase
 {
+    protected const CACHE_DIRECTORY = __DIR__ . '/runtime/cache';
+
     protected function createCacheInstance(): CacheInterface
     {
-        return new Cache(new FileCache(FileCacheTest::CACHE_DIRECTORY));
+        return new Cache(new FileCache(static::CACHE_DIRECTORY));
     }
 
     public function testAdd(): void
@@ -119,19 +121,6 @@ class FileCacheDecoratorExtraTest extends TestCase
         $cache->set($key, 42);
         $this->assertSame(42, $cache->get($key));
     }
-
-    // TODO commented for speed
-    /*public function testExpireAdd(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
-        usleep(500000);
-        $this->assertSameExceptObject('expire_testa', $cache->get('expire_testa'));
-        usleep(2500000);
-        $this->assertNull($cache->get('expire_testa'));
-    }*/
 
     public function testNormalizeKey(): void
     {
