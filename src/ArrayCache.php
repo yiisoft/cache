@@ -14,7 +14,7 @@ use Psr\SimpleCache\CacheInterface;
  */
 final class ArrayCache implements CacheInterface
 {
-    public const EXPIRATION_INFINITY = 0;
+    private const EXPIRATION_INFINITY = 0;
 
     private $cache = [];
 

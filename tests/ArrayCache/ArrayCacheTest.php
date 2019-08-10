@@ -1,17 +1,8 @@
 <?php
 
-namespace Yiisoft\Cache;
-
-/**
- * Mock for the time() function for caching classes.
- * @return int
- */
-function time(): int
-{
-    return \Yiisoft\Cache\Tests\ArrayCache\ArrayCacheTest::$time ?: \time();
-}
-
 namespace Yiisoft\Cache\Tests\ArrayCache;
+
+require_once __DIR__ . '/../functions_mocks.php';
 
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
@@ -19,19 +10,14 @@ use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\MockHelper;
 use Yiisoft\Cache\Tests\TestCase;
 
 class ArrayCacheTest extends TestCase
 {
-    /**
-     * @var int virtual time to be returned by mocked time() function.
-     * Null means normal time() behavior.
-     */
-    public static $time;
-
     protected function tearDown(): void
     {
-        static::$time = null;
+        MockHelper::$time = null;
     }
 
     protected function createCacheInstance(): CacheInterface
@@ -44,14 +30,14 @@ class ArrayCacheTest extends TestCase
         $cache = $this->createCacheInstance();
         $cache->clear();
 
-        static::$time = \time();
+        MockHelper::$time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
 
-        static::$time++;
+        MockHelper::$time++;
         $this->assertTrue($cache->has('expire_test'));
         $this->assertSameExceptObject('expire_test', $cache->get('expire_test'));
 
-        static::$time++;
+        MockHelper::$time++;
         $this->assertFalse($cache->has('expire_test'));
         $this->assertNull($cache->get('expire_test'));
     }
@@ -263,9 +249,6 @@ class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider dataProviderNormalizeTtl
-     * @covers       \Yiisoft\Cache\ArrayCache::normalizeTtl()
-     * @covers       \Yiisoft\Cache\Memcached::normalizeTtl()
-     * @covers       \Yiisoft\Cache\Cache::normalizeTtl()
      * @param mixed $ttl
      * @param mixed $expectedResult
      * @throws ReflectionException
@@ -294,6 +277,30 @@ class ArrayCacheTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider ttlToExpirationProvider
+     * @param mixed $ttl
+     * @param mixed $expected
+     * @throws ReflectionException
+     */
+    public function testTtlToExpiration($ttl, $expected): void
+    {
+        if ($expected === 'calculate_expiration') {
+            MockHelper::$time = \time();
+            $expected = MockHelper::$time + $ttl;
+        }
+        $cache = new ArrayCache();
+        $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));
+    }
+
+    public function ttlToExpirationProvider(): array
+    {
+        return [
+            [3, 'calculate_expiration'],
+            [null, 0],
+            [-5, -1],
+        ];
+    }
 
     /**
      * @dataProvider iterableProvider
