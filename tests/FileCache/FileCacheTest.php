@@ -18,7 +18,7 @@ class FileCacheTest extends TestCase
 {
     use PHPMock;
 
-    public const CACHE_DIRECTORY = __DIR__ . '/runtime/cache';
+    protected const CACHE_DIRECTORY = __DIR__ . '/runtime/cache';
 
     protected function tearDown(): void
     {
@@ -353,20 +353,6 @@ class FileCacheTest extends TestCase
         MockHelper::$time++;
         $this->assertNull($cache->get('expire_test'));
     }
-
-    // TODO move to decorator test
-    /*public function testExpireAdd(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        MockHelper::$time = \time();
-        $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
-        MockHelper::$time++;
-        $this->assertEquals('expire_testa', $cache->get('expire_testa'));
-        MockHelper::$time++;
-        $this->assertNull($cache->get('expire_testa'));
-    }*/
 
     /**
      * We have to on separate process because of PHPMock not being able to mock a function that

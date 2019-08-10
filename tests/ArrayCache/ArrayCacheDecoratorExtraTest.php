@@ -120,19 +120,6 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $this->assertSame(42, $cache->get($key));
     }
 
-    // TODO commented for speed
-    /*public function testExpireAdd(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        $this->assertTrue($cache->add('expire_testa', 'expire_testa', 2));
-        usleep(500000);
-        $this->assertSameExceptObject('expire_testa', $cache->get('expire_testa'));
-        usleep(2500000);
-        $this->assertNull($cache->get('expire_testa'));
-    }*/
-
     public function testNormalizeKey(): void
     {
         /** @var Cache $cache */
