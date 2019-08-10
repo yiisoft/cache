@@ -288,4 +288,55 @@ final class FileCache implements CacheInterface
             closedir($handle);
         }
     }
+
+    /**
+     * @param string $cacheFileSuffix cache file suffix. Defaults to '.bin'.
+     */
+    public function setCacheFileSuffix(string $cacheFileSuffix): void
+    {
+        $this->cacheFileSuffix = $cacheFileSuffix;
+    }
+
+    /**
+     * @param int $gcProbability the probability (parts per million) that garbage collection (GC) should be performed
+     * when storing a piece of data in the cache. Defaults to 10, meaning 0.001% chance.
+     * This number should be between 0 and 1000000. A value 0 means no GC will be performed at all.
+     */
+    public function setGcProbability(int $gcProbability): void
+    {
+        $this->gcProbability = $gcProbability;
+    }
+
+    /**
+     * @param int $fileMode the permission to be set for newly created cache files.
+     * This value will be used by PHP chmod() function. No umask will be applied.
+     * If not set, the permission will be determined by the current environment.
+     */
+    public function setFileMode(int $fileMode): void
+    {
+        $this->fileMode = $fileMode;
+    }
+
+    /**
+     * @param int $dirMode the permission to be set for newly created directories.
+     * This value will be used by PHP chmod() function. No umask will be applied.
+     * Defaults to 0775, meaning the directory is read-writable by owner and group,
+     * but read-only for other users.
+     */
+    public function setDirMode(int $dirMode): void
+    {
+        $this->dirMode = $dirMode;
+    }
+
+    /**
+     * @param int $directoryLevel the level of sub-directories to store cache files. Defaults to 1.
+     * If the system has huge number of cache files (e.g. one million), you may use a bigger value
+     * (usually no bigger than 3). Using sub-directories is mainly to ensure the file system
+     * is not over burdened with a single directory having too many files.
+     *
+     */
+    public function setDirectoryLevel(int $directoryLevel): void
+    {
+        $this->directoryLevel = $directoryLevel;
+    }
 }
