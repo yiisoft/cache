@@ -15,6 +15,7 @@ use Psr\SimpleCache\CacheInterface;
 final class ArrayCache implements CacheInterface
 {
     private const EXPIRATION_INFINITY = 0;
+    private const EXPIRATION_EXPIRED = -1;
 
     private $cache = [];
 
@@ -110,7 +111,7 @@ final class ArrayCache implements CacheInterface
         if ($ttl === null) {
             $expiration = static::EXPIRATION_INFINITY;
         } elseif ($ttl <= 0) {
-            $expiration = -1;
+            $expiration = static::EXPIRATION_EXPIRED;
         } else {
             $expiration = $ttl + time();
         }
