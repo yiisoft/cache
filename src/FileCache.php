@@ -23,6 +23,7 @@ final class FileCache implements CacheInterface
 {
     private const TTL_INFINITY = 31536000; // 1 year
     private const EXPIRATION_EXPIRED = -1;
+    private const TTL_EXPIRED = -1;
 
     /**
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.
@@ -197,7 +198,7 @@ final class FileCache implements CacheInterface
             try {
                 return (new DateTime('@0'))->add($ttl)->getTimestamp();
             } catch (Exception $e) {
-                return null;
+                return static::TTL_EXPIRED;
             }
         }
 

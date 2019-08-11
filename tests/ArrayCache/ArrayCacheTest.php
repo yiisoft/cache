@@ -255,7 +255,7 @@ class ArrayCacheTest extends TestCase
      */
     public function testNormalizeTtl($ttl, $expectedResult): void
     {
-        $cache = $this->createCacheInstance();
+        $cache = new ArrayCache();
         $this->assertSameExceptObject($expectedResult, $this->invokeMethod($cache, 'normalizeTtl', [$ttl]));
     }
 
@@ -347,5 +347,17 @@ class ArrayCacheTest extends TestCase
                 })()
             ]
         ];
+    }
+
+    public function testSetWithDateIntervalTtl()
+    {
+        $cache = $this->createCacheInstance();
+        $cache->clear();
+
+        $cache->set('a', 1, new DateInterval('PT1H'));
+        $this->assertSameExceptObject(1, $cache->get('a'));
+
+        $cache->setMultiple(['b' => 2]);
+        $this->assertSameExceptObject(['b' => 2], $cache->getMultiple(['b']));
     }
 }

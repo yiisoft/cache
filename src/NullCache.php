@@ -80,10 +80,6 @@ final class NullCache implements CacheInterface
     {
     }
 
-    public function setSerializer(?SerializerInterface $serializer): void
-    {
-    }
-
     private function iterableToArray(iterable $iterable): array
     {
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
