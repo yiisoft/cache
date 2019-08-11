@@ -16,6 +16,7 @@ final class ArrayCache implements CacheInterface
 {
     private const EXPIRATION_INFINITY = 0;
     private const EXPIRATION_EXPIRED = -1;
+    private const TTL_EXPIRED = -1;
 
     private $cache = [];
 
@@ -130,7 +131,7 @@ final class ArrayCache implements CacheInterface
             try {
                 return (new DateTime('@0'))->add($ttl)->getTimestamp();
             } catch (Exception $e) {
-                return null;
+                return static::TTL_EXPIRED;
             }
         }
 

@@ -1,33 +1,35 @@
 <?php
 
-namespace Yiisoft\Cache\Tests\FileCache;
-
-require_once __DIR__ . '/../functions_mocks.php';
+namespace Yiisoft\Cache\Tests\WinCache;
 
 use DateInterval;
-use phpmock\phpunit\PHPMock;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
-use Yiisoft\Cache\FileCache;
 use Yiisoft\Cache\Cache;
-use Yiisoft\Cache\MockHelper;
 use Yiisoft\Cache\Tests\TestCase;
+use Yiisoft\Cache\WinCache;
 
-class FileCacheTest extends TestCase
+class WinCacheTest extends TestCase
 {
-    use PHPMock;
-
-    protected const CACHE_DIRECTORY = __DIR__ . '/runtime/cache';
-
-    protected function tearDown(): void
+    public static function setUpBeforeClass(): void
     {
-        MockHelper::$time = null;
+        if (!extension_loaded('wincache')) {
+            self::markTestSkipped('Required extension "wincache" is not loaded');
+        }
+
+        if (!ini_get('wincache.enablecli')) {
+            self::markTestSkipped('Wincache is installed but not enabled. Enable with "wincache.enablecli" from php.ini. Skipping.');
+        }
+
+        if (!ini_get('wincache.ucenabled')) {
+            self::markTestSkipped('Wincache user cache disabled. Enable with "wincache.ucenabled" from php.ini. Skipping.');
+        }
     }
 
     protected function createCacheInstance(): CacheInterface
     {
-        return new FileCache(static::CACHE_DIRECTORY);
+        return new WinCache();
     }
 
     /**
@@ -214,7 +216,7 @@ class FileCacheTest extends TestCase
         $this->assertSameExceptObject($emptyData, $cache->getMultiple(array_keys($data)));
     }
 
-    public function testZeroAndNegativeTtl()
+    public function testNegativeTtl()
     {
         $cache = $this->createCacheInstance();
         $cache->clear();
@@ -229,10 +231,6 @@ class FileCacheTest extends TestCase
         $cache->set('a', 11, -1);
 
         $this->assertFalse($cache->has('a'));
-
-        $cache->set('b', 22, 0);
-
-        $this->assertFalse($cache->has('b'));
     }
 
     /**
@@ -243,7 +241,7 @@ class FileCacheTest extends TestCase
      */
     public function testNormalizeTtl($ttl, $expectedResult): void
     {
-        $cache = new FileCache(static::CACHE_DIRECTORY);
+        $cache = new WinCache();
         $this->assertSameExceptObject($expectedResult, $this->invokeMethod($cache, 'normalizeTtl', [$ttl]));
     }
 
@@ -258,39 +256,10 @@ class FileCacheTest extends TestCase
         return [
             [123, 123],
             ['123', 123],
-            [null, null],
+            [null, 0],
             [0, 0],
             [new DateInterval('PT6H8M'), 6 * 3600 + 8 * 60],
             [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600],
-        ];
-    }
-
-    /**
-     * @dataProvider ttlToExpirationProvider
-     * @param mixed $ttl
-     * @param mixed $expected
-     * @throws ReflectionException
-     */
-    public function testTtlToExpiration($ttl, $expected): void
-    {
-        if ($expected === 'calculate_expiration') {
-            MockHelper::$time = \time();
-            $expected = MockHelper::$time + $ttl;
-        }
-        if ($expected === 'calculate_max_expiration') {
-            MockHelper::$time = \time();
-            $expected = MockHelper::$time + 31536000;
-        }
-        $cache = new FileCache(static::CACHE_DIRECTORY);
-        $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));
-    }
-
-    public function ttlToExpirationProvider(): array
-    {
-        return [
-            [3, 'calculate_expiration'],
-            [null, 'calculate_max_expiration'],
-            [-5, -1],
         ];
     }
 
@@ -339,48 +308,6 @@ class FileCacheTest extends TestCase
                 })()
             ]
         ];
-    }
-
-    public function testExpire(): void
-    {
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        MockHelper::$time = \time();
-        $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
-        MockHelper::$time++;
-        $this->assertEquals('expire_test', $cache->get('expire_test'));
-        MockHelper::$time++;
-        $this->assertNull($cache->get('expire_test'));
-    }
-
-    /**
-     * We have to on separate process because of PHPMock not being able to mock a function that
-     * was already called.
-     * @runInSeparateProcess
-     */
-    public function testCacheRenewalOnDifferentOwnership(): void
-    {
-        if (!function_exists('posix_geteuid')) {
-            $this->markTestSkipped('Can not test without posix extension installed.');
-        }
-
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        $cacheValue = uniqid('value_', false);
-        $cacheKey = uniqid('key_', false);
-
-        MockHelper::$time = \time();
-        $this->assertTrue($cache->set($cacheKey, $cacheValue, 2));
-        $this->assertSame($cacheValue, $cache->get($cacheKey));
-
-        // Override fileowner method so it always returns something not equal to the current user
-        $notCurrentEuid = posix_geteuid() + 15;
-        $this->getFunctionMock('Yiisoft\Cache', 'fileowner')->expects($this->any())->willReturn($notCurrentEuid);
-        $this->getFunctionMock('Yiisoft\Cache', 'unlink')->expects($this->once());
-
-        $this->assertTrue($cache->set($cacheKey, uniqid('value_2_', false), 2), 'Cannot rebuild cache on different file ownership');
     }
 
     public function testSetWithDateIntervalTtl()
