@@ -35,8 +35,8 @@ install:
   # setup PHP extension
   - |
     if [[ $TRAVIS_PHP_VERSION != nightly ]]; then
-      tests/travis/apcu-setup.sh
-      tests/travis/memcache-setup.sh
+      source tests/travis/apcu-setup.sh
+      source tests/travis/memcache-setup.sh
     fi
 
 before_script:
