@@ -2,7 +2,7 @@
 
 namespace Yiisoft\Cache\Tests\Memcached;
 
-require_once __DIR__ . '/../functions_mocks.php';
+require_once __DIR__ . '/../MockHelper.php';
 
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
@@ -359,8 +359,7 @@ class MemcachedTest extends TestCase
             ],
             'IteratorAggregate' => [
                 ['a' => 1, 'b' => 2,],
-                new class() implements \IteratorAggregate
-                {
+                new class() implements \IteratorAggregate {
                     public function getIterator()
                     {
                         return new \ArrayIterator(['a' => 1, 'b' => 2,]);
