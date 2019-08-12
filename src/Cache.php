@@ -4,7 +4,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Exception;
 use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\SetCacheException;
@@ -359,7 +358,7 @@ final class Cache implements CacheInterface
      */
     public function setKeyPrefix(string $keyPrefix): void
     {
-        if ($keyPrefix != '' && !ctype_alnum($keyPrefix)) {
+        if ($keyPrefix !== '' && !ctype_alnum($keyPrefix)) {
             throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Cache key prefix should be alphanumeric');
         }
         $this->keyPrefix = $keyPrefix;
@@ -382,6 +381,8 @@ final class Cache implements CacheInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
@@ -393,11 +394,7 @@ final class Cache implements CacheInterface
         }
 
         if ($ttl instanceof DateInterval) {
-            try {
-                return (new DateTime('@0'))->add($ttl)->getTimestamp();
-            } catch (Exception $e) {
-                return $this->defaultTtl;
-            }
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
         return $ttl;

@@ -4,7 +4,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Exception;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -59,7 +58,7 @@ final class ArrayCache implements CacheInterface
         return true;
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $results = [];
         foreach ($keys as $key) {
@@ -92,17 +91,17 @@ final class ArrayCache implements CacheInterface
 
     /**
      * Checks whether item is expired or not
-     * @param $key
+     * @param string $key
      * @return bool
      */
-    private function isExpired($key): bool
+    private function isExpired(string $key): bool
     {
         return $this->cache[$key][1] !== 0 && $this->cache[$key][1] <= time();
     }
 
     /**
      * Converts TTL to expiration
-     * @param $ttl
+     * @param int|DateInterval|null $ttl
      * @return int
      */
     private function ttlToExpiration($ttl): int
@@ -121,6 +120,8 @@ final class ArrayCache implements CacheInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
@@ -128,11 +129,7 @@ final class ArrayCache implements CacheInterface
     private function normalizeTtl($ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
-            try {
-                return (new DateTime('@0'))->add($ttl)->getTimestamp();
-            } catch (Exception $e) {
-                return static::TTL_EXPIRED;
-            }
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
         return $ttl;

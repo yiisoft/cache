@@ -4,7 +4,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Exception\CacheException;
 use Yiisoft\Cache\Serializer\PhpSerializer;
@@ -90,7 +89,7 @@ final class FileCache implements CacheInterface
         return $default;
     }
 
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         $this->gc();
 
@@ -125,18 +124,18 @@ final class FileCache implements CacheInterface
         return false;
     }
 
-    public function delete($key)
+    public function delete($key): bool
     {
         return @unlink($this->getCacheFile($key));
     }
 
-    public function clear()
+    public function clear(): bool
     {
         $this->removeCacheFiles($this->cachePath, false);
         return true;
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $results = [];
         foreach ($keys as $key) {
@@ -146,7 +145,7 @@ final class FileCache implements CacheInterface
         return $results;
     }
 
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         foreach ($values as $key => $value) {
             $this->set($key, $value, $ttl);
@@ -154,7 +153,7 @@ final class FileCache implements CacheInterface
         return true;
     }
 
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         foreach ($keys as $key) {
             $this->delete($key);
@@ -162,14 +161,14 @@ final class FileCache implements CacheInterface
         return true;
     }
 
-    public function has($key)
+    public function has($key): bool
     {
         return $this->existsAndNotExpired($key);
     }
 
     /**
      * Converts TTL to expiration
-     * @param $ttl
+     * @param int|DateInterval|null $ttl
      * @return int
      */
     private function ttlToExpiration($ttl): int
@@ -188,6 +187,8 @@ final class FileCache implements CacheInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
@@ -195,11 +196,7 @@ final class FileCache implements CacheInterface
     private function normalizeTtl($ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
-            try {
-                return (new DateTime('@0'))->add($ttl)->getTimestamp();
-            } catch (Exception $e) {
-                return static::TTL_EXPIRED;
-            }
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
         return $ttl;
@@ -328,14 +325,17 @@ final class FileCache implements CacheInterface
      * If the system has huge number of cache files (e.g. one million), you may use a bigger value
      * (usually no bigger than 3). Using sub-directories is mainly to ensure the file system
      * is not over burdened with a single directory having too many files.
-     *
      */
     public function setDirectoryLevel(int $directoryLevel): void
     {
         $this->directoryLevel = $directoryLevel;
     }
 
-    private function existsAndNotExpired(string $key)
+    /**
+     * @param string $key
+     * @return bool
+     */
+    private function existsAndNotExpired(string $key): bool
     {
         return @filemtime($this->getCacheFile($key)) > time();
     }
