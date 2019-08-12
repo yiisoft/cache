@@ -1,8 +1,12 @@
 <?php
+
 namespace Yiisoft\Cache;
 
-use Psr\Log\LoggerInterface;
+use DateInterval;
+use DateTime;
+use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Exception\CacheException;
+use Yiisoft\Cache\Serializer\PhpSerializer;
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
@@ -14,9 +18,11 @@ use Yiisoft\Cache\Serializer\SerializerInterface;
  *
  * Please refer to {@see \Psr\SimpleCache\CacheInterface} for common cache operations that are supported by FileCache.
  */
-final class FileCache extends SimpleCache
+final class FileCache implements CacheInterface
 {
     private const TTL_INFINITY = 31536000; // 1 year
+    private const EXPIRATION_EXPIRED = -1;
+    private const TTL_EXPIRED = -1;
 
     /**
      * @var string the directory to store cache files. You may use [path alias](guide:concept-aliases) here.
@@ -54,85 +60,28 @@ final class FileCache extends SimpleCache
      */
     private $dirMode = 0775;
 
-    private $logger;
-
-    public function __construct(string $cachePath, LoggerInterface $logger, SerializerInterface $serializer = null)
-    {
-        $this->logger = $logger;
-        $this->setCachePath($cachePath);
-        parent::__construct($serializer);
-    }
-
     /**
-     * Sets cache path and ensures it exists.
-     * @param string $cachePath
+     * @var SerializerInterface the serializer to be used for serializing and unserializing of the cached data.
      */
-    public function setCachePath(string $cachePath): void
+    private $serializer;
+
+    public function __construct(string $cachePath, ?SerializerInterface $serializer = null)
     {
         $this->cachePath = $cachePath;
-
-        if (!$this->createDirectory($this->cachePath, $this->dirMode)) {
-            throw new CacheException('Failed to create cache directory "' . $this->cachePath . '"');
-        }
+        $this->serializer = $serializer ?? new PhpSerializer();
+        $this->initCacheDirectory();
     }
 
-    protected function hasValue(string $key): bool
+    public function get($key, $default = null)
     {
-        $cacheFile = $this->getCacheFile($key);
-
-        return @filemtime($cacheFile) > time();
-    }
-
-    /**
-     * @param string $cacheFileSuffix cache file suffix. Defaults to '.bin'.
-     */
-    public function setCacheFileSuffix(string $cacheFileSuffix): void
-    {
-        $this->cacheFileSuffix = $cacheFileSuffix;
-    }
-
-    /**
-     * @param int $gcProbability the probability (parts per million) that garbage collection (GC) should be performed
-     * when storing a piece of data in the cache. Defaults to 10, meaning 0.001% chance.
-     * This number should be between 0 and 1000000. A value 0 means no GC will be performed at all.
-     */
-    public function setGcProbability(int $gcProbability): void
-    {
-        $this->gcProbability = $gcProbability;
-    }
-
-    /**
-     * @param int $fileMode the permission to be set for newly created cache files.
-     * This value will be used by PHP chmod() function. No umask will be applied.
-     * If not set, the permission will be determined by the current environment.
-     */
-    public function setFileMode(int $fileMode): void
-    {
-        $this->fileMode = $fileMode;
-    }
-
-    /**
-     * @param int $dirMode the permission to be set for newly created directories.
-     * This value will be used by PHP chmod() function. No umask will be applied.
-     * Defaults to 0775, meaning the directory is read-writable by owner and group,
-     * but read-only for other users.
-     */
-    public function setDirMode(int $dirMode): void
-    {
-        $this->dirMode = $dirMode;
-    }
-
-    protected function getValue(string $key, $default = null)
-    {
-        $cacheFile = $this->getCacheFile($key);
-
-        if (@filemtime($cacheFile) > time()) {
-            $fp = @fopen($cacheFile, 'rb');
+        if ($this->existsAndNotExpired($key)) {
+            $fp = @fopen($this->getCacheFile($key), 'rb');
             if ($fp !== false) {
                 @flock($fp, LOCK_SH);
                 $cacheValue = @stream_get_contents($fp);
                 @flock($fp, LOCK_UN);
                 @fclose($fp);
+                $cacheValue = $this->serializer->unserialize($cacheValue);
                 return $cacheValue;
             }
         }
@@ -140,14 +89,19 @@ final class FileCache extends SimpleCache
         return $default;
     }
 
-    protected function setValue(string $key, $value, ?int $ttl): bool
+    public function set($key, $value, $ttl = null): bool
     {
         $this->gc();
+
+        $expiration = $this->ttlToExpiration($ttl);
+        if ($expiration < 0) {
+            return $this->delete($key);
+        }
+
         $cacheFile = $this->getCacheFile($key);
         if ($this->directoryLevel > 0) {
             $directoryName = \dirname($cacheFile);
             if (!$this->createDirectory($directoryName, $this->dirMode)) {
-                $this->logger->warning('Failed to create cache directory "' . $directoryName . '"');
                 return false;
             }
         }
@@ -158,23 +112,109 @@ final class FileCache extends SimpleCache
             @unlink($cacheFile);
         }
 
+        $value = $this->serializer->serialize($value);
+
         if (@file_put_contents($cacheFile, $value, LOCK_EX) !== false) {
             if ($this->fileMode !== null) {
                 @chmod($cacheFile, $this->fileMode);
             }
-            $ttl = $ttl ?? self::TTL_INFINITY;
-            return @touch($cacheFile, $ttl + time());
+            return @touch($cacheFile, $expiration);
         }
 
-        $error = error_get_last();
-        $this->logger->warning("Failed to write cache data to \"$cacheFile\": " . $error['message']);
         return false;
     }
 
-    protected function deleteValue(string $key): bool
+    public function delete($key): bool
     {
-        $cacheFile = $this->getCacheFile($key);
-        return @unlink($cacheFile);
+        return @unlink($this->getCacheFile($key));
+    }
+
+    public function clear(): bool
+    {
+        $this->removeCacheFiles($this->cachePath, false);
+        return true;
+    }
+
+    public function getMultiple($keys, $default = null): iterable
+    {
+        $results = [];
+        foreach ($keys as $key) {
+            $value = $this->get($key, $default);
+            $results[$key] = $value;
+        }
+        return $results;
+    }
+
+    public function setMultiple($values, $ttl = null): bool
+    {
+        foreach ($values as $key => $value) {
+            $this->set($key, $value, $ttl);
+        }
+        return true;
+    }
+
+    public function deleteMultiple($keys): bool
+    {
+        foreach ($keys as $key) {
+            $this->delete($key);
+        }
+        return true;
+    }
+
+    public function has($key): bool
+    {
+        return $this->existsAndNotExpired($key);
+    }
+
+    /**
+     * Converts TTL to expiration
+     * @param int|DateInterval|null $ttl
+     * @return int
+     */
+    private function ttlToExpiration($ttl): int
+    {
+        $ttl = $this->normalizeTtl($ttl);
+
+        if ($ttl === null) {
+            $expiration = static::TTL_INFINITY + time();
+        } elseif ($ttl <= 0) {
+            $expiration = static::EXPIRATION_EXPIRED;
+        } else {
+            $expiration = $ttl + time();
+        }
+
+        return $expiration;
+    }
+
+    /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
+     * @param int|DateInterval|null $ttl raw TTL.
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     */
+    private function normalizeTtl($ttl): ?int
+    {
+        if ($ttl instanceof DateInterval) {
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
+        }
+
+        return $ttl;
+    }
+
+    /**
+     * Ensures that cache directory exists.
+     */
+    private function initCacheDirectory(): void
+    {
+        if (!$this->createDirectory($this->cachePath, $this->dirMode)) {
+            throw new CacheException('Failed to create cache directory "' . $this->cachePath . '"');
+        }
+    }
+
+    private function createDirectory(string $path, int $mode): bool
+    {
+        return is_dir($path) || (mkdir($path, $mode, true) && is_dir($path));
     }
 
     /**
@@ -196,12 +236,6 @@ final class FileCache extends SimpleCache
         }
 
         return $this->cachePath . DIRECTORY_SEPARATOR . $key . $this->cacheFileSuffix;
-    }
-
-    public function clear(): bool
-    {
-        $this->removeCacheFiles($this->cachePath, false);
-        return true;
     }
 
     /**
@@ -247,9 +281,43 @@ final class FileCache extends SimpleCache
         }
     }
 
-    private function createDirectory(string $path, int $mode): bool
+    /**
+     * @param string $cacheFileSuffix cache file suffix. Defaults to '.bin'.
+     */
+    public function setCacheFileSuffix(string $cacheFileSuffix): void
     {
-        return is_dir($path) || (mkdir($path, $mode, true) && is_dir($path));
+        $this->cacheFileSuffix = $cacheFileSuffix;
+    }
+
+    /**
+     * @param int $gcProbability the probability (parts per million) that garbage collection (GC) should be performed
+     * when storing a piece of data in the cache. Defaults to 10, meaning 0.001% chance.
+     * This number should be between 0 and 1000000. A value 0 means no GC will be performed at all.
+     */
+    public function setGcProbability(int $gcProbability): void
+    {
+        $this->gcProbability = $gcProbability;
+    }
+
+    /**
+     * @param int $fileMode the permission to be set for newly created cache files.
+     * This value will be used by PHP chmod() function. No umask will be applied.
+     * If not set, the permission will be determined by the current environment.
+     */
+    public function setFileMode(int $fileMode): void
+    {
+        $this->fileMode = $fileMode;
+    }
+
+    /**
+     * @param int $dirMode the permission to be set for newly created directories.
+     * This value will be used by PHP chmod() function. No umask will be applied.
+     * Defaults to 0775, meaning the directory is read-writable by owner and group,
+     * but read-only for other users.
+     */
+    public function setDirMode(int $dirMode): void
+    {
+        $this->dirMode = $dirMode;
     }
 
     /**
@@ -257,10 +325,18 @@ final class FileCache extends SimpleCache
      * If the system has huge number of cache files (e.g. one million), you may use a bigger value
      * (usually no bigger than 3). Using sub-directories is mainly to ensure the file system
      * is not over burdened with a single directory having too many files.
-     *
      */
     public function setDirectoryLevel(int $directoryLevel): void
     {
         $this->directoryLevel = $directoryLevel;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    private function existsAndNotExpired(string $key): bool
+    {
+        return @filemtime($this->getCacheFile($key)) > time();
     }
 }

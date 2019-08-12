@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Cache;
 
 use Yiisoft\Cache\Dependency\Dependency;
@@ -33,7 +34,7 @@ final class NullCache implements CacheInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
-        return array_fill_keys($keys, $default);
+        return array_fill_keys($this->iterableToArray($keys), $default);
     }
 
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
@@ -64,5 +65,25 @@ final class NullCache implements CacheInterface
     public function has($key): bool
     {
         return false;
+    }
+
+    public function enableKeyNormalization(): void
+    {
+        // do nothing
+    }
+
+    public function disableKeyNormalization(): void
+    {
+        // do nothing
+    }
+
+    public function setKeyPrefix(string $keyPrefix): void
+    {
+        // do nothing
+    }
+
+    private function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 }

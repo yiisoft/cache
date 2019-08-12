@@ -14,11 +14,11 @@ class DependencyTest extends DependencyTestCase
         $value = ['dummy'];
         $dependency = new MockDependency();
         $this->setInaccessibleProperty($dependency, 'reusableData', $value, false);
-        $this->assertEquals($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
+        $this->assertSameExceptObject($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
 
         $dependency->resetReusableData();
 
-        $this->assertEquals([], $this->getInaccessibleProperty($dependency, 'reusableData'));
+        $this->assertSameExceptObject([], $this->getInaccessibleProperty($dependency, 'reusableData'));
     }
 
     public function testGenerateReusableHash(): void
@@ -28,8 +28,8 @@ class DependencyTest extends DependencyTestCase
 
         $result = $this->invokeMethod($dependency, 'generateReusableHash');
 
-        $this->assertEquals(5, strlen($this->getInaccessibleProperty($dependency, 'data')));
-        $this->assertEquals(40, strlen($result));
+        $this->assertSameExceptObject(5, strlen($this->getInaccessibleProperty($dependency, 'data')));
+        $this->assertSameExceptObject(40, strlen($result));
     }
 
     public function testIsChanged(): void

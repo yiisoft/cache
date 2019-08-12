@@ -1,6 +1,9 @@
 <?php
+
 namespace Yiisoft\Cache;
 
+use DateInterval;
+use DateTime;
 use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\SetCacheException;
@@ -38,6 +41,21 @@ final class Cache implements CacheInterface
     private $handler;
 
     /**
+     * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
+     * It is recommended that you set a unique cache key prefix for each application if the same cache
+     * storage is being used by different applications.
+     */
+    private $keyPrefix = '';
+
+    private $keyNormalization = true;
+
+    /**
+     * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
+     * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
+     */
+    private $defaultTtl;
+
+    /**
      * @param \Psr\SimpleCache\CacheInterface cache handler.
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
@@ -57,27 +75,28 @@ final class Cache implements CacheInterface
      */
     private function buildKey($key): string
     {
-        if (\is_string($key)) {
-            return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
+        if (!$this->keyNormalization) {
+            $normalizedKey = $key;
+        } elseif (\is_string($key)) {
+            $normalizedKey = ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
+        } else {
+            $normalizedKey = $this->keyPrefix . md5(json_encode($key));
         }
-        return md5(json_encode($key));
+
+        return $this->keyPrefix . $normalizedKey;
     }
 
 
     public function get($key, $default = null)
     {
         $key = $this->buildKey($key);
-        $value = $this->handler->get($key);
-
-        if ($value === null) {
-            return $default;
-        }
+        $value = $this->handler->get($key, $default);
 
         if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
             if ($value[1]->isChanged($this)) {
                 return $default;
             }
-            return $value[0];
+            $value = $value[0];
         }
 
         return $value;
@@ -108,11 +127,11 @@ final class Cache implements CacheInterface
         foreach ($keys as $key) {
             $keyMap[$key] = $this->buildKey($key);
         }
-        $values = $this->handler->getMultiple(array_values($keyMap));
+        $values = $this->handler->getMultiple(array_values($keyMap), $default);
         $results = [];
         foreach ($keyMap as $key => $newKey) {
             $results[$key] = $default;
-            if (isset($values[$newKey])) {
+            if (array_key_exists($newKey, $this->iterableToArray($values))) {
                 $value = $values[$newKey];
                 if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
                     if ($value[1]->isChanged($this)) {
@@ -144,11 +163,14 @@ final class Cache implements CacheInterface
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
+        $ttl = $this->normalizeTtl($ttl);
+
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
             $value = [$value, $dependency];
         }
         $key = $this->buildKey($key);
+
         return $this->handler->set($key, $value, $ttl);
     }
 
@@ -167,6 +189,7 @@ final class Cache implements CacheInterface
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
     {
         $data = $this->prepareDataForSetOrAddMultiple($values, $dependency);
+        $ttl = $this->normalizeTtl($ttl);
         return $this->handler->setMultiple($data, $ttl);
     }
 
@@ -193,6 +216,7 @@ final class Cache implements CacheInterface
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
     {
         $data = $this->prepareDataForSetOrAddMultiple($values, $dependency);
+        $ttl = $this->normalizeTtl($ttl);
         $existingValues = $this->handler->getMultiple(array_keys($data));
         foreach ($existingValues as $key => $value) {
             if ($value !== null) {
@@ -202,7 +226,7 @@ final class Cache implements CacheInterface
         return $this->handler->setMultiple($data, $ttl);
     }
 
-    private function prepareDataForSetOrAddMultiple(array $values, ?Dependency $dependency): array
+    private function prepareDataForSetOrAddMultiple(iterable $values, ?Dependency $dependency): array
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -245,6 +269,8 @@ final class Cache implements CacheInterface
         if ($this->handler->has($key)) {
             return false;
         }
+
+        $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
     }
@@ -307,10 +333,80 @@ final class Cache implements CacheInterface
         }
 
         $value = $callable($this);
+        $ttl = $this->normalizeTtl($ttl);
         if (!$this->set($key, $value, $ttl, $dependency)) {
             throw new SetCacheException($key, $value, $this);
         }
 
         return $value;
+    }
+
+    public function enableKeyNormalization(): void
+    {
+        $this->keyNormalization = true;
+    }
+
+    public function disableKeyNormalization(): void
+    {
+        $this->keyNormalization = false;
+    }
+
+    /**
+     * @param string $keyPrefix a string prefixed to every cache key so that it is unique globally in the whole cache storage.
+     * It is recommended that you set a unique cache key prefix for each application if the same cache
+     * storage is being used by different applications.
+     */
+    public function setKeyPrefix(string $keyPrefix): void
+    {
+        if ($keyPrefix !== '' && !ctype_alnum($keyPrefix)) {
+            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Cache key prefix should be alphanumeric');
+        }
+        $this->keyPrefix = $keyPrefix;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDefaultTtl(): ?int
+    {
+        return $this->defaultTtl;
+    }
+
+    /**
+     * @param int|DateInterval|null $defaultTtl
+     */
+    public function setDefaultTtl($defaultTtl): void
+    {
+        $this->defaultTtl = $this->normalizeTtl($defaultTtl);
+    }
+
+    /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
+     * @param int|DateInterval|null $ttl raw TTL.
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     */
+    protected function normalizeTtl($ttl): ?int
+    {
+        if ($ttl === null) {
+            return $this->defaultTtl;
+        }
+
+        if ($ttl instanceof DateInterval) {
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
+        }
+
+        return $ttl;
+    }
+
+    /**
+     * Converts iterable to array
+     * @param iterable $iterable
+     * @return array
+     */
+    private function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 }

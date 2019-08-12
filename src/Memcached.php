@@ -2,188 +2,63 @@
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
+use DateTime;
+use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Exception\InvalidConfigException;
-use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
  * Memcached implements a cache application component based on [memcached](http://pecl.php.net/package/memcached) PECL
  * extension.
  *
- * Memcached can be configured with a list of memcached servers by settings its {@see Memcached::$servers} property.
- * By default, MemCached assumes there is a memcached server running on localhost at port 11211.
+ * Memcached can be configured with a list of memcached servers passed to the constructor.
+ * By default, Memcached assumes there is a memcached server running on localhost at port 11211.
  *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that MemCached supports.
  *
  * Note, there is no security measure to protected data in memcached.
  * All data in memcached can be accessed by any process running in the system.
- *
- * You can configure more properties of each server, such as `persistent`, `weight`, `timeout`.
- * Please see {@see MemcachedServer} for available options.
  */
-final class Memcached extends SimpleCache
+final class Memcached implements CacheInterface
 {
-    private const TTL_INFINITY = 0;
+    private const EXPIRATION_INFINITY = 0;
+    private const EXPIRATION_EXPIRED = -1;
+    private const TTL_EXPIRED = -1;
+    private const DEFAULT_SERVER_HOST = '127.0.0.1';
+    private const DEFAULT_SERVER_PORT = 11211;
+    private const DEFAULT_SERVER_WEIGHT = 1;
+
+    /**
+     * @var \Memcached the Memcached instance
+     */
+    private $cache;
 
     /**
      * @var string an ID that identifies a Memcached instance.
      * By default the Memcached instances are destroyed at the end of the request. To create an instance that
      * persists between requests, you may specify a unique ID for the instance. All instances created with the
      * same ID will share the same connection.
-     * @see http://ca2.php.net/manual/en/memcached.construct.php
+     * @see https://www.php.net/manual/en/memcached.construct.php
      */
     private $persistentId;
-    /**
-     * @var array options for Memcached.
-     * @see http://ca2.php.net/manual/en/memcached.setoptions.php
-     */
-    private $options;
-    /**
-     * @var string memcached sasl username.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    private $username;
-    /**
-     * @var string memcached sasl password.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    private $password;
 
     /**
-     * @var \Memcached the Memcached instance
+     * @param string $persistentId By default the Memcached instances are destroyed at the end of the request. To create an
+     * instance that persists between requests, use persistent_id to specify a unique ID for the instance. All instances
+     * created with the same persistent_id will share the same connection.
+     * @param array $servers list of memcached servers that will be added to the server pool
+     * @see https://www.php.net/manual/en/memcached.construct.php
+     * @see https://www.php.net/manual/en/memcached.addservers.php
      */
-    private $cache;
-    /**
-     * @var array list of memcached server configurations
-     */
-    private $servers;
-
-    /**
-     * @param SerializerInterface|null $serializer
-     * @param MemcachedServer[] $servers list of memcached server configurations
-     * @throws InvalidConfigException
-     * @see setSerializer
-     */
-    public function __construct(?SerializerInterface $serializer = null, array $servers = [])
+    public function __construct($persistentId = '', array $servers = [])
     {
-        parent::__construct($serializer);
-
-        if (empty($servers)) {
-            $servers = [new MemcachedServer('127.0.0.1')];
-        }
-
-        $this->servers = $servers;
-
-        $this->addServers($this->getMemcached(), $this->servers);
-    }
-
-    /**
-     * Add servers to the server pool of the cache specified
-     *
-     * @param \Memcached $cache
-     * @param MemcachedServer[] $servers
-     */
-    private function addServers(\Memcached $cache, array $servers): void
-    {
-        $existingServers = [];
-        if ($this->persistentId !== null) {
-            foreach ($cache->getServerList() as $s) {
-                $existingServers[$s['host'] . ':' . $s['port']] = true;
-            }
-        }
-        foreach ($servers as $server) {
-            $serverAddress = $server->getHost() . ':' . $server->getPort();
-            if (empty($existingServers) || !isset($existingServers[$serverAddress])) {
-                $cache->addServer($server->getHost(), $server->getPort(), $server->getWeight());
-            }
-        }
-    }
-
-    /**
-     * Returns the underlying memcached object.
-     * @return \Memcached the memcached object used by this cache component.
-     * @throws InvalidConfigException if memcached extension is not loaded
-     */
-    public function getMemcached(): \Memcached
-    {
-        if ($this->cache === null) {
-            if (!\extension_loaded('memcached')) {
-                throw new InvalidConfigException('MemCached requires PHP memcached extension to be loaded.');
-            }
-
-            $this->cache = $this->persistentId !== null ? new \Memcached($this->persistentId) : new \Memcached();
-            if ($this->username !== null || $this->password !== null) {
-                $this->cache->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
-                $this->cache->setSaslAuthData($this->username, $this->password);
-            }
-            if (!empty($this->options)) {
-                $this->cache->setOptions($this->options);
-            }
-        }
-
-        return $this->cache;
-    }
-
-    /**
-     * Returns the memcached server configurations.
-     * @return MemcachedServer[] list of memcached server configurations.
-     */
-    public function getServers(): array
-    {
-        return $this->servers;
-    }
-
-    /**
-     * @param array $configs list of memcached server configurations. Each element must be an array
-     * with the following keys: host, port, weight.
-     * @see http://php.net/manual/en/memcached.addserver.php
-     */
-    public function setServers(array $configs): void
-    {
-        foreach ($configs as $config) {
-            $this->servers[] = new MemcachedServer($config['host'], $config['port'], $config['weight']);
-        }
-    }
-
-    /**
-     * @param string $persistentId an ID that identifies a Memcached instance.
-     * By default the Memcached instances are destroyed at the end of the request. To create an instance that
-     * persists between requests, you may specify a unique ID for the instance. All instances created with the
-     * same ID will share the same connection.
-     * @see http://ca2.php.net/manual/en/memcached.construct.php
-     */
-    public function setPersistentId(string $persistentId): void
-    {
+        $this->validateServers($servers);
         $this->persistentId = $persistentId;
+        $this->initCache();
+        $this->initServers($servers);
     }
 
-    /**
-     * @param array $options options for Memcached.
-     * @see http://ca2.php.net/manual/en/memcached.setoptions.php
-     */
-    public function setOptions(array $options): void
-    {
-        $this->options = $options;
-    }
-
-    /**
-     * @param string $username memcached sasl username.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    public function setUsername(string $username): void
-    {
-        $this->username = $username;
-    }
-
-    /**
-     * @param string $password memcached sasl password.
-     * @see http://php.net/manual/en/memcached.setsaslauthdata.php
-     */
-    public function setPassword(string $password): void
-    {
-        $this->password = $password;
-    }
-
-    protected function getValue(string $key, $default = null)
+    public function get($key, $default = null)
     {
         $value = $this->cache->get($key);
 
@@ -194,38 +69,16 @@ final class Memcached extends SimpleCache
         return $default;
     }
 
-    protected function getValues(iterable $keys, $default = null): iterable
+    public function set($key, $value, $ttl = null): bool
     {
-        $values = $this->cache->getMulti($keys);
-
-        if ($this->cache->getResultCode() === \Memcached::RES_SUCCESS) {
-            return $values;
+        $expiration = $this->ttlToExpiration($ttl);
+        if ($expiration < 0) {
+            return $this->delete($key);
         }
-
-        return array_fill_keys($keys, $default);
+        return $this->cache->set($key, $value, $expiration);
     }
 
-    protected function setValue(string $key, $value, ?int $ttl): bool
-    {
-        if ($ttl === null) {
-            $ttl = self::TTL_INFINITY;
-        } else {
-            $ttl += time();
-        }
-        return $this->cache->set($key, $value, $ttl);
-    }
-
-    protected function setValues(iterable $values, ?int $ttl): bool
-    {
-        if ($ttl === null) {
-            $ttl = self::TTL_INFINITY;
-        } else {
-            $ttl += time();
-        }
-        return $this->cache->setMulti($values, $ttl);
-    }
-
-    protected function deleteValue(string $key): bool
+    public function delete($key): bool
     {
         return $this->cache->delete($key);
     }
@@ -235,19 +88,152 @@ final class Memcached extends SimpleCache
         return $this->cache->flush();
     }
 
-    protected function hasValue(string $key): bool
+    public function getMultiple($keys, $default = null): iterable
     {
-        $this->cache->get($key);
-        return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
+        $values = $this->cache->getMulti($this->iterableToArray($keys));
+        return array_merge(array_fill_keys($this->iterableToArray($keys), $default), $values);
     }
 
-    public function deleteValues(iterable $keys): bool
+    public function setMultiple($values, $ttl = null): bool
     {
-        foreach ($this->cache->deleteMulti($keys) as $result) {
+        $expiration = $this->ttlToExpiration($ttl);
+        return $this->cache->setMulti($this->iterableToArray($values), $expiration);
+    }
+
+    public function deleteMultiple($keys): bool
+    {
+        foreach ($this->cache->deleteMulti($this->iterableToArray($keys)) as $result) {
             if ($result === false) {
                 return false;
             }
         }
         return true;
+    }
+
+    public function has($key): bool
+    {
+        $this->cache->get($key);
+        return $this->cache->getResultCode() === \Memcached::RES_SUCCESS;
+    }
+
+    /**
+     * Returns underlying \Memcached instance
+     * @return \Memcached
+     */
+    public function getCache(): \Memcached
+    {
+        return $this->cache;
+    }
+
+    /**
+     * Inits Memcached instance
+     */
+    private function initCache(): void
+    {
+        $this->cache = new \Memcached($this->persistentId);
+    }
+
+    /**
+     * Converts TTL to expiration
+     * @param int|DateInterval|null $ttl
+     * @return int
+     */
+    private function ttlToExpiration($ttl): int
+    {
+        $ttl = $this->normalizeTtl($ttl);
+
+        if ($ttl === null) {
+            $expiration = static::EXPIRATION_INFINITY;
+        } elseif ($ttl <= 0) {
+            $expiration = static::EXPIRATION_EXPIRED;
+        } else {
+            $expiration = $ttl + time();
+        }
+
+        return $expiration;
+    }
+
+    /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
+     * @param int|DateInterval|null $ttl raw TTL.
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     */
+    private function normalizeTtl($ttl): ?int
+    {
+        if ($ttl instanceof DateInterval) {
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
+        }
+
+        return $ttl;
+    }
+
+    /**
+     * Converts iterable to array
+     * @param iterable $iterable
+     * @return array
+     */
+    private function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+    }
+
+    /**
+     * @param array $servers
+     */
+    private function initServers(array $servers): void
+    {
+        if ($servers === []) {
+            $servers = [
+                [self::DEFAULT_SERVER_HOST, self::DEFAULT_SERVER_PORT, self::DEFAULT_SERVER_WEIGHT],
+            ];
+        }
+
+        if ($this->persistentId !== '') {
+            $servers = $this->getNewServers($servers);
+        }
+
+        $success = $this->cache->addServers($servers);
+
+        if (!$success) {
+            throw new InvalidConfigException('An error occurred while adding servers to the server pool.');
+        }
+    }
+
+    /**
+     * Returns the list of the servers that are not in the pool.
+     * @param array $servers
+     * @return array
+     */
+    private function getNewServers(array $servers): array
+    {
+        $existingServers = [];
+        foreach ($this->cache->getServerList() as $existingServer) {
+            $existingServers[$existingServer['host'] . ':' . $existingServer['port']] = true;
+        }
+
+        $newServers = [];
+        foreach ($servers as $server) {
+            $serverAddress = $server[0] . ':' . $server[1];
+            if (!array_key_exists($serverAddress, $existingServers)) {
+                $newServers[] = $server;
+            }
+        }
+
+        return $newServers;
+    }
+
+    /**
+     * Validates servers format
+     * @param array $servers
+     */
+    private function validateServers(array $servers): void
+    {
+        foreach ($servers as $server) {
+            if (!is_array($server) || !isset($server[0], $server[1])) {
+                throw new InvalidConfigException('Each entry in servers parameter is supposed to be an array containing hostname, port, and, optionally, weight of the server.');
+            }
+        }
     }
 }
