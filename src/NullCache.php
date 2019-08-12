@@ -3,7 +3,6 @@
 namespace Yiisoft\Cache;
 
 use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
  * NullCache does not cache anything reporting success for all methods calls.
@@ -70,14 +69,17 @@ final class NullCache implements CacheInterface
 
     public function enableKeyNormalization(): void
     {
+        // do nothing
     }
 
     public function disableKeyNormalization(): void
     {
+        // do nothing
     }
 
     public function setKeyPrefix(string $keyPrefix): void
     {
+        // do nothing
     }
 
     private function iterableToArray(iterable $iterable): array

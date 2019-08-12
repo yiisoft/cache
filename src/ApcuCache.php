@@ -4,7 +4,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Exception;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -26,7 +25,7 @@ class ApcuCache implements CacheInterface
         return $success ? $value : $default;
     }
 
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         $ttl = $this->normalizeTtl($ttl);
         if ($ttl < 0) {
@@ -35,38 +34,40 @@ class ApcuCache implements CacheInterface
         return \apcu_store($key, $value, $ttl);
     }
 
-    public function delete($key)
+    public function delete($key): bool
     {
         return \apcu_delete($key);
     }
 
-    public function clear()
+    public function clear(): bool
     {
         return \apcu_clear_cache();
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $values = \apcu_fetch($this->iterableToArray($keys), $success) ?: [];
         return array_merge(array_fill_keys($this->iterableToArray($keys), $default), $values);
     }
 
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         return \apcu_store($this->iterableToArray($values), null, $this->normalizeTtl($ttl)) === [];
     }
 
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         return \apcu_delete($this->iterableToArray($keys)) === [];
     }
 
-    public function has($key)
+    public function has($key): bool
     {
         return \apcu_exists($key);
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
@@ -75,11 +76,7 @@ class ApcuCache implements CacheInterface
     {
         $normalizedTtl = $ttl;
         if ($ttl instanceof DateInterval) {
-            try {
-                $normalizedTtl = (new DateTime('@0'))->add($ttl)->getTimestamp();
-            } catch (Exception $e) {
-                $normalizedTtl = self::TTL_EXPIRED;
-            }
+            $normalizedTtl = (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
         return $normalizedTtl ?? static::TTL_INFINITY;
