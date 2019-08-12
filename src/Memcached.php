@@ -4,7 +4,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Exception\InvalidConfigException;
 
@@ -89,7 +88,7 @@ final class Memcached implements CacheInterface
         return $this->cache->flush();
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $values = $this->cache->getMulti($this->iterableToArray($keys));
         return array_merge(array_fill_keys($this->iterableToArray($keys), $default), $values);
@@ -136,7 +135,7 @@ final class Memcached implements CacheInterface
 
     /**
      * Converts TTL to expiration
-     * @param $ttl
+     * @param int|DateInterval|null $ttl
      * @return int
      */
     private function ttlToExpiration($ttl): int
@@ -155,6 +154,8 @@ final class Memcached implements CacheInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
+     *
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
@@ -162,11 +163,7 @@ final class Memcached implements CacheInterface
     private function normalizeTtl($ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
-            try {
-                return (new DateTime('@0'))->add($ttl)->getTimestamp();
-            } catch (Exception $e) {
-                return static::TTL_EXPIRED;
-            }
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
         return $ttl;
@@ -187,7 +184,7 @@ final class Memcached implements CacheInterface
      */
     private function initServers(array $servers): void
     {
-        if (empty($servers)) {
+        if ($servers === []) {
             $servers = [
                 [self::DEFAULT_SERVER_HOST, self::DEFAULT_SERVER_PORT, self::DEFAULT_SERVER_WEIGHT],
             ];
@@ -231,7 +228,7 @@ final class Memcached implements CacheInterface
      * Validates servers format
      * @param array $servers
      */
-    private function validateServers(array $servers)
+    private function validateServers(array $servers): void
     {
         foreach ($servers as $server) {
             if (!is_array($server) || !isset($server[0], $server[1])) {
