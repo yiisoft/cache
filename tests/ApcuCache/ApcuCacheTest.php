@@ -288,8 +288,7 @@ class ApcuCacheTest extends TestCase
             ],
             'IteratorAggregate' => [
                 ['a' => 1, 'b' => 2,],
-                new class() implements \IteratorAggregate
-                {
+                new class() implements \IteratorAggregate {
                     public function getIterator()
                     {
                         return new \ArrayIterator(['a' => 1, 'b' => 2,]);
