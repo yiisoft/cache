@@ -1,51 +1,44 @@
 language: php
 
 env:
-  global:
-    - DEFAULT_COMPOSER_FLAGS="--prefer-dist --no-interaction --no-progress --optimize-autoloader"
+    global:
+        - DEFAULT_COMPOSER_FLAGS="--prefer-dist --no-interaction --no-progress --optimize-autoloader"
 
 services:
-  - memcached
+    - memcached
 
 # cache vendor dirs
 cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
+    directories:
+        - vendor
+        - $HOME/.composer/cache
 
 matrix:
-  fast_finish: true
-  include:
-    - php: "7.2"
-    - php: "7.3"
-    - php: nightly
+    fast_finish: true
+    include:
+        -   php: "7.2"
+        -   php: "7.3"
+        -   php: nightly
 
-  allow_failures:
-    - php: nightly
+    allow_failures:
+        -   php: nightly
 
 before_install:
-  - phpenv config-rm xdebug.ini || echo "xdebug is not installed"
+    - phpenv config-rm xdebug.ini || echo "xdebug is not installed"
 
 install:
-  - travis_retry composer self-update
-  - travis_retry composer global require hirak/prestissimo
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
-
-  # setup PHP extension
-  - |
-    if [[ $TRAVIS_PHP_VERSION != nightly ]]; then
-      source tests/travis/apcu-setup.sh
-      source tests/travis/memcache-setup.sh
-    fi
+    - travis_retry composer self-update
+    - travis_retry composer global require hirak/prestissimo
+    - export PATH="$HOME/.composer/vendor/bin:$PATH"
+    - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
 
 before_script:
-  # show some versions and env information
-  - php --version
-  - composer --version
+    # show some versions and env information
+    - php --version
+    - composer --version
 
 script:
-  - phpdbg -qrr vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --exclude-group wincache
+    - phpdbg -qrr vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --exclude-group wincache
 
 after_script:
     - travis_retry wget https://scrutinizer-ci.com/ocular.phar
