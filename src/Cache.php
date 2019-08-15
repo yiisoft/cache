@@ -91,7 +91,7 @@ final class Cache implements CacheInterface
     {
         $key = $this->buildKey($key);
         $value = $this->handler->get($key, $default);
-        $value = $this->verifyDependency($value, $default);
+        $value = $this->getValueOrDefaultIfDependencyChanged($value, $default);
 
         return $value;
     }
@@ -120,7 +120,7 @@ final class Cache implements CacheInterface
         $keyMap = $this->buildKeyMap($keys);
         $values = $this->handler->getMultiple(array_keys($keyMap), $default);
         $values = $this->restoreKeys($values, $keyMap);
-        $values = $this->verifyDependencyMultiple($values, $default);
+        $values = $this->getValueOrDefaultIfDependencyChangedMultiple($values, $default);
 
         return $values;
     }
@@ -142,7 +142,7 @@ final class Cache implements CacheInterface
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
         $key = $this->buildKey($key);
-        $value = $this->addDependency($value, $dependency);
+        $value = $this->addEvaluatedDependencyToValue($value, $dependency);
         $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
@@ -197,7 +197,7 @@ final class Cache implements CacheInterface
     {
         $data = [];
         foreach ($values as $key => $value) {
-            $value = $this->addDependency($value, $dependency);
+            $value = $this->addEvaluatedDependencyToValue($value, $dependency);
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
@@ -225,7 +225,7 @@ final class Cache implements CacheInterface
             return false;
         }
 
-        $value = $this->addDependency($value, $dependency);
+        $value = $this->addEvaluatedDependencyToValue($value, $dependency);
         $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
@@ -373,7 +373,7 @@ final class Cache implements CacheInterface
      * @param Dependency|null $dependency
      * @return mixed
      */
-    private function addDependency($value, ?Dependency $dependency)
+    private function addEvaluatedDependencyToValue($value, ?Dependency $dependency)
     {
         if ($dependency === null) {
             return $value;
@@ -404,12 +404,12 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * Checks whether value has a dependency and verifies whether it has changed
+     * Returns value if there is no dependency or it has not been changed and default value otherwise.
      * @param mixed $value
      * @param mixed $default
      * @return mixed
      */
-    private function verifyDependency($value, $default)
+    private function getValueOrDefaultIfDependencyChanged($value, $default)
     {
         if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
             /** @var Dependency $dependency */
@@ -420,6 +420,22 @@ final class Cache implements CacheInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Returns values without dependencies or if dependency has not been changed and default values otherwise.
+     * @param iterable $values
+     * @param mixed $default
+     * @return array
+     */
+    private function getValueOrDefaultIfDependencyChangedMultiple(iterable $values, $default): array
+    {
+        $results = [];
+        foreach ($values as $key => $value) {
+            $results[$key] = $this->getValueOrDefaultIfDependencyChanged($value, $default);
+        }
+
+        return $results;
     }
 
     /**
@@ -452,22 +468,6 @@ final class Cache implements CacheInterface
                 $restoredKey = $keyMap[$key];
             }
             $results[$restoredKey] = $value;
-        }
-
-        return $results;
-    }
-
-    /**
-     * Verifies dependency for each value
-     * @param iterable $values
-     * @param mixed $default
-     * @return array
-     */
-    private function verifyDependencyMultiple(iterable $values, $default): array
-    {
-        $results = [];
-        foreach ($values as $key => $value) {
-            $results[$key] = $this->verifyDependency($value, $default);
         }
 
         return $results;
