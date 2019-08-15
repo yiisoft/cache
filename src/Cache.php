@@ -417,7 +417,6 @@ final class Cache implements CacheInterface
             if ($dependency->isChanged($this)) {
                 return $default;
             }
-            return $value;
         }
 
         return $value;
