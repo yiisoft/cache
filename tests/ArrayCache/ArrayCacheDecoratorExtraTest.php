@@ -7,6 +7,9 @@ use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
+use Yiisoft\Cache\Exception\SetCacheException;
+use Yiisoft\Cache\Tests\FalseCache;
 use Yiisoft\Cache\Tests\TestCase;
 
 class ArrayCacheDecoratorExtraTest extends TestCase
@@ -31,6 +34,38 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $this->assertNull($cache->get('add_test'));
         $this->assertTrue($cache->add('add_test', 13));
         $this->assertSameExceptObject(13, $cache->get('add_test'));
+    }
+
+    public function testAddWithDependency(): void
+    {
+        /** @var Cache $cache */
+        $cache = $this->createCacheInstance();
+
+        $dependency = new TagDependency('tag_test');
+
+        $cache->add('a', 1, null, $dependency);
+
+        $this->assertSameExceptObject(1, $cache->get('a'));
+
+        TagDependency::invalidate($cache, 'tag_test');
+
+        $this->assertSameExceptObject(null, $cache->get('a'));
+    }
+
+    public function testSetMultipleWithDependency(): void
+    {
+        /** @var Cache $cache */
+        $cache = $this->createCacheInstance();
+
+        $dependency = new TagDependency('tag_test');
+
+        $cache->setMultiple(['a' => 1, 'b' => 2], null, $dependency);
+
+        $this->assertSameExceptObject(['a' => 1, 'b' => 2], $cache->getMultiple(['a', 'b']));
+
+        TagDependency::invalidate($cache, 'tag_test');
+
+        $this->assertSameExceptObject(['a' => null, 'b' => null], $cache->getMultiple(['a', 'b']));
     }
 
     public function testAddMultiple(): void
@@ -66,6 +101,32 @@ class ArrayCacheDecoratorExtraTest extends TestCase
             return get_class($cache);
         }));
         $this->assertSameExceptObject($expected, $cache->get('something'));
+    }
+
+    public function testGetOrSetException(): void
+    {
+        $this->expectException(SetCacheException::class);
+
+        $cache = new Cache(new FalseCache());
+
+        $cache->getOrSet('something', static function (CacheInterface $cache): string {
+            return get_class($cache);
+        });
+    }
+
+    public function testSetCacheException(): void
+    {
+        $cache = new Cache(new FalseCache());
+
+        try {
+            $cache->getOrSet('something', static function (CacheInterface $cache): string {
+                return get_class($cache);
+            });
+        } catch (SetCacheException $e) {
+            $this->assertEquals('something', $e->getKey());
+            $this->assertEquals('Yiisoft\Cache\Cache', $e->getValue());
+            $this->assertEquals($cache, $e->getCache());
+        }
     }
 
     public function testGetOrSetWithDependencies(): void
@@ -145,6 +206,15 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $cache->setKeyPrefix('prefix');
         $cache = $this->prepare($cache);
         $this->assertSameExceptObject(1, $cache->get('test_integer'));
+    }
+
+    public function testInvalidKeyPrefix(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        /** @var Cache $cache */
+        $cache = $this->createCacheInstance();
+        $cache->setKeyPrefix('_prefix');
     }
 
     public function testKeyPrefix(): void

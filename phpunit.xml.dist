@@ -23,6 +23,7 @@
             <exclude>
                 <directory>./tests</directory>
                 <directory>./vendor</directory>
+                <file>./src/NullCache.php</file>
             </exclude>
         </whitelist>
     </filter>
