@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Yiisoft\Cache\Dependency;
 
 use Psr\SimpleCache\InvalidArgumentException;
@@ -71,7 +72,7 @@ final class TagDependency extends Dependency
     public static function invalidate(CacheInterface $cache, $tags): void
     {
         $keys = [];
-        foreach ((array) $tags as $tag) {
+        foreach ((array)$tags as $tag) {
             $keys[] = self::buildCacheKey($tag);
         }
         self::touchKeys($cache, $keys);

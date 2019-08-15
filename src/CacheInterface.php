@@ -3,7 +3,6 @@
 namespace Yiisoft\Cache;
 
 use Yiisoft\Cache\Dependency\Dependency;
-use Yiisoft\Cache\Serializer\SerializerInterface;
 
 /**
  * CacheInterface defines the common interface to be implemented by cache classes.
