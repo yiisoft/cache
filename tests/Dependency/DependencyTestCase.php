@@ -22,11 +22,11 @@ abstract class DependencyTestCase extends TestCase
 
     protected function assertDependencyChanged(Dependency $dependency): void
     {
-        $this->assertTrue($dependency->isChanged($this->getCache()), 'Dependecy data was not changed');
+        $this->assertTrue($dependency->isChanged($this->getCache()), 'Dependency data was not changed');
     }
 
     protected function assertDependencyNotChanged(Dependency $dependency): void
     {
-        $this->assertFalse($dependency->isChanged($this->getCache()), 'Dependecy data was changed');
+        $this->assertFalse($dependency->isChanged($this->getCache()), 'Dependency data was changed');
     }
 }

@@ -43,11 +43,11 @@ final class TagDependency extends Dependency
      */
     protected function generateDependencyData(CacheInterface $cache): array
     {
-        $timestamps = $this->getTimestamps($cache, $this->tags);
+        $timestamps = $this->getStoredTagTimestamps($cache, $this->tags);
 
         $newKeys = [];
         foreach ($timestamps as $key => $timestamp) {
-            if ($timestamp === false) {
+            if ($timestamp === null) {
                 $newKeys[] = $key;
             }
         }
@@ -60,7 +60,7 @@ final class TagDependency extends Dependency
 
     public function isChanged(CacheInterface $cache): bool
     {
-        $timestamps = $this->getTimestamps($cache, $this->tags);
+        $timestamps = $this->getStoredTagTimestamps($cache, $this->tags);
         return $timestamps !== $this->data;
     }
 
@@ -102,7 +102,7 @@ final class TagDependency extends Dependency
      * @return array the timestamps indexed by the specified tags.
      * @throws InvalidArgumentException
      */
-    private function getTimestamps(CacheInterface $cache, array $tags): iterable
+    private function getStoredTagTimestamps(CacheInterface $cache, array $tags): iterable
     {
         if (empty($tags)) {
             return [];
