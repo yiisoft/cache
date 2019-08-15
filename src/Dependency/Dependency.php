@@ -32,7 +32,7 @@ abstract class Dependency
     private static $reusableData = [];
 
     /**
-     * Changes dependecy behavior so dependent data for this cache dependency will be generated only once per request.
+     * Changes dependency behavior so dependent data for this cache dependency will be generated only once per request.
      * This allows you to use the same cache dependency for multiple separate cache calls while generating the same
      * page without an overhead of re-evaluating dependency data each time.
      */
@@ -85,6 +85,15 @@ abstract class Dependency
     public static function resetReusableData(): void
     {
         self::$reusableData = [];
+    }
+
+    /**
+     * Checks whether the dependency has already been evaluated.
+     * @return bool
+     */
+    public function isEvaluated(): bool
+    {
+        return $this->data !== null;
     }
 
     /**

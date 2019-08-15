@@ -4,7 +4,7 @@ namespace Yiisoft\Cache\Tests\Dependency;
 use Yiisoft\Cache\Dependency\AnyDependency;
 use Yiisoft\Cache\Dependency\CallbackDependency;
 
-class AnyDependecyTest extends DependencyTestCase
+class AnyDependencyTest extends DependencyTestCase
 {
     public function test(): void
     {
