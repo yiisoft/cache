@@ -120,7 +120,7 @@ final class Cache implements CacheInterface
         $keyMap = $this->buildKeyMap($keys);
         $values = $this->handler->getMultiple(array_keys($keyMap), $default);
         $values = $this->restoreKeys($values, $keyMap);
-        $values = $this->getValueOrDefaultIfDependencyChangedMultiple($values, $default);
+        $values = $this->getValuesOrDefaultIfDependencyChanged($values, $default);
 
         return $values;
     }
@@ -428,7 +428,7 @@ final class Cache implements CacheInterface
      * @param mixed $default
      * @return array
      */
-    private function getValueOrDefaultIfDependencyChangedMultiple(iterable $values, $default): array
+    private function getValuesOrDefaultIfDependencyChanged(iterable $values, $default): array
     {
         $results = [];
         foreach ($values as $key => $value) {
