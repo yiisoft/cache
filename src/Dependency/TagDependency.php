@@ -36,7 +36,6 @@ final class TagDependency extends Dependency
 
     /**
      * Generates the data needed to determine if dependency has been changed.
-     * This method does nothing in this class.
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return mixed the data needed to determine if dependency has been changed.
      * @throws InvalidArgumentException
