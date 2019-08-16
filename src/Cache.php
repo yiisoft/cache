@@ -196,8 +196,9 @@ final class Cache implements CacheInterface
     private function prepareDataForSetOrAddMultiple(iterable $values, ?Dependency $dependency): array
     {
         $data = [];
+        $i = 0;
         foreach ($values as $key => $value) {
-            $value = $this->addEvaluatedDependencyToValue($value, $dependency);
+            $value = $this->addEvaluatedDependencyToValue($value, $dependency, 0 === $i++);
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
@@ -371,15 +372,16 @@ final class Cache implements CacheInterface
      * Evaluates dependency if it is not null and adds it to the value
      * @param mixed $value
      * @param Dependency|null $dependency
+     * @param bool $forceEvaluate
      * @return mixed
      */
-    private function addEvaluatedDependencyToValue($value, ?Dependency $dependency)
+    private function addEvaluatedDependencyToValue($value, ?Dependency $dependency, $forceEvaluate = true)
     {
         if ($dependency === null) {
             return $value;
         }
 
-        if (!$dependency->isEvaluated()) {
+        if (!$dependency->isEvaluated() || $forceEvaluate) {
             $dependency->evaluateDependency($this);
         }
 

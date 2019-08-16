@@ -111,6 +111,16 @@ abstract class Dependency
     }
 
     /**
+     * Converts iterable to array
+     * @param iterable $iterable
+     * @return array
+     */
+    protected function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+    }
+
+    /**
      * Generates the data needed to determine if dependency is changed.
      * Derived classes should override this method to generate the actual dependency data.
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
