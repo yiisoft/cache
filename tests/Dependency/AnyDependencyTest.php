@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Cache\Tests\Dependency;
 
 use Yiisoft\Cache\Dependency\AnyDependency;

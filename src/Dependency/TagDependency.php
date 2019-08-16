@@ -43,16 +43,7 @@ final class TagDependency extends Dependency
     protected function generateDependencyData(CacheInterface $cache): array
     {
         $timestamps = $this->getStoredTagTimestamps($cache, $this->tags);
-
-        $newKeys = [];
-        foreach ($timestamps as $key => $timestamp) {
-            if ($timestamp === null) {
-                $newKeys[] = $key;
-            }
-        }
-        if (!empty($newKeys)) {
-            $timestamps = array_merge($timestamps, self::touchKeys($cache, $newKeys));
-        }
+        $timestamps = $this->storeTimestampsForNewTags($cache, $timestamps);
 
         return $timestamps;
     }
@@ -70,10 +61,7 @@ final class TagDependency extends Dependency
      */
     public static function invalidate(CacheInterface $cache, $tags): void
     {
-        $keys = [];
-        foreach ((array)$tags as $tag) {
-            $keys[] = self::buildCacheKey($tag);
-        }
+        $keys = self::buildCacheKeys($tags);
         self::touchKeys($cache, $keys);
     }
 
@@ -107,10 +95,7 @@ final class TagDependency extends Dependency
             return [];
         }
 
-        $keys = [];
-        foreach ($tags as $tag) {
-            $keys[] = self::buildCacheKey($tag);
-        }
+        $keys = self::buildCacheKeys($tags);
 
         return $cache->getMultiple($keys);
     }
@@ -124,5 +109,41 @@ final class TagDependency extends Dependency
     private static function buildCacheKey(string $tag): string
     {
         return md5(json_encode([__CLASS__, $tag]));
+    }
+
+    /**
+     * Builds array of keys from a given tags
+     * @param mixed $tags
+     * @return array
+     */
+    private static function buildCacheKeys($tags): array
+    {
+        $keys = [];
+        foreach ((array)$tags as $tag) {
+            $keys[] = self::buildCacheKey($tag);
+        }
+
+        return $keys;
+    }
+
+    /**
+     * Generates and stores timestamps for tags that are not stored in the cache yet.
+     * @param CacheInterface $cache
+     * @param iterable $timestamps
+     * @return array
+     */
+    private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps)
+    {
+        $newKeys = [];
+        foreach ($timestamps as $key => $timestamp) {
+            if ($timestamp === null) {
+                $newKeys[] = $key;
+            }
+        }
+        if (!empty($newKeys)) {
+            $timestamps = array_merge($this->iterableToArray($timestamps), self::touchKeys($cache, $newKeys));
+        }
+
+        return $timestamps;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Cache\Tests\Dependency;
 
 use Yiisoft\Cache\ArrayCache;
@@ -32,5 +33,14 @@ class TagDependencyTest extends DependencyTestCase
 
         $this->assertNull($cache->get('item_42_price'));
         $this->assertNull($cache->get('item_42_total'));
+    }
+
+    public function testEmptyTags()
+    {
+        $cache = $this->getCache();
+        $dependency = new TagDependency([]);
+        $cache->set('item_42_price', 13, null, $dependency);
+        $this->assertSame(13, $cache->get('item_42_price'));
+        $this->assertSame([], $this->getInaccessibleProperty($dependency, 'data'));
     }
 }

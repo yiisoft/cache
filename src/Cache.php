@@ -142,7 +142,8 @@ final class Cache implements CacheInterface
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
         $key = $this->buildKey($key);
-        $value = $this->addEvaluatedDependencyToValue($value, $dependency);
+        $dependency = $this->evaluateDependency($dependency);
+        $value = $this->addDependencyToValue($value, $dependency);
         $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
@@ -196,8 +197,9 @@ final class Cache implements CacheInterface
     private function prepareDataForSetOrAddMultiple(iterable $values, ?Dependency $dependency): array
     {
         $data = [];
+        $dependency = $this->evaluateDependency($dependency);
         foreach ($values as $key => $value) {
-            $value = $this->addEvaluatedDependencyToValue($value, $dependency);
+            $value = $this->addDependencyToValue($value, $dependency);
             $key = $this->buildKey($key);
             $data[$key] = $value;
         }
@@ -225,7 +227,8 @@ final class Cache implements CacheInterface
             return false;
         }
 
-        $value = $this->addEvaluatedDependencyToValue($value, $dependency);
+        $dependency = $this->evaluateDependency($dependency);
+        $value = $this->addDependencyToValue($value, $dependency);
         $ttl = $this->normalizeTtl($ttl);
 
         return $this->handler->set($key, $value, $ttl);
@@ -366,21 +369,30 @@ final class Cache implements CacheInterface
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 
+    /**
+     * Evaluates dependency if it is not null
+     * @param Dependency|null $dependency
+     * @return Dependency|null
+     */
+    private function evaluateDependency(?Dependency $dependency)
+    {
+        if ($dependency !== null) {
+            $dependency->evaluateDependency($this);
+        }
+
+        return $dependency;
+    }
 
     /**
-     * Evaluates dependency if it is not null and adds it to the value
+     * Returns array of value and dependency or just value if dependency is null
      * @param mixed $value
      * @param Dependency|null $dependency
      * @return mixed
      */
-    private function addEvaluatedDependencyToValue($value, ?Dependency $dependency)
+    private function addDependencyToValue($value, ?Dependency $dependency)
     {
         if ($dependency === null) {
             return $value;
-        }
-
-        if (!$dependency->isEvaluated()) {
-            $dependency->evaluateDependency($this);
         }
 
         return [$value, $dependency];

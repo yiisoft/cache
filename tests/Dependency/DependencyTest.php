@@ -1,7 +1,11 @@
 <?php
+
 namespace Yiisoft\Cache\Tests\Dependency;
 
+use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\Dependency;
+use Yiisoft\Cache\Dependency\TagDependency;
 
 /**
  * Dependency (abstract) tests.
@@ -41,5 +45,18 @@ class DependencyTest extends DependencyTestCase
         $this->setInaccessibleProperty($dependency, 'data', 'changed');
 
         $this->assertDependencyChanged($dependency);
+    }
+
+    public function testEvaluateDependencyReusable()
+    {
+        $cache = new Cache(new ArrayCache());
+        $dependency = new TagDependency('test');
+        $dependency->markAsReusable();
+        $cache->set('a', 1, null, $dependency);
+        TagDependency::invalidate($cache, 'test');
+        $data1 = $this->getInaccessibleProperty($dependency, 'data');
+        $cache->set('b', 2, null, $dependency);
+        $data2 = $this->getInaccessibleProperty($dependency, 'data');
+        $this->assertEquals($data1, $data2);
     }
 }
