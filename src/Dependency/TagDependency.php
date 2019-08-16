@@ -130,7 +130,7 @@ final class TagDependency extends Dependency
      * Generates and stores timestamps for tags that are not stored in the cache yet.
      * @param CacheInterface $cache
      * @param iterable $timestamps
-     * @return array|iterable
+     * @return array
      */
     private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps)
     {
