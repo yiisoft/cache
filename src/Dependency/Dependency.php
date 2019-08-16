@@ -88,15 +88,6 @@ abstract class Dependency
     }
 
     /**
-     * Checks whether the dependency has already been evaluated.
-     * @return bool
-     */
-    public function isEvaluated(): bool
-    {
-        return $this->data !== null;
-    }
-
-    /**
      * Generates a unique hash that can be used for retrieving reusable dependency data.
      * @return string a unique hash value for this cache dependency.
      * @see isReusable
