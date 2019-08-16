@@ -88,15 +88,6 @@ abstract class Dependency
     }
 
     /**
-     * Checks whether the dependency has already been evaluated.
-     * @return bool
-     */
-    public function isEvaluated(): bool
-    {
-        return $this->data !== null;
-    }
-
-    /**
      * Generates a unique hash that can be used for retrieving reusable dependency data.
      * @return string a unique hash value for this cache dependency.
      * @see isReusable
@@ -108,6 +99,16 @@ abstract class Dependency
         $key = sha1(serialize($this));
         $this->data = $data;
         return $key;
+    }
+
+    /**
+     * Converts iterable to array
+     * @param iterable $iterable
+     * @return array
+     */
+    protected function iterableToArray(iterable $iterable): array
+    {
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 
     /**
