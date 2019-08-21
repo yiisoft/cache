@@ -269,11 +269,12 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $dataWithPrefix = $this->getDataProviderData('for_multiple_');
         $cache->setMultiple($dataWithPrefix);
 
-        $data = array_merge($this->getDataProviderData(), $dataWithPrefix, ['nonexistent-key' => null]);
+        $data = $this->getDataProviderData() + $dataWithPrefix + ['nonexistent-key' => null];
         $dataWithDefault = $data;
         $dataWithDefault['nonexistent-key'] = 'default';
 
         foreach ($data as $key => $value) {
+            $key = (string)$key;
             if ($key === 'nonexistent-key') {
                 $this->assertFalse($cache->has($key));
                 $this->assertSameExceptObject(null, $cache->get($key));

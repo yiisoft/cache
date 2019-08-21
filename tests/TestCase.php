@@ -91,6 +91,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             'null' => ['test_null', null],
             'supported_key_characters' => ['AZaz09_.', 'b'],
             '64_characters_key_max' => ['bVGEIeslJXtDPrtK.hgo6HL25_.1BGmzo4VA25YKHveHh7v9tUP8r5BNCyLhx4zy', 'c'],
+            'string_with_number_key' => ['111', 11],
+            'string_with_number_key_1' => ['022', 22],
         ];
     }
 

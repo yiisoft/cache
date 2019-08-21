@@ -5,6 +5,7 @@ namespace Yiisoft\Cache;
 use DateInterval;
 use DateTime;
 use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
 
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
@@ -20,6 +21,7 @@ final class ArrayCache implements CacheInterface
 
     public function get($key, $default = null)
     {
+        $this->validateKey($key);
         if (isset($this->cache[$key]) && !$this->isExpired($key)) {
             $value = $this->cache[$key][0];
             if (is_object($value)) {
@@ -34,6 +36,7 @@ final class ArrayCache implements CacheInterface
 
     public function set($key, $value, $ttl = null): bool
     {
+        $this->validateKey($key);
         $expiration = $this->ttlToExpiration($ttl);
         if ($expiration < 0) {
             return $this->delete($key);
@@ -47,6 +50,7 @@ final class ArrayCache implements CacheInterface
 
     public function delete($key): bool
     {
+        $this->validateKey($key);
         unset($this->cache[$key]);
         return true;
     }
@@ -59,8 +63,10 @@ final class ArrayCache implements CacheInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
+        $this->validateKey($keys, true);
         $results = [];
         foreach ($keys as $key) {
+            $key = (string)$key;
             $value = $this->get($key, $default);
             $results[$key] = $value;
         }
@@ -69,22 +75,25 @@ final class ArrayCache implements CacheInterface
 
     public function setMultiple($values, $ttl = null): bool
     {
+        $this->validateKey($values, true, true);
         foreach ($values as $key => $value) {
-            $this->set($key, $value, $ttl);
+            $this->set((string)$key, $value, $ttl);
         }
         return true;
     }
 
     public function deleteMultiple($keys): bool
     {
+        $this->validateKey($keys, true);
         foreach ($keys as $key) {
-            $this->delete($key);
+            $this->delete((string)$key);
         }
         return true;
     }
 
     public function has($key): bool
     {
+        $this->validateKey($key);
         return isset($this->cache[$key]) && !$this->isExpired($key);
     }
 
@@ -136,5 +145,28 @@ final class ArrayCache implements CacheInterface
         }
 
         return $ttl;
+    }
+
+    /**
+     * Checks whether key is a legal value or not
+     * @param mixed $key Key or array of keys ([key1, key2] or [key1 => val1, key2 => val2]) to be validated
+     * @param bool $multiple Set to true if $key is an array of the following format [key1, key2]
+     * @param bool $withValues Set to true if $key is an array of the following format [key1 => val1, key2 => val2]
+     */
+    private function validateKey($key, $multiple = false, $withValues = false): void
+    {
+        if ($multiple && !is_iterable($key)) {
+            throw new InvalidArgumentException('Invalid $key value.');
+        }
+        if ($multiple && !$withValues) {
+            foreach ($key as $item) {
+                if (!\is_string($item) && !\is_int($item)) {
+                    throw new InvalidArgumentException('Invalid $key value.');
+                }
+            }
+        }
+        if (!$multiple && !\is_string($key)) {
+            throw new InvalidArgumentException('Invalid $key value.');
+        }
     }
 }
