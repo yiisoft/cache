@@ -5,6 +5,7 @@ namespace Yiisoft\Cache;
 use DateInterval;
 use DateTime;
 use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
 
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
@@ -20,6 +21,7 @@ final class ArrayCache implements CacheInterface
 
     public function get($key, $default = null)
     {
+        $this->validateKey($key);
         if (isset($this->cache[$key]) && !$this->isExpired($key)) {
             $value = $this->cache[$key][0];
             if (is_object($value)) {
@@ -34,6 +36,7 @@ final class ArrayCache implements CacheInterface
 
     public function set($key, $value, $ttl = null): bool
     {
+        $this->validateKey($key);
         $expiration = $this->ttlToExpiration($ttl);
         if ($expiration < 0) {
             return $this->delete($key);
@@ -47,6 +50,7 @@ final class ArrayCache implements CacheInterface
 
     public function delete($key): bool
     {
+        $this->validateKey($key);
         unset($this->cache[$key]);
         return true;
     }
@@ -59,6 +63,8 @@ final class ArrayCache implements CacheInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
+        $keys = $this->iterableToArray($keys);
+        $this->validateKeys($keys);
         $results = [];
         foreach ($keys as $key) {
             $value = $this->get($key, $default);
@@ -69,14 +75,18 @@ final class ArrayCache implements CacheInterface
 
     public function setMultiple($values, $ttl = null): bool
     {
+        $values = $this->iterableToArray($values);
+        $this->validateKeysOfValues($values);
         foreach ($values as $key => $value) {
-            $this->set($key, $value, $ttl);
+            $this->set((string)$key, $value, $ttl);
         }
         return true;
     }
 
     public function deleteMultiple($keys): bool
     {
+        $keys = $this->iterableToArray($keys);
+        $this->validateKeys($keys);
         foreach ($keys as $key) {
             $this->delete($key);
         }
@@ -85,6 +95,7 @@ final class ArrayCache implements CacheInterface
 
     public function has($key): bool
     {
+        $this->validateKey($key);
         return isset($this->cache[$key]) && !$this->isExpired($key);
     }
 
@@ -136,5 +147,48 @@ final class ArrayCache implements CacheInterface
         }
 
         return $ttl;
+    }
+
+    /**
+     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
+     * @param $iterable
+     * @return array
+     */
+    private function iterableToArray($iterable): array
+    {
+        if (!is_iterable($iterable)) {
+            throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
+        }
+
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+    }
+
+    /**
+     * @param $key
+     */
+    private function validateKey($key): void
+    {
+        if (!\is_string($key)) {
+            throw new InvalidArgumentException('Invalid key value.');
+        }
+    }
+
+    /**
+     * @param array $keys
+     */
+    private function validateKeys(array $keys): void
+    {
+        foreach ($keys as $key) {
+            $this->validateKey($key);
+        }
+    }
+
+    /**
+     * @param array $values
+     */
+    private function validateKeysOfValues(array $values): void
+    {
+        $keys = array_map('strval', array_keys($values));
+        $this->validateKeys($keys);
     }
 }
