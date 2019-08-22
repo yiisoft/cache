@@ -81,12 +81,14 @@ class ArrayCacheDecoratorExtraTest extends TestCase
                 [
                     'test_integer' => 13,
                     'add_test' => 13,
+                    '444' => 14,
                 ]
             )
         );
 
         $this->assertSameExceptObject(1, $cache->get('test_integer'));
         $this->assertSameExceptObject(13, $cache->get('add_test'));
+        $this->assertSameExceptObject(14, $cache->get('444'));
     }
 
     public function testGetOrSet(): void
@@ -270,6 +272,7 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $cache->setMultiple($dataWithPrefix);
 
         $data = $this->getDataProviderData() + $dataWithPrefix + ['nonexistent-key' => null];
+        $keys = array_map('strval', array_keys($data));
         $dataWithDefault = $data;
         $dataWithDefault['nonexistent-key'] = 'default';
 
@@ -286,8 +289,8 @@ class ArrayCacheDecoratorExtraTest extends TestCase
             }
         }
 
-        $this->assertSameExceptObject($data, $cache->getMultiple(array_keys($data)));
-        $this->assertSameExceptObject($dataWithDefault, $cache->getMultiple(array_keys($data), 'default'));
+        $this->assertSameExceptObject($data, $cache->getMultiple($keys));
+        $this->assertSameExceptObject($dataWithDefault, $cache->getMultiple($keys, 'default'));
     }
 
     public function testDefaultTtl(): void

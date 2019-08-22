@@ -63,10 +63,10 @@ final class ArrayCache implements CacheInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
-        $this->validateKey($keys, true);
+        $keys = $this->iterableToArray($keys);
+        $this->validateKeys($keys);
         $results = [];
         foreach ($keys as $key) {
-            $key = (string)$key;
             $value = $this->get($key, $default);
             $results[$key] = $value;
         }
@@ -75,7 +75,8 @@ final class ArrayCache implements CacheInterface
 
     public function setMultiple($values, $ttl = null): bool
     {
-        $this->validateKey($values, true, true);
+        $values = $this->iterableToArray($values);
+        $this->validateKeysOfValues($values);
         foreach ($values as $key => $value) {
             $this->set((string)$key, $value, $ttl);
         }
@@ -84,9 +85,10 @@ final class ArrayCache implements CacheInterface
 
     public function deleteMultiple($keys): bool
     {
-        $this->validateKey($keys, true);
+        $keys = $this->iterableToArray($keys);
+        $this->validateKeys($keys);
         foreach ($keys as $key) {
-            $this->delete((string)$key);
+            $this->delete($key);
         }
         return true;
     }
@@ -148,25 +150,45 @@ final class ArrayCache implements CacheInterface
     }
 
     /**
-     * Checks whether key is a legal value or not
-     * @param mixed $key Key or array of keys ([key1, key2] or [key1 => val1, key2 => val2]) to be validated
-     * @param bool $multiple Set to true if $key is an array of the following format [key1, key2]
-     * @param bool $withValues Set to true if $key is an array of the following format [key1 => val1, key2 => val2]
+     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
+     * @param $iterable
+     * @return array
      */
-    private function validateKey($key, $multiple = false, $withValues = false): void
+    private function iterableToArray($iterable): array
     {
-        if ($multiple && !is_iterable($key)) {
-            throw new InvalidArgumentException('Invalid $key value.');
+        if (!is_iterable($iterable)) {
+            throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
         }
-        if ($multiple && !$withValues) {
-            foreach ($key as $item) {
-                if (!\is_string($item) && !\is_int($item)) {
-                    throw new InvalidArgumentException('Invalid $key value.');
-                }
-            }
+
+        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+    }
+
+    /**
+     * @param $key
+     */
+    private function validateKey($key): void
+    {
+        if (!\is_string($key)) {
+            throw new InvalidArgumentException('Invalid key value.');
         }
-        if (!$multiple && !\is_string($key)) {
-            throw new InvalidArgumentException('Invalid $key value.');
+    }
+
+    /**
+     * @param array $keys
+     */
+    private function validateKeys(array $keys): void
+    {
+        foreach ($keys as $key) {
+            $this->validateKey($key);
         }
+    }
+
+    /**
+     * @param array $values
+     */
+    private function validateKeysOfValues(array $values): void
+    {
+        $keys = array_map('strval', array_keys($values));
+        $this->validateKeys($keys);
     }
 }

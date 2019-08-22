@@ -194,36 +194,36 @@ class ArrayCacheTest extends TestCase
 
     public function testGetMultiple(): void
     {
-        /** @var Cache $cache */
         $cache = $this->createCacheInstance();
         $cache->clear();
 
         $data = $this->getDataProviderData();
+        $keys = array_map('strval', array_keys($data));
 
         $cache->setMultiple($data);
 
-        $this->assertSameExceptObject($data, $cache->getMultiple(array_keys($data)));
+        $this->assertSameExceptObject($data, $cache->getMultiple($keys));
     }
 
     public function testDeleteMultiple(): void
     {
-        /** @var Cache $cache */
         $cache = $this->createCacheInstance();
         $cache->clear();
 
         $data = $this->getDataProviderData();
+        $keys = array_map('strval', array_keys($data));
 
         $cache->setMultiple($data);
 
-        $this->assertSameExceptObject($data, $cache->getMultiple(array_keys($data)));
+        $this->assertSameExceptObject($data, $cache->getMultiple($keys));
 
-        $cache->deleteMultiple(array_keys($data));
+        $cache->deleteMultiple($keys);
 
         $emptyData = array_map(static function ($v) {
             return null;
         }, $data);
 
-        $this->assertSameExceptObject($emptyData, $cache->getMultiple(array_keys($data)));
+        $this->assertSameExceptObject($emptyData, $cache->getMultiple($keys));
     }
 
     public function testZeroAndNegativeTtl()

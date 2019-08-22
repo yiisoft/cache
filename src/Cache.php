@@ -118,7 +118,7 @@ final class Cache implements CacheInterface
     public function getMultiple($keys, $default = null): iterable
     {
         $keyMap = $this->buildKeyMap($keys);
-        $values = $this->handler->getMultiple(array_keys($keyMap), $default);
+        $values = $this->handler->getMultiple($this->getKeys($keyMap), $default);
         $values = $this->restoreKeys($values, $keyMap);
         $values = $this->getValuesOrDefaultIfDependencyChanged($values, $default);
 
@@ -171,7 +171,7 @@ final class Cache implements CacheInterface
     public function deleteMultiple($keys): bool
     {
         $keyMap = $this->buildKeyMap($this->iterableToArray($keys));
-        return $this->handler->deleteMultiple(array_keys($keyMap));
+        return $this->handler->deleteMultiple($this->getKeys($keyMap));
     }
 
     /**
@@ -374,7 +374,7 @@ final class Cache implements CacheInterface
      * @param Dependency|null $dependency
      * @return Dependency|null
      */
-    private function evaluateDependency(?Dependency $dependency)
+    private function evaluateDependency(?Dependency $dependency): ?Dependency
     {
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -405,7 +405,7 @@ final class Cache implements CacheInterface
      */
     private function excludeExistingValues(array $values): array
     {
-        $existingValues = $this->handler->getMultiple(array_keys($values));
+        $existingValues = $this->handler->getMultiple($this->getKeys($values));
         foreach ($existingValues as $key => $value) {
             if ($value !== null) {
                 unset($values[$key]);
@@ -483,5 +483,14 @@ final class Cache implements CacheInterface
         }
 
         return $results;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function getKeys(array $data): array
+    {
+        return array_map('strval', array_keys($data));
     }
 }
