@@ -27,6 +27,12 @@
     "require-dev": {
         "phpunit/phpunit": "^8.2"
     },
+    "suggest": {
+        "yiisoft/cache-wincache": "To store cache using WinCache PECL extension",
+        "yiisoft/cache-memcached": "To store cache using memcached PECL extension",
+        "yiisoft/cache-file": "To store cache in files",
+        "yiisoft/cache-apcu": "To store cache using APCu PECL extension"
+    },
     "provide": {
         "psr/simple-cache-implementation": "1.0.0"
     },
