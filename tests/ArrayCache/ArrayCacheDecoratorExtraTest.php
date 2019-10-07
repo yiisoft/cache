@@ -17,7 +17,6 @@ use Yiisoft\Cache\Tests\TestCase;
 
 class ArrayCacheDecoratorExtraTest extends TestCase
 {
-
     protected function tearDown(): void
     {
         MockHelper::resetMocks();
