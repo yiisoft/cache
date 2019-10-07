@@ -2,6 +2,8 @@
 
 namespace Yiisoft\Cache\Tests\ArrayCache;
 
+require_once __DIR__ . '/../MockHelper.php';
+
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\ArrayCache;
@@ -10,10 +12,17 @@ use Yiisoft\Cache\Dependency\TagDependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\SetCacheException;
 use Yiisoft\Cache\Tests\FalseCache;
+use Yiisoft\Cache\Tests\MockHelper;
 use Yiisoft\Cache\Tests\TestCase;
 
 class ArrayCacheDecoratorExtraTest extends TestCase
 {
+
+    protected function tearDown(): void
+    {
+        MockHelper::resetMocks();
+    }
+
     protected function createCacheInstance(): CacheInterface
     {
         return new Cache(new ArrayCache());
@@ -168,6 +177,16 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $this->assertSame(42, $cache->get($key));
     }
 
+    public function testInvalidKey(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        MockHelper::$mock_json_encode = false;
+        $key = [42];
+        $cache = $this->createCacheInstance();
+        $cache->clear();
+        $cache->set($key, 42);
+    }
+
     public function testWithObjectKeys(): void
     {
         $key = new class {
@@ -253,7 +272,7 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $this->featuresTest($cache);
     }
 
-    public function featuresProvider()
+    public function featuresProvider(): array
     {
         // [prefix, normalization]
         return [
@@ -264,7 +283,7 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         ];
     }
 
-    private function featuresTest(Cache $cache)
+    private function featuresTest(Cache $cache): void
     {
         $this->prepare($cache);
 

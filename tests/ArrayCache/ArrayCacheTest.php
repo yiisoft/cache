@@ -9,15 +9,14 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
 use Yiisoft\Cache\ArrayCache;
-use Yiisoft\Cache\Cache;
-use Yiisoft\Cache\MockHelper;
+use Yiisoft\Cache\Tests\MockHelper;
 use Yiisoft\Cache\Tests\TestCase;
 
 class ArrayCacheTest extends TestCase
 {
     protected function tearDown(): void
     {
-        MockHelper::$time = null;
+        MockHelper::resetMocks();
     }
 
     protected function createCacheInstance(): CacheInterface
@@ -30,14 +29,14 @@ class ArrayCacheTest extends TestCase
         $cache = $this->createCacheInstance();
         $cache->clear();
 
-        MockHelper::$time = \time();
+        MockHelper::$mock_time = \time();
         $this->assertTrue($cache->set('expire_test', 'expire_test', 2));
 
-        MockHelper::$time++;
+        MockHelper::$mock_time++;
         $this->assertTrue($cache->has('expire_test'));
         $this->assertSameExceptObject('expire_test', $cache->get('expire_test'));
 
-        MockHelper::$time++;
+        MockHelper::$mock_time++;
         $this->assertFalse($cache->has('expire_test'));
         $this->assertNull($cache->get('expire_test'));
     }
@@ -286,8 +285,8 @@ class ArrayCacheTest extends TestCase
     public function testTtlToExpiration($ttl, $expected): void
     {
         if ($expected === 'calculate_expiration') {
-            MockHelper::$time = \time();
-            $expected = MockHelper::$time + $ttl;
+            MockHelper::$mock_time = \time();
+            $expected = MockHelper::$mock_time + $ttl;
         }
         $cache = new ArrayCache();
         $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));

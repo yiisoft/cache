@@ -2,13 +2,22 @@
 
 namespace Yiisoft\Cache\Tests\Dependency;
 
+require_once __DIR__ . '/../MockHelper.php';
+
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependency\TagDependency;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
+use Yiisoft\Cache\Tests\MockHelper;
 
 class TagDependencyTest extends DependencyTestCase
 {
+    protected function tearDown(): void
+    {
+        MockHelper::resetMocks();
+    }
+
     protected function createCache(): CacheInterface
     {
         // isChanged of TagDependency needs cache access.
@@ -35,12 +44,21 @@ class TagDependencyTest extends DependencyTestCase
         $this->assertNull($cache->get('item_42_total'));
     }
 
-    public function testEmptyTags()
+    public function testEmptyTags(): void
     {
         $cache = $this->getCache();
         $dependency = new TagDependency([]);
         $cache->set('item_42_price', 13, null, $dependency);
         $this->assertSame(13, $cache->get('item_42_price'));
         $this->assertSame([], $this->getInaccessibleProperty($dependency, 'data'));
+    }
+
+    public function testInvalidTag(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        MockHelper::$mock_json_encode = false;
+        $cache = $this->getCache();
+        $dependency = new TagDependency(['test']);
+        $dependency->isChanged($cache);
     }
 }

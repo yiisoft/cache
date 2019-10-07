@@ -36,6 +36,18 @@ class DependencyTest extends DependencyTestCase
         $this->assertSameExceptObject(40, strlen($result));
     }
 
+    public function testIsChangedReusable(): void
+    {
+        /* @var $dependency Dependency */
+        $dependency = $this->getMockForAbstractClass(Dependency::class);
+        $dependency->markAsReusable();
+        $this->assertDependencyNotChanged($dependency);
+
+        $this->setInaccessibleProperty($dependency, 'data', 'changed');
+
+        $this->assertDependencyChanged($dependency);
+    }
+
     public function testIsChanged(): void
     {
         /* @var $dependency Dependency */
