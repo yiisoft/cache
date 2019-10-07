@@ -114,6 +114,7 @@ final class Cache implements CacheInterface
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function getMultiple($keys, $default = null): iterable
     {
@@ -134,10 +135,11 @@ final class Cache implements CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached value. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
@@ -156,10 +158,11 @@ final class Cache implements CacheInterface
      *
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool True on success and false on failure.
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
     {
@@ -180,10 +183,11 @@ final class Cache implements CacheInterface
      *
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
     {
@@ -214,10 +218,11 @@ final class Cache implements CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached value. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function add($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
@@ -240,6 +245,7 @@ final class Cache implements CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @return bool if no error happens during deletion
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function delete($key): bool
     {
@@ -279,11 +285,12 @@ final class Cache implements CacheInterface
      * @param callable|\Closure $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached value. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return mixed result of $callable execution
      * @throws SetCacheException
      * @throws InvalidArgumentException
+     * @suppress PhanTypeInvalidThrowsIsInterface
      */
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null)
     {

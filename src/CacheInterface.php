@@ -41,7 +41,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the value. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      */
@@ -54,7 +54,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      *
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool
      */
@@ -67,7 +67,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the value. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      */
@@ -79,7 +79,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      *
      * @param array $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the cached values. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool
      */
@@ -105,7 +105,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @param callable $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency $dependency dependency of the value. If the dependency changes,
+     * @param Dependency|null $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * @return mixed result of $callable execution
      */
