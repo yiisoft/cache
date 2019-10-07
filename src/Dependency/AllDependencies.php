@@ -37,6 +37,7 @@ class AllDependencies extends Dependency
      *
      * @param CacheInterface $cache
      * @return null
+     * @suppress PhanUnusedProtectedMethodParameter
      */
     protected function generateDependencyData(CacheInterface $cache)
     {

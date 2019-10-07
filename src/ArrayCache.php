@@ -67,7 +67,7 @@ final class ArrayCache implements CacheInterface
         $this->validateKeys($keys);
         $results = [];
         foreach ($keys as $key) {
-            $value = $this->get($key, $default);
+            $value = $this->get((string)$key, $default);
             $results[$key] = $value;
         }
         return $results;
@@ -88,7 +88,7 @@ final class ArrayCache implements CacheInterface
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         foreach ($keys as $key) {
-            $this->delete($key);
+            $this->delete((string)$key);
         }
         return true;
     }
@@ -135,6 +135,7 @@ final class ArrayCache implements CacheInterface
      * Normalizes cache TTL handling strings and {@see DateInterval} objects.
      * @param int|string|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     * @suppress PhanPossiblyFalseTypeReturn
      */
     private function normalizeTtl($ttl): ?int
     {

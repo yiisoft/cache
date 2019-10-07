@@ -37,7 +37,7 @@ final class TagDependency extends Dependency
     /**
      * Generates the data needed to determine if dependency has been changed.
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
-     * @return mixed the data needed to determine if dependency has been changed.
+     * @return array the data needed to determine if dependency has been changed.
      * @throws InvalidArgumentException
      * @suppress PhanTypeInvalidThrowsIsInterface
      */
@@ -87,7 +87,7 @@ final class TagDependency extends Dependency
      * Returns the timestamps for the specified tags.
      * @param CacheInterface $cache
      * @param string[] $tags
-     * @return array the timestamps indexed by the specified tags.
+     * @return iterable the timestamps indexed by the specified tags.
      * @throws InvalidArgumentException
      * @suppress PhanTypeInvalidThrowsIsInterface
      */
@@ -110,7 +110,12 @@ final class TagDependency extends Dependency
      */
     private static function buildCacheKey(string $tag): string
     {
-        return md5(json_encode([__CLASS__, $tag]));
+        $jsonTag = json_encode([__CLASS__, $tag]);
+        if ($jsonTag === false) {
+            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid tag.');
+        }
+
+        return md5($jsonTag);
     }
 
     /**
@@ -122,7 +127,7 @@ final class TagDependency extends Dependency
     {
         $keys = [];
         foreach ((array)$tags as $tag) {
-            $keys[] = self::buildCacheKey($tag);
+            $keys[] = self::buildCacheKey((string)$tag);
         }
 
         return $keys;
@@ -134,7 +139,7 @@ final class TagDependency extends Dependency
      * @param iterable $timestamps
      * @return array
      */
-    private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps)
+    private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps): array
     {
         $newKeys = [];
         foreach ($timestamps as $key => $timestamp) {
@@ -142,8 +147,9 @@ final class TagDependency extends Dependency
                 $newKeys[] = $key;
             }
         }
+        $timestamps = $this->iterableToArray($timestamps);
         if (!empty($newKeys)) {
-            $timestamps = array_merge($this->iterableToArray($timestamps), self::touchKeys($cache, $newKeys));
+            $timestamps = array_merge($timestamps, self::touchKeys($cache, $newKeys));
         }
 
         return $timestamps;

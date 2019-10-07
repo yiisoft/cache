@@ -56,9 +56,9 @@ final class Cache implements CacheInterface
     private $defaultTtl;
 
     /**
-     * @param \Psr\SimpleCache\CacheInterface cache handler.
+     * @param \Psr\SimpleCache\CacheInterface $handler cache handler.
      */
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler = null)
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler)
     {
         $this->handler = $handler;
     }
@@ -80,7 +80,11 @@ final class Cache implements CacheInterface
             $key = (string)$key;
             $normalizedKey = ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
         } else {
-            $normalizedKey = $this->keyPrefix . md5(json_encode($key));
+            $jsonKey = json_encode($key);
+            if ($jsonKey === false) {
+                throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid key.');
+            }
+            $normalizedKey = $this->keyPrefix . md5($jsonKey);
         }
 
         return $this->keyPrefix . $normalizedKey;
@@ -108,7 +112,7 @@ final class Cache implements CacheInterface
      * Some caches, such as memcached or apcu, allow retrieving multiple cached values at the same time,
      * which may improve the performance. In case a cache does not support this feature natively,
      * this method will try to simulate it.
-     * @param string[] $keys list of string keys identifying the cached values
+     * @param iterable $keys list of string keys identifying the cached values
      * @param mixed $default Default value to return for keys that do not exist.
      * @return iterable list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
@@ -118,7 +122,7 @@ final class Cache implements CacheInterface
      */
     public function getMultiple($keys, $default = null): iterable
     {
-        $keyMap = $this->buildKeyMap($keys);
+        $keyMap = $this->buildKeyMap($this->iterableToArray($keys));
         $values = $this->handler->getMultiple($this->getKeys($keyMap), $default);
         $values = $this->restoreKeys($values, $keyMap);
         $values = $this->getValuesOrDefaultIfDependencyChanged($values, $default);
@@ -156,7 +160,7 @@ final class Cache implements CacheInterface
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param array $values the values to be cached, as key-value pairs.
+     * @param iterable $values the values to be cached, as key-value pairs.
      * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
@@ -352,6 +356,7 @@ final class Cache implements CacheInterface
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      * @param int|DateInterval|null $ttl raw TTL.
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
+     * @suppress PhanPossiblyFalseTypeReturn
      */
     protected function normalizeTtl($ttl): ?int
     {
