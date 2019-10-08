@@ -2,8 +2,6 @@
 
 namespace Yiisoft\Cache\Tests\Dependency;
 
-require_once __DIR__ . '/../MockHelper.php';
-
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;

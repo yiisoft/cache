@@ -2,8 +2,6 @@
 
 namespace Yiisoft\Cache\Tests\ArrayCache;
 
-require_once __DIR__ . '/../MockHelper.php';
-
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\ArrayCache;

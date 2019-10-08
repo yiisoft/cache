@@ -112,7 +112,7 @@ final class TagDependency extends Dependency
     {
         $jsonTag = json_encode([__CLASS__, $tag]);
         if ($jsonTag === false) {
-            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid tag.');
+            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid tag. ' . json_last_error_msg());
         }
 
         return md5($jsonTag);

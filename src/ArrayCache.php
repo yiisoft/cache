@@ -67,7 +67,8 @@ final class ArrayCache implements CacheInterface
         $this->validateKeys($keys);
         $results = [];
         foreach ($keys as $key) {
-            $value = $this->get((string)$key, $default);
+            assert(is_string($key));
+            $value = $this->get($key, $default);
             $results[$key] = $value;
         }
         return $results;
@@ -88,7 +89,8 @@ final class ArrayCache implements CacheInterface
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         foreach ($keys as $key) {
-            $this->delete((string)$key);
+            assert(is_string($key));
+            $this->delete($key);
         }
         return true;
     }

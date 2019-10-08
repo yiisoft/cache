@@ -55,9 +55,6 @@ final class Cache implements CacheInterface
      */
     private $defaultTtl;
 
-    /**
-     * @param \Psr\SimpleCache\CacheInterface $handler cache handler.
-     */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler)
     {
         $this->handler = $handler;
@@ -82,7 +79,7 @@ final class Cache implements CacheInterface
         } else {
             $jsonKey = json_encode($key);
             if ($jsonKey === false) {
-                throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid key.');
+                throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid key. ' . json_last_error_msg());
             }
             $normalizedKey = $this->keyPrefix . md5($jsonKey);
         }
