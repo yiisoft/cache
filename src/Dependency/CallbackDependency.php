@@ -19,6 +19,11 @@ class CallbackDependency extends Dependency
         $this->callback = $callback;
     }
 
+    /**
+     * @param CacheInterface $cache
+     * @return mixed
+     * @suppress PhanUnusedProtectedMethodParameter
+     */
     protected function generateDependencyData(CacheInterface $cache)
     {
         $callback = $this->callback;
