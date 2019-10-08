@@ -23,6 +23,12 @@ final class FileDependency extends Dependency
         $this->fileName = $fileName;
     }
 
+    /**
+     * @param CacheInterface $cache
+     * @return false|int|mixed
+     * @suppress PhanUnusedProtectedMethodParameter
+     * @suppress PhanUnusedProtectedFinalMethodParameter
+     */
     protected function generateDependencyData(CacheInterface $cache)
     {
         clearstatcache(false, $this->fileName);

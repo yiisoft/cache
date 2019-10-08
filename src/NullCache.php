@@ -9,6 +9,7 @@ use Yiisoft\Cache\Dependency\Dependency;
  *
  * By replacing it with some other cache component, one can quickly switch from
  * non-caching mode to caching mode.
+ * @phan-file-suppress PhanUnusedPublicFinalMethodParameter
  */
 final class NullCache implements CacheInterface
 {
