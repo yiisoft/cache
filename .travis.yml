@@ -28,6 +28,7 @@ install:
     - travis_retry composer global require hirak/prestissimo
     - export PATH="$HOME/.composer/vendor/bin:$PATH"
     - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
+    - pecl install ast
 
 before_script:
     # show some versions and env information
@@ -36,6 +37,8 @@ before_script:
 
 script:
     - phpdbg -qrr vendor/bin/phpunit --verbose --coverage-clover=coverage.clover
+    - composer phan
+    - cat analysis.txt
 
 after_script:
     - travis_retry wget https://scrutinizer-ci.com/ocular.phar

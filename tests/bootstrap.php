@@ -9,4 +9,5 @@ error_reporting(E_ALL);
     }
 
     require_once $composerAutoload;
+    require_once 'MockHelper.php';
 })();
