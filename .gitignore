@@ -24,3 +24,6 @@ phpunit.phar
 
 /tests/runtime
 /tests/*/runtime
+
+# Phan
+analysis.txt
