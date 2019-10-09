@@ -37,7 +37,6 @@ namespace Yiisoft\Cache\Tests {
      */
     function json_encode($value, $options = 0, $depth = 512)
     {
-        var_dump('mocked');
         return MockHelper::$mock_json_encode ?? \json_encode($value, $options, $depth);
     }
 }
