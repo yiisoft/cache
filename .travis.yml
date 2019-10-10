@@ -43,6 +43,9 @@ script:
     - |
         if [ $TASK_STATIC_ANALYSIS == 1 ]; then
           composer phan
+        fi
+    - |
+        if [ $TASK_STATIC_ANALYSIS == 1 ]; then
           cat analysis.txt
         fi
 
