@@ -9,11 +9,11 @@ class AnyDependencyTest extends DependencyTestCase
 {
     public function test(): void
     {
-        $data1 = new class {
+        $data1 = new class() {
             public $data = 1;
         };
 
-        $data2 = new class {
+        $data2 = new class() {
             public $data = 2;
         };
 

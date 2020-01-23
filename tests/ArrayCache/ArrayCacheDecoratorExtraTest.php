@@ -186,7 +186,7 @@ class ArrayCacheDecoratorExtraTest extends TestCase
 
     public function testWithObjectKeys(): void
     {
-        $key = new class {
+        $key = new class() {
             public $value = 42;
         };
         $cache = $this->createCacheInstance();
