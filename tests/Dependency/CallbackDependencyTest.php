@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Cache\Tests\Dependency;
 
 use Yiisoft\Cache\Dependency\CallbackDependency;
@@ -24,7 +25,7 @@ class CallbackDependencyTest extends DependencyTestCase
 
     public function testScopeWithObject(): void
     {
-        $dataObject = new class {
+        $dataObject = new class() {
             public $value = 42;
         };
 
