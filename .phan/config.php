@@ -43,7 +43,7 @@ return [
     // Note that the **only** effect of choosing `'5.6'` is to infer that functions removed in php 7.0 exist.
     // (See `backward_compatibility_checks` for additional options)
     // Automatically inferred from composer.json requirement for "php" of ">=7.1.0"
-    'target_php_version' => '7.1',
+    'target_php_version' => '7.4',
 
     // If enabled, missing properties will be created when
     // they are first seen. If false, we'll report an
@@ -285,7 +285,7 @@ return [
     // directories/files, unanalyzable files, or files that
     // can't be removed for whatever reason.
     // (e.g. `'@Test\.php$@'`, or `'@vendor/.*/(tests|Tests)/@'`)
-    'exclude_file_regex' => '@^vendor/.*/(tests?|Tests?)/@',
+    'exclude_file_regex' => '@^vendor/.*/(tests?|Tests?|vendor)/@',
 
     // A file list that defines files that will be excluded
     // from parsing and analysis and will not be read at all.
@@ -364,8 +364,7 @@ return [
     // your application should be included in this list.
     'directory_list' => [
         'src',
-        'vendor/phpunit/phpunit/src',
-        'vendor/psr/simple-cache/src',
+        'vendor'
     ],
 
     // A list of individual files to include in analysis
