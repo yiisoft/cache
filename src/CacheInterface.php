@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Cache;
 
 use Yiisoft\Cache\Dependency\Dependency;
