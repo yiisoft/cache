@@ -6,7 +6,7 @@
     <br>
 </p>
 
-This library provides [PSR-16] compatible caching library.
+This library provides a wrapper around [PSR-16] compatible caching libraries adding more features.
 It is used in [Yii Framework] but is usable separately.
 
 [PSR-16]: https://www.php-fig.org/psr/psr-16/
