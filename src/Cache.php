@@ -83,7 +83,7 @@ final class Cache implements CacheInterface
             if ($jsonKey === false) {
                 throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid key. ' . json_last_error_msg());
             }
-            $normalizedKey = $this->keyPrefix . md5($jsonKey);
+            $normalizedKey = md5($jsonKey);
         }
 
         return $this->keyPrefix . $normalizedKey;
