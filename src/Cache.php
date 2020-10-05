@@ -40,22 +40,22 @@ final class Cache implements CacheInterface
     /**
      * @var \Psr\SimpleCache\CacheInterface actual cache handler.
      */
-    private $handler;
+    private \Psr\SimpleCache\CacheInterface $handler;
 
     /**
      * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
      * It is recommended that you set a unique cache key prefix for each application if the same cache
      * storage is being used by different applications.
      */
-    private $keyPrefix = '';
+    private string $keyPrefix = '';
 
-    private $keyNormalization = true;
+    private bool $keyNormalization = true;
 
     /**
      * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
      * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
      */
-    private $defaultTtl;
+    private ?int $defaultTtl = null;
 
     public function __construct(\Psr\SimpleCache\CacheInterface $handler)
     {
