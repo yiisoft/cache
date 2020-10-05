@@ -19,7 +19,7 @@ final class ArrayCache implements CacheInterface
     private const EXPIRATION_INFINITY = 0;
     private const EXPIRATION_EXPIRED = -1;
 
-    private $cache = [];
+    private array $cache = [];
 
     public function get($key, $default = null)
     {
