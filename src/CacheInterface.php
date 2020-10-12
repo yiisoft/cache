@@ -39,8 +39,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param mixed $key a key identifying the value to be cached. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
+     * @param string $key a key identifying the value to be cached.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the value. If the dependency changes,
@@ -65,15 +64,14 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * Nothing will be done if the cache already contains the key.
-     * @param mixed $key a key identifying the value to be cached. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
+     * @param string $key a key identifying the value to be cached.
      * @param mixed $value the value to be cached
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      */
-    public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool;
+    public function add(string $key, $value, $ttl = 0, Dependency $dependency = null): bool;
 
     /**
      * Stores multiple values in cache. Each value is identified by a key.
@@ -102,8 +100,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * }
      * ```
      *
-     * @param mixed $key a key identifying the value to be cached. This can be a simple string or
-     * a complex data structure consisting of factors representing the key.
+     * @param string $key a key identifying the value to be cached.
      * @param callable $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
      * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
@@ -111,11 +108,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      * @return mixed result of $callable execution
      */
-    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null);
-
-    public function enableKeyNormalization(): void;
-
-    public function disableKeyNormalization(): void;
+    public function getOrSet(string $key, callable $callable, $ttl = null, Dependency $dependency = null);
 
     public function setKeyPrefix(string $keyPrefix): void;
 }
