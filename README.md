@@ -25,7 +25,6 @@ It is used in [Yii Framework] but is usable separately.
 - Built on top of PSR-16, could be used as PSR-16 cache or use any PSR-16 cache as backend.
 - Provides multiple cache backends: APC, PHP array, files, memcached, WinCache.
 - Customizable way of serializing data. Out of the box PHP, JSON, Igbinary and custom callbacks are supported.
-- Supports non-string keys.
 - Ability to set default TTL and key prefix per cache instance.
 - Easy to implement your own cache backends extending from `SimpleCache`.
 - Adds cache invalidation dependencies on top of PSR-16. Out of the box supports invalidation by tag and invalidation by 
