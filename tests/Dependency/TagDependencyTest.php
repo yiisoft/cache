@@ -58,7 +58,7 @@ class TagDependencyTest extends DependencyTestCase
         $this->expectException(InvalidArgumentException::class);
         MockHelper::$mock_json_encode = false;
         $cache = $this->getCache();
-        $dependency = new TagDependency(['test']);
+        $dependency = new TagDependency('test');
         $dependency->isChanged($cache);
     }
 }

@@ -15,7 +15,7 @@ abstract class DependencyTestCase extends TestCase
 
     protected function getCache(): CacheInterface
     {
-        return $this->cache ?? $this->cache = $this->createCache();
+        return $this->cache ??= $this->createCache();
     }
 
     protected function createCache(): CacheInterface
