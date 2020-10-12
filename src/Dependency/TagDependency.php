@@ -41,7 +41,7 @@ final class TagDependency extends Dependency
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      * @return array the data needed to determine if dependency has been changed.
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     protected function generateDependencyData(CacheInterface $cache): array
     {
@@ -91,7 +91,7 @@ final class TagDependency extends Dependency
      * @param string[] $tags
      * @return iterable the timestamps indexed by the specified tags.
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     private function getStoredTagTimestamps(CacheInterface $cache, array $tags): iterable
     {

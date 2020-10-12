@@ -117,7 +117,7 @@ final class Cache implements CacheInterface
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function getMultiple($keys, $default = null): iterable
     {
@@ -142,7 +142,7 @@ final class Cache implements CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
@@ -165,7 +165,7 @@ final class Cache implements CacheInterface
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool True on success and false on failure.
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
     {
@@ -190,7 +190,7 @@ final class Cache implements CacheInterface
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
     {
@@ -225,7 +225,7 @@ final class Cache implements CacheInterface
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
      * @return bool whether the value is successfully stored into cache
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function add($key, $value, $ttl = null, Dependency $dependency = null): bool
     {
@@ -248,7 +248,7 @@ final class Cache implements CacheInterface
      * a complex data structure consisting of factors representing the key.
      * @return bool if no error happens during deletion
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function delete($key): bool
     {
@@ -293,7 +293,7 @@ final class Cache implements CacheInterface
      * @return mixed result of $callable execution
      * @throws SetCacheException
      * @throws InvalidArgumentException
-     * @suppress PhanTypeInvalidThrowsIsInterface
+     * @psalm-suppress InvalidThrow
      */
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null)
     {
