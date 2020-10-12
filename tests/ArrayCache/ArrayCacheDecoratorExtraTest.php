@@ -164,18 +164,6 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $this->assertSameExceptObject($expected, $cache->getOrSet('some-login', $loginClosure, null, $dependency));
     }
 
-    public function testWithArrayKeys(): void
-    {
-        $key = [42];
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        $this->assertNull($cache->get($key));
-
-        $cache->set($key, 42);
-        $this->assertSame(42, $cache->get($key));
-    }
-
     public function testInvalidKey(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -184,39 +172,6 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $cache = $this->createCacheInstance();
         $cache->clear();
         $cache->set($key, 42);
-    }
-
-    public function testWithObjectKeys(): void
-    {
-        $key = new class() {
-            public $value = 42;
-        };
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-
-        $this->assertNull($cache->get($key));
-
-        $cache->set($key, 42);
-        $this->assertSame(42, $cache->get($key));
-    }
-
-    public function testNormalizeKey(): void
-    {
-        /** @var Cache $cache */
-        $cache = $this->createCacheInstance();
-        $cache->clear();
-        $cache->enableKeyNormalization();
-
-        $cache->set('test_normalized', 1);
-
-        $cache->disableKeyNormalization();
-
-        $cache->set('test_not_normalized', 2);
-
-        $cache->disableKeyNormalization();
-        $this->assertFalse($cache->has('test_normalized'));
-        $this->assertSameExceptObject(1, $cache->get('2753a58fdc3bf713af86cb3a97a55e57'));
-        $this->assertSameExceptObject(2, $cache->get('test_not_normalized'));
     }
 
     public function testGetWithPrefix(): void
@@ -242,7 +197,6 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         /** @var Cache $cache */
         $cache = $this->createCacheInstance();
         $cache->clear();
-        $cache->disableKeyNormalization();
         $cache->setKeyPrefix('prefix');
 
         $cache->set('test_with_prefix', 1);
@@ -258,27 +212,23 @@ class ArrayCacheDecoratorExtraTest extends TestCase
     }
 
     /**
-     * @dataProvider featuresProvider
-     * @param $features
+     * @dataProvider prefixProvider
      */
-    public function testFeatures($features): void
+    public function testFeatures(string $prefix): void
     {
         /** @var Cache $cache */
         $cache = $this->createCacheInstance();
-        $cache->setKeyPrefix($features[0]);
-        $features[1] ? $cache->enableKeyNormalization() : $cache->disableKeyNormalization();
-
+        $cache->setKeyPrefix($prefix);
         $this->featuresTest($cache);
     }
 
-    public function featuresProvider(): array
+    public function prefixProvider(): array
     {
-        // [prefix, normalization]
         return [
-            [['', false]],
-            [['testprefix', false]],
-            [['testprefix', true]],
-            [['', true]],
+            [''],
+            ['testprefix'],
+            ['testprefix'],
+            [''],
         ];
     }
 

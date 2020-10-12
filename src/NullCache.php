@@ -105,12 +105,9 @@ final class NullCache implements CacheInterface
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 
-    /**
-     * @param $key
-     */
-    private function validateKey($key): void
+    private function validateKey(string $key): void
     {
-        if (!\is_string($key) || strpbrk($key, '{}()/\@:')) {
+        if (strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
