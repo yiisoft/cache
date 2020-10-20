@@ -27,7 +27,7 @@
     "require-dev": {
         "infection/infection": "^0.16.3",
         "phpunit/phpunit": "^9.3",
-        "vimeo/psalm": "^3.15"
+        "vimeo/psalm": "^3.15 || ^4.0"
     },
     "suggest": {
         "yiisoft/cache-wincache": "To store cache using WinCache PECL extension",
