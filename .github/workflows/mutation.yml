@@ -31,6 +31,8 @@ jobs:
           ini-values: memory_limit=-1
           coverage: "pcov"
           tools: composer:v2
+        env:
+          update: true
 
       - name: Determine composer cache directory
         run: echo "COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
