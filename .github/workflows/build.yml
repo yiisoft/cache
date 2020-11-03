@@ -83,6 +83,7 @@ jobs:
       - name: Run tests with phpunit without coverage
         if: matrix.os != 'ubuntu-latest' || matrix.php != '7.4'
         run: vendor/bin/phpunit --colors=always
+        shell: bash
 
       - name: Upload code coverage scrutinizer on Linux php 7.4
         if: matrix.os == 'ubuntu-latest' && matrix.php == '7.4'
