@@ -9,7 +9,7 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          stopOnFailure="false"
-         executionOrder="random"
+         executionOrder="default"
          resolveDependencies="true">
     <php>
         <ini name="error_reporting" value="-1"/>
