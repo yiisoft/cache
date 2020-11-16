@@ -44,7 +44,7 @@ final class CacheKeyNormalizerTest extends TestCase
                 $this->encode($object),
             ],
             'empty-object' => [$object = new stdClass(), $this->encode($object)],
-            'callable' => [$callable = fn() => null, $this->encode($callable)],
+            'callable' => [$callable = fn () => null, $this->encode($callable)],
         ];
     }
 
