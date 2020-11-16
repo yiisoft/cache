@@ -60,8 +60,9 @@ final class CacheKeyNormalizerTest extends TestCase
 
     public function testNormalizeThrowExceptionForInvalidKey(): void
     {
+        $resource = fopen('php://memory', 'r');
         $this->expectException(InvalidArgumentException::class);
-        $this->normalizer->normalize($resource = fopen('php://memory', 'r'));
+        $this->normalizer->normalize($resource);
         fclose($resource);
     }
 
