@@ -10,7 +10,7 @@ build:
         analysis:
             environment:
                 php: 7.4.12
-                
+
             tests:
                 override:
                     - php-scrutinizer-run
@@ -18,9 +18,10 @@ build:
         tests-and-coverage:
             environment:
                 php: 7.4.12
-        
+
             dependencies:
                 override:
+                    - composer self-update
                     - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
             tests:
@@ -30,6 +31,6 @@ build:
                         on_node: 1
                         coverage:
                             file: coverage.xml
-                            format: php-clover      
-                                          
+                            format: php-clover
+
 
