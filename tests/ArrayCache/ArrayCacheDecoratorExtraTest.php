@@ -183,15 +183,6 @@ class ArrayCacheDecoratorExtraTest extends TestCase
         $this->assertSameExceptObject(1, $cache->get('test_integer'));
     }
 
-    public function testInvalidKeyPrefix(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        /** @var Cache $cache */
-        $cache = $this->createCacheInstance();
-        $cache->setKeyPrefix('_prefix');
-    }
-
     public function testKeyPrefix(): void
     {
         /** @var Cache $cache */
