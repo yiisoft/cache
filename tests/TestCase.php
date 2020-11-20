@@ -11,12 +11,15 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * Invokes a inaccessible method.
+     *
      * @param $object
      * @param $method
      * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution
-     * @return mixed
+     *
      * @throws \ReflectionException
+     *
+     * @return mixed
      */
     protected function invokeMethod($object, $method, array $args = [], bool $revoke = true)
     {
@@ -33,10 +36,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Sets an inaccessible object property to a designated value.
+     *
      * @param $object
      * @param $propertyName
      * @param $value
      * @param bool $revoke whether to make property inaccessible after setting
+     *
      * @throws \ReflectionException
      */
     protected function setInaccessibleProperty($object, $propertyName, $value, bool $revoke = true): void
@@ -53,14 +58,16 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-
     /**
      * Gets an inaccessible object property.
+     *
      * @param $object
      * @param $propertyName
      * @param bool $revoke whether to make property inaccessible after getting
-     * @return mixed
+     *
      * @throws \ReflectionException
+     *
+     * @return mixed
      */
     protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
     {
@@ -109,12 +116,14 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         return $data;
     }
 
-
     /**
      * This function configures given cache to match some expectations
+     *
      * @param CacheInterface $cache
-     * @return CacheInterface
+     *
      * @throws InvalidArgumentException
+     *
+     * @return CacheInterface
      */
     public function prepare(CacheInterface $cache): CacheInterface
     {

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests {
-
     class MockHelper
     {
         /**
@@ -12,7 +11,7 @@ namespace Yiisoft\Cache\Tests {
          */
         public static $mock_time;
         /**
-         * @var string|false value to be returned by mocked json_encode() function.
+         * @var false|string value to be returned by mocked json_encode() function.
          * null means normal json_encode() behavior.
          */
         public static $mock_json_encode;
@@ -26,6 +25,7 @@ namespace Yiisoft\Cache\Tests {
 
     /**
      * Mock for the time() function
+     *
      * @return int
      */
     function time(): int
@@ -35,7 +35,8 @@ namespace Yiisoft\Cache\Tests {
 
     /**
      * Mock for the json_encode() function
-     * @return string|false
+     *
+     * @return false|string
      */
     function json_encode($value, $options = 0, $depth = 512)
     {

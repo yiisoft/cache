@@ -46,6 +46,7 @@ abstract class Dependency
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
      * This method is invoked by cache before writing data into it.
+     *
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
      */
     public function evaluateDependency(CacheInterface $cache): void
@@ -63,7 +64,9 @@ abstract class Dependency
 
     /**
      * Checks whether the dependency is changed.
+     *
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     *
      * @return bool whether the dependency has changed.
      */
     public function isChanged(CacheInterface $cache): bool
@@ -91,7 +94,9 @@ abstract class Dependency
 
     /**
      * Generates a unique hash that can be used for retrieving reusable dependency data.
+     *
      * @return string a unique hash value for this cache dependency.
+     *
      * @see isReusable
      */
     protected function generateReusableHash(): string
@@ -105,7 +110,9 @@ abstract class Dependency
 
     /**
      * Converts iterable to array
+     *
      * @param iterable $iterable
+     *
      * @return array
      */
     protected function iterableToArray(iterable $iterable): array
@@ -116,7 +123,9 @@ abstract class Dependency
     /**
      * Generates the data needed to determine if dependency is changed.
      * Derived classes should override this method to generate the actual dependency data.
+     *
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     *
      * @return mixed the data needed to determine if dependency has been changed.
      */
     abstract protected function generateDependencyData(CacheInterface $cache);

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests;
 
-use PHPUnit\Framework\TestCase;
-use stdClass;
-use Yiisoft\Cache\Exception\InvalidArgumentException;
-use Yiisoft\Cache\CacheKeyNormalizer;
-
 use function fclose;
 use function fopen;
 use function json_encode;
 use function md5;
+
+use PHPUnit\Framework\TestCase;
+use stdClass;
+use Yiisoft\Cache\CacheKeyNormalizer;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
 
 final class CacheKeyNormalizerTest extends TestCase
 {
@@ -50,6 +50,7 @@ final class CacheKeyNormalizerTest extends TestCase
 
     /**
      * @dataProvider keyDataProvider
+     *
      * @param mixed $key
      * @param string $excepted
      */
@@ -68,6 +69,7 @@ final class CacheKeyNormalizerTest extends TestCase
 
     /**
      * @param mixed $key
+     *
      * @return string
      */
     private function encode($key): string
