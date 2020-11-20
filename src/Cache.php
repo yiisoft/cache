@@ -63,7 +63,8 @@ final class Cache implements CacheInterface
     /**
      * Builds a normalized cache key from a given key by appending key prefix.
      *
-     * @param string|mixed $key the key to be normalized
+     * @param mixed|string $key the key to be normalized
+     *
      * @return string the generated cache key
      */
     private function buildKey($key): string
@@ -74,16 +75,12 @@ final class Cache implements CacheInterface
         return $this->keyPrefix . $key;
     }
 
-
     public function get($key, $default = null)
     {
         $key = $this->buildKey($key);
         $value = $this->handler->get($key, $default);
-        $value = $this->getValueOrDefaultIfDependencyChanged($value, $default);
-
-        return $value;
+        return $this->getValueOrDefaultIfDependencyChanged($value, $default);
     }
-
 
     public function has($key): bool
     {
@@ -96,12 +93,15 @@ final class Cache implements CacheInterface
      * Some caches, such as memcached or apcu, allow retrieving multiple cached values at the same time,
      * which may improve the performance. In case a cache does not support this feature natively,
      * this method will try to simulate it.
+     *
      * @param iterable $keys list of string keys identifying the cached values
      * @param mixed $default Default value to return for keys that do not exist.
+     *
+     * @throws InvalidArgumentException
+     *
      * @return iterable list of cached values corresponding to the specified keys. The array
      * is returned in terms of (key, value) pairs.
      * If a value is not cached or expired, the corresponding array value will be false.
-     * @throws InvalidArgumentException
      * @psalm-suppress InvalidThrow
      */
     public function getMultiple($keys, $default = null): iterable
@@ -109,9 +109,7 @@ final class Cache implements CacheInterface
         $keyMap = $this->buildKeyMap($this->iterableToArray($keys));
         $values = $this->handler->getMultiple($this->getKeys($keyMap), $default);
         $values = $this->restoreKeys($values, $keyMap);
-        $values = $this->getValuesOrDefaultIfDependencyChanged($values, $default);
-
-        return $values;
+        return $this->getValuesOrDefaultIfDependencyChanged($values, $default);
     }
 
     /**
@@ -121,11 +119,13 @@ final class Cache implements CacheInterface
      *
      * @param string $key a key identifying the value to be cached.
      * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL of this value. If not set, default value is used.
+     * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     * @return bool whether the value is successfully stored into cache
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool whether the value is successfully stored into cache
      * @psalm-suppress InvalidThrow
      */
     public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
@@ -144,11 +144,13 @@ final class Cache implements CacheInterface
      * expiration time will be replaced with the new ones, respectively.
      *
      * @param array $values the values to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     * @return bool True on success and false on failure.
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool True on success and false on failure.
      * @psalm-suppress InvalidThrow
      */
     public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
@@ -169,11 +171,13 @@ final class Cache implements CacheInterface
      * If the cache already contains such a key, the existing value and expiration time will be preserved.
      *
      * @param array $values the values to be cached, as key-value pairs.
-     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     * @return bool
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool
      * @psalm-suppress InvalidThrow
      */
     public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
@@ -201,13 +205,16 @@ final class Cache implements CacheInterface
     /**
      * Stores a value identified by a key into cache if the cache does not contain this key.
      * Nothing will be done if the cache already contains the key.
+     *
      * @param string $key a key identifying the value to be cached.
      * @param mixed $value the value to be cached
-     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     * @return bool whether the value is successfully stored into cache
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool whether the value is successfully stored into cache
      * @psalm-suppress InvalidThrow
      */
     public function add(string $key, $value, $ttl = null, Dependency $dependency = null): bool
@@ -227,9 +234,12 @@ final class Cache implements CacheInterface
 
     /**
      * Deletes a value with the specified key from cache.
+     *
      * @param mixed $key a key identifying the value to be deleted from cache.
-     * @return bool if no error happens during deletion
+     *
      * @throws InvalidArgumentException
+     *
+     * @return bool if no error happens during deletion
      * @psalm-suppress InvalidThrow
      */
     public function delete($key): bool
@@ -242,6 +252,7 @@ final class Cache implements CacheInterface
     /**
      * Deletes all values from cache.
      * Be careful of performing this operation if the cache is shared among multiple applications.
+     *
      * @return bool whether the flush operation was successful.
      */
     public function clear(): bool
@@ -268,12 +279,14 @@ final class Cache implements CacheInterface
      * @param string $key a key identifying the value to be cached.
      * @param callable|\Closure $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
-     * @param null|int|\DateInterval $ttl the TTL value of this value. If not set, default value is used.
+     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     * @return mixed result of $callable execution
+     *
      * @throws SetCacheException
      * @throws InvalidArgumentException
+     *
+     * @return mixed result of $callable execution
      * @psalm-suppress InvalidThrow
      */
     public function getOrSet(string $key, callable $callable, $ttl = null, Dependency $dependency = null)
@@ -310,7 +323,7 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * @param int|DateInterval|null $defaultTtl
+     * @param DateInterval|int|null $defaultTtl
      */
     public function setDefaultTtl($defaultTtl): void
     {
@@ -321,7 +334,9 @@ final class Cache implements CacheInterface
      * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
      *
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
-     * @param int|DateInterval|null $ttl raw TTL.
+     *
+     * @param DateInterval|int|null $ttl raw TTL.
+     *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      * @suppress PhanPossiblyFalseTypeReturn
      */
@@ -340,7 +355,9 @@ final class Cache implements CacheInterface
 
     /**
      * Converts iterable to array
+     *
      * @param iterable $iterable
+     *
      * @return array
      */
     private function iterableToArray(iterable $iterable): array
@@ -350,7 +367,9 @@ final class Cache implements CacheInterface
 
     /**
      * Evaluates dependency if it is not null
+     *
      * @param Dependency|null $dependency
+     *
      * @return Dependency|null
      */
     private function evaluateDependency(?Dependency $dependency): ?Dependency
@@ -364,8 +383,10 @@ final class Cache implements CacheInterface
 
     /**
      * Returns array of value and dependency or just value if dependency is null
+     *
      * @param mixed $value
      * @param Dependency|null $dependency
+     *
      * @return mixed
      */
     private function addDependencyToValue($value, ?Dependency $dependency)
@@ -379,7 +400,9 @@ final class Cache implements CacheInterface
 
     /**
      * Checks for the existing values and returns only values that are not in the cache yet.
+     *
      * @param array $values
+     *
      * @return array
      */
     private function excludeExistingValues(array $values): array
@@ -396,8 +419,10 @@ final class Cache implements CacheInterface
 
     /**
      * Returns value if there is no dependency or it has not been changed and default value otherwise.
+     *
      * @param mixed $value
      * @param mixed $default
+     *
      * @return mixed
      */
     private function getValueOrDefaultIfDependencyChanged($value, $default)
@@ -415,8 +440,10 @@ final class Cache implements CacheInterface
 
     /**
      * Returns values without dependencies or if dependency has not been changed and default values otherwise.
+     *
      * @param iterable $values
      * @param mixed $default
+     *
      * @return array
      */
     private function getValuesOrDefaultIfDependencyChanged(iterable $values, $default): array
@@ -431,7 +458,9 @@ final class Cache implements CacheInterface
 
     /**
      * Builds key map `[built_key => key]`
+     *
      * @param array $keys
+     *
      * @return array
      */
     private function buildKeyMap(array $keys): array
@@ -446,8 +475,10 @@ final class Cache implements CacheInterface
 
     /**
      * Restores original keys
+     *
      * @param iterable $values
      * @param array $keyMap
+     *
      * @return array
      */
     private function restoreKeys(iterable $values, array $keyMap): array
@@ -466,6 +497,7 @@ final class Cache implements CacheInterface
 
     /**
      * @param array $data
+     *
      * @return array
      */
     private function getKeys(array $data): array

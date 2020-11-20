@@ -38,7 +38,6 @@ class AnyDependency extends Dependency
      * @codeCoverageIgnore method is not used
      *
      * @param CacheInterface $cache
-     * @return null
      * @suppress PhanUnusedProtectedMethodParameter
      */
     protected function generateDependencyData(CacheInterface $cache)

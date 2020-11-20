@@ -29,7 +29,7 @@ final class TagDependency extends Dependency
     private $tags;
 
     /**
-     * @param string|array $tags a list of tag names for this dependency. For a single tag, you may specify it as a string
+     * @param array|string $tags a list of tag names for this dependency. For a single tag, you may specify it as a string
      */
     public function __construct($tags)
     {
@@ -38,17 +38,18 @@ final class TagDependency extends Dependency
 
     /**
      * Generates the data needed to determine if dependency has been changed.
+     *
      * @param CacheInterface $cache the cache component that is currently evaluating this dependency
-     * @return array the data needed to determine if dependency has been changed.
+     *
      * @throws InvalidArgumentException
+     *
+     * @return array the data needed to determine if dependency has been changed.
      * @psalm-suppress InvalidThrow
      */
     protected function generateDependencyData(CacheInterface $cache): array
     {
         $timestamps = $this->getStoredTagTimestamps($cache, $this->tags);
-        $timestamps = $this->storeTimestampsForNewTags($cache, $timestamps);
-
-        return $timestamps;
+        return $this->storeTimestampsForNewTags($cache, $timestamps);
     }
 
     public function isChanged(CacheInterface $cache): bool
@@ -59,8 +60,9 @@ final class TagDependency extends Dependency
 
     /**
      * Invalidates all of the cached values that are associated with any of the specified {@see tags}.
+     *
      * @param CacheInterface $cache the cache component that caches the values
-     * @param string|array $tags
+     * @param array|string $tags
      */
     public static function invalidate(CacheInterface $cache, $tags): void
     {
@@ -70,8 +72,10 @@ final class TagDependency extends Dependency
 
     /**
      * Generates the timestamp for the specified cache keys.
+     *
      * @param CacheInterface $cache
      * @param string[] $keys
+     *
      * @return array the timestamp indexed by cache keys
      */
     private static function touchKeys(CacheInterface $cache, array $keys): array
@@ -87,10 +91,13 @@ final class TagDependency extends Dependency
 
     /**
      * Returns the timestamps for the specified tags.
+     *
      * @param CacheInterface $cache
      * @param string[] $tags
-     * @return iterable the timestamps indexed by the specified tags.
+     *
      * @throws InvalidArgumentException
+     *
+     * @return iterable the timestamps indexed by the specified tags.
      * @psalm-suppress InvalidThrow
      */
     private function getStoredTagTimestamps(CacheInterface $cache, array $tags): iterable
@@ -107,7 +114,9 @@ final class TagDependency extends Dependency
     /**
      * Builds a normalized cache key from a given tag, making sure it is short enough and safe
      * for any particular cache storage.
+     *
      * @param string $tag tag name.
+     *
      * @return string cache key.
      */
     private static function buildCacheKey(string $tag): string
@@ -122,7 +131,9 @@ final class TagDependency extends Dependency
 
     /**
      * Builds array of keys from a given tags
+     *
      * @param mixed $tags
+     *
      * @return array
      */
     private static function buildCacheKeys($tags): array
@@ -137,8 +148,10 @@ final class TagDependency extends Dependency
 
     /**
      * Generates and stores timestamps for tags that are not stored in the cache yet.
+     *
      * @param CacheInterface $cache
      * @param iterable $timestamps
+     *
      * @return array
      */
     private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps): array
