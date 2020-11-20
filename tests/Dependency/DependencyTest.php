@@ -11,6 +11,7 @@ use Yiisoft\Cache\Dependency\TagDependency;
 
 /**
  * Dependency (abstract) tests.
+ *
  * @group caching
  */
 class DependencyTest extends DependencyTestCase

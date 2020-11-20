@@ -105,7 +105,9 @@ final class ArrayCache implements CacheInterface
 
     /**
      * Checks whether item is expired or not
+     *
      * @param string $key
+     *
      * @return bool
      */
     private function isExpired(string $key): bool
@@ -115,7 +117,9 @@ final class ArrayCache implements CacheInterface
 
     /**
      * Converts TTL to expiration
-     * @param int|DateInterval|null $ttl
+     *
+     * @param DateInterval|int|null $ttl
+     *
      * @return int
      */
     private function ttlToExpiration($ttl): int
@@ -123,9 +127,9 @@ final class ArrayCache implements CacheInterface
         $ttl = $this->normalizeTtl($ttl);
 
         if ($ttl === null) {
-            $expiration = static::EXPIRATION_INFINITY;
+            $expiration = self::EXPIRATION_INFINITY;
         } elseif ($ttl <= 0) {
-            $expiration = static::EXPIRATION_EXPIRED;
+            $expiration = self::EXPIRATION_EXPIRED;
         } else {
             $expiration = $ttl + time();
         }
@@ -137,7 +141,9 @@ final class ArrayCache implements CacheInterface
      * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
      *
      * Normalizes cache TTL handling strings and {@see DateInterval} objects.
-     * @param int|string|DateInterval|null $ttl raw TTL.
+     *
+     * @param DateInterval|int|string|null $ttl raw TTL.
+     *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      * @suppress PhanPossiblyFalseTypeReturn
      */
@@ -156,7 +162,9 @@ final class ArrayCache implements CacheInterface
 
     /**
      * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
+     *
      * @param $iterable
+     *
      * @return array
      */
     private function iterableToArray($iterable): array

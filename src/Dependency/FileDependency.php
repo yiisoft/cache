@@ -27,6 +27,7 @@ final class FileDependency extends Dependency
 
     /**
      * @param CacheInterface $cache
+     *
      * @return false|int|mixed
      * @suppress PhanUnusedProtectedMethodParameter
      * @suppress PhanUnusedProtectedFinalMethodParameter
