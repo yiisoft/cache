@@ -26,7 +26,7 @@ final class TagDependency extends Dependency
     /**
      * @var array a list of tag names for this dependency
      */
-    private $tags;
+    private array $tags;
 
     /**
      * @param array|string $tags a list of tag names for this dependency. For a single tag, you may specify it as a string

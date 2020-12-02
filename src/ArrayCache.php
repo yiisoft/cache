@@ -145,7 +145,6 @@ final class ArrayCache implements CacheInterface
      * @param DateInterval|int|string|null $ttl raw TTL.
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
-     * @suppress PhanPossiblyFalseTypeReturn
      */
     private function normalizeTtl($ttl): ?int
     {

@@ -8,16 +8,14 @@ use Yiisoft\Cache\CacheInterface;
 
 final class SetCacheException extends CacheException
 {
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var string $key */
+    private string $key;
     private $value;
 
     /**
      * @var CacheInterface
      */
-    private $cache;
+    private CacheInterface $cache;
 
     public function __construct(
         string $key,
