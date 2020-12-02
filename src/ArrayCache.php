@@ -160,14 +160,15 @@ final class ArrayCache implements CacheInterface
     }
 
     /**
-     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
+     * Converts iterable to array
      *
-     * @param $iterable
+     * @param iterable $iterable
      *
      * @return array
      */
     private function iterableToArray($iterable): array
     {
+        /** @psalm-suppress DocblockTypeContradiction */
         if (!is_iterable($iterable)) {
             throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
         }
@@ -176,7 +177,7 @@ final class ArrayCache implements CacheInterface
     }
 
     /**
-     * @param $key
+     * @param mixed $key
      */
     private function validateKey($key): void
     {

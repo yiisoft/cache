@@ -15,7 +15,7 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
  */
 final class NullCache implements CacheInterface
 {
-    public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool
+    public function add(string $key, $value, $ttl = 0, Dependency $dependency = null): bool
     {
         $this->validateKey($key);
         return true;
@@ -61,7 +61,7 @@ final class NullCache implements CacheInterface
         return true;
     }
 
-    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null)
+    public function getOrSet(string $key, callable $callable, $ttl = null, Dependency $dependency = null)
     {
         $this->validateKey($key);
         return $callable($this);
