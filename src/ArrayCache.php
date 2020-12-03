@@ -21,10 +21,16 @@ final class ArrayCache implements CacheInterface
 
     private array $cache = [];
 
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed|null
+     */
     public function get($key, $default = null)
     {
         $this->validateKey($key);
         if (isset($this->cache[$key]) && !$this->isExpired($key)) {
+            /** @var mixed */
             $value = $this->cache[$key][0];
             if (is_object($value)) {
                 $value = clone $value;
