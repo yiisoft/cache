@@ -179,6 +179,7 @@ final class ArrayCache implements CacheInterface
             throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
         }
 
+        /** @psalm-suppress RedundantCast */
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 
