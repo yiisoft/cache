@@ -166,7 +166,7 @@ final class ArrayCache implements CacheInterface
     }
 
     /**
-     * Converts iterable to array
+     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
      *
      * @param iterable $iterable
      *
