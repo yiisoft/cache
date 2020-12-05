@@ -19,13 +19,7 @@ final class SetCacheException extends CacheException
     private CacheInterface $cache;
 
     /**
-     * SetCacheException constructor.
-     * @param string $key
      * @param mixed $value
-     * @param CacheInterface $cache
-     * @param string $message
-     * @param int $code
-     * @param \Throwable|null $previous
      */
     public function __construct(
         string $key,
