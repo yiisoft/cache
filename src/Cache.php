@@ -143,7 +143,7 @@ final class Cache implements CacheInterface
      * If the cache already contains such a key, the existing value and
      * expiration time will be replaced with the new ones, respectively.
      *
-     * @param array $values the values to be cached, as key-value pairs.
+     * @param iterable $values the values to be cached, as key-value pairs.
      * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
      * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
@@ -362,6 +362,7 @@ final class Cache implements CacheInterface
      */
     private function iterableToArray(iterable $iterable): array
     {
+        /** @psalm-suppress RedundantCast */
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 

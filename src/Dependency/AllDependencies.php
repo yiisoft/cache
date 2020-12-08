@@ -16,7 +16,7 @@ class AllDependencies extends Dependency
     /**
      * @var Dependency[]
      */
-    private $dependencies;
+    private array $dependencies;
 
     /**
      * @param Dependency[] $dependencies list of dependencies that this dependency is composed of.
@@ -38,7 +38,6 @@ class AllDependencies extends Dependency
      * @codeCoverageIgnore method is not used
      *
      * @param CacheInterface $cache
-     * @suppress PhanUnusedProtectedMethodParameter
      */
     protected function generateDependencyData(CacheInterface $cache)
     {

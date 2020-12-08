@@ -14,7 +14,7 @@ use Yiisoft\Cache\CacheInterface;
  */
 final class FileDependency extends Dependency
 {
-    private $fileName;
+    private string $fileName;
 
     /**
      * @param string $fileName the file path whose last modification time is used to
@@ -29,8 +29,6 @@ final class FileDependency extends Dependency
      * @param CacheInterface $cache
      *
      * @return false|int|mixed
-     * @suppress PhanUnusedProtectedMethodParameter
-     * @suppress PhanUnusedProtectedFinalMethodParameter
      */
     protected function generateDependencyData(CacheInterface $cache)
     {

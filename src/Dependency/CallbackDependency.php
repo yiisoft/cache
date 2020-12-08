@@ -25,7 +25,6 @@ class CallbackDependency extends Dependency
      * @param CacheInterface $cache
      *
      * @return mixed
-     * @suppress PhanUnusedProtectedMethodParameter
      */
     protected function generateDependencyData(CacheInterface $cache)
     {
