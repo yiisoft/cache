@@ -12,12 +12,10 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
  *
  * By replacing it with some other cache component, one can quickly switch from
  * non-caching mode to caching mode.
- *
- * @phan-file-suppress PhanUnusedPublicFinalMethodParameter
  */
 final class NullCache implements CacheInterface
 {
-    public function add($key, $value, $ttl = 0, Dependency $dependency = null): bool
+    public function add(string $key, $value, $ttl = 0, Dependency $dependency = null): bool
     {
         $this->validateKey($key);
         return true;
@@ -63,7 +61,7 @@ final class NullCache implements CacheInterface
         return true;
     }
 
-    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null)
+    public function getOrSet(string $key, callable $callable, $ttl = null, Dependency $dependency = null)
     {
         $this->validateKey($key);
         return $callable($this);
@@ -103,6 +101,7 @@ final class NullCache implements CacheInterface
 
     private function iterableToArray(iterable $iterable): array
     {
+        /** @psalm-suppress RedundantCast */
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 

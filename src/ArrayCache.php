@@ -21,10 +21,17 @@ final class ArrayCache implements CacheInterface
 
     private array $cache = [];
 
+    /**
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed|null
+     */
     public function get($key, $default = null)
     {
         $this->validateKey($key);
         if (isset($this->cache[$key]) && !$this->isExpired($key)) {
+            /** @var mixed */
             $value = $this->cache[$key][0];
             if (is_object($value)) {
                 $value = clone $value;
@@ -145,7 +152,6 @@ final class ArrayCache implements CacheInterface
      * @param DateInterval|int|string|null $ttl raw TTL.
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
-     * @suppress PhanPossiblyFalseTypeReturn
      */
     private function normalizeTtl($ttl): ?int
     {
@@ -163,21 +169,23 @@ final class ArrayCache implements CacheInterface
     /**
      * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
      *
-     * @param $iterable
+     * @param iterable $iterable
      *
      * @return array
      */
     private function iterableToArray($iterable): array
     {
+        /** @psalm-suppress DocblockTypeContradiction */
         if (!is_iterable($iterable)) {
             throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
         }
 
+        /** @psalm-suppress RedundantCast */
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 
     /**
-     * @param $key
+     * @param mixed $key
      */
     private function validateKey($key): void
     {

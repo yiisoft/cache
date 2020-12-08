@@ -26,12 +26,12 @@ abstract class Dependency
      * to use the same cache dependency for multiple separate cache calls while generating the same
      * page without an overhead of re-evaluating dependency data each time. Defaults to false.
      */
-    protected $isReusable = false;
+    protected bool $isReusable = false;
 
     /**
      * @var array static storage of cached data for reusable dependencies.
      */
-    private static $reusableData = [];
+    private static array $reusableData = [];
 
     /**
      * Changes dependency behavior so dependent data for this cache dependency will be generated only once per request.
@@ -117,6 +117,7 @@ abstract class Dependency
      */
     protected function iterableToArray(iterable $iterable): array
     {
+        /** @psalm-suppress RedundantCast */
         return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
     }
 
