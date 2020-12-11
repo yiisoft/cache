@@ -68,13 +68,4 @@ interface CacheInterface
      * @return bool If no error happens during deletion.
      */
     public function remove($key): bool;
-
-    /**
-     * Removes all values from cache.
-     *
-     * Be careful of performing this operation if the cache is shared among multiple applications.
-     *
-     * @return bool Whether the flush operation was successful.
-     */
-    public function clear(): bool;
 }

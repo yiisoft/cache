@@ -43,9 +43,4 @@ final class CacheItems
             unset($this->items[$key]);
         }
     }
-
-    public function clear(): void
-    {
-        $this->items = [];
-    }
 }

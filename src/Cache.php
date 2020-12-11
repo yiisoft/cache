@@ -13,7 +13,6 @@ use Yiisoft\Cache\Metadata\CacheItems;
 
 use function ctype_alnum;
 use function gettype;
-use function is_array;
 use function is_int;
 use function is_string;
 use function json_encode;
@@ -99,16 +98,6 @@ final class Cache implements CacheInterface
 
         if ($this->handler->delete($key)) {
             $this->metadata->remove($key);
-            return true;
-        }
-
-        return false;
-    }
-
-    public function clear(): bool
-    {
-        if ($this->handler->clear()) {
-            $this->metadata->clear();
             return true;
         }
 
