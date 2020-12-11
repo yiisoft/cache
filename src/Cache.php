@@ -84,24 +84,13 @@ final class Cache implements CacheInterface
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
     {
         $key = $this->buildKey($key);
+        $value = $this->getValue($key, $beta);
 
-        if (!$this->metadata->expired($key, $beta)) {
-            $value = $this->getValueOrDefaultIfDependencyChanged($this->handler->get($key));
-
-            if ($value !== null) {
-                return $value;
-            }
+        if ($value !== null) {
+            return $value;
         }
 
-        $ttl = ($ttl = $this->normalizeTtl($ttl)) ?? $this->defaultTtl;
-        $value = $this->addDependencyToValue($callable, $dependency);
-
-        if (!$this->handler->set($key, $value, $ttl)) {
-            throw new SetCacheException($key, $value, $this);
-        }
-
-        $this->metadata->set($key, $ttl);
-        return $value;
+        return $this->setAndGet($key, $callable, $ttl, $dependency);
     }
 
     public function remove($key): bool
@@ -126,44 +115,36 @@ final class Cache implements CacheInterface
         return false;
     }
 
-    /**
-     * Returns array of value and dependency or just value if dependency is null.
-     *
-     * @param callable $callable
-     * @param Dependency|null $dependency
-     *
-     * @return mixed
-     */
-    private function addDependencyToValue(callable $callable, ?Dependency $dependency)
+    private function getValue(string $key, float $beta)
     {
-        $value = $callable($this);
-
-        if ($dependency === null) {
-            return $value;
+        if ($this->metadata->expired($key, $beta)) {
+            return null;
         }
 
-        $dependency->evaluateDependency($this);
-        return [$value, $dependency];
+        $dependency = $this->metadata->dependency($key);
+
+        if ($dependency !== null && $dependency->isChanged($this)) {
+            return null;
+        }
+
+        return $this->handler->get($key);
     }
 
-    /**
-     * Returns value if there is no dependency or it has not been changed and default value otherwise.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    private function getValueOrDefaultIfDependencyChanged($value)
+    private function setAndGet(string $key, callable $callable, $ttl, ?Dependency $dependency)
     {
-        if (is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
-            /** @var Dependency $dependency */
-            [$value, $dependency] = $value;
+        $ttl = $this->normalizeTtl($ttl);
+        $ttl ??= $this->defaultTtl;
+        $value = $callable($this);
 
-            if ($dependency->isChanged($this)) {
-                return null;
-            }
+        if ($dependency !== null) {
+            $dependency->evaluateDependency($this);
         }
 
+        if (!$this->handler->set($key, $value, $ttl)) {
+            throw new SetCacheException($key, $value, $this);
+        }
+
+        $this->metadata->set($key, $ttl, $dependency);
         return $value;
     }
 
