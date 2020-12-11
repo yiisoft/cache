@@ -130,7 +130,7 @@ final class Cache implements CacheInterface
         }
 
         if (!$this->handler->set($key, $value, $ttl)) {
-            throw new SetCacheException($key, $value, $this);
+            throw new SetCacheException($key, $value, $ttl);
         }
 
         $this->metadata->set($key, $ttl, $dependency);
