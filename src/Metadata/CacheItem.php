@@ -18,12 +18,12 @@ use const PHP_INT_MAX;
 final class CacheItem
 {
     private ?int $expiry;
-    private float $time;
+    private float $created;
 
     public function __construct(?int $expiry)
     {
         $this->expiry = $expiry;
-        $this->time = microtime(true);
+        $this->created = microtime(true);
     }
 
     public function expiry(?int $expiry): void
@@ -49,10 +49,9 @@ final class CacheItem
         }
 
         $now = microtime(true);
-        $delta = ceil(1000 * ($now - $this->time)) / 1000;
+        $delta = ceil(1000 * ($now - $this->created)) / 1000;
         $expired = $now - $delta * $beta * log(random_int(1, PHP_INT_MAX) / PHP_INT_MAX);
 
-        $this->time = microtime(true);
         return $this->expiry <= $expired;
     }
 }
