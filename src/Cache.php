@@ -8,6 +8,7 @@ use DateInterval;
 use DateTime;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
+use Yiisoft\Cache\Exception\RemoveCacheException;
 use Yiisoft\Cache\Exception\SetCacheException;
 use Yiisoft\Cache\Metadata\CacheItems;
 
@@ -92,16 +93,15 @@ final class Cache implements CacheInterface
         return $this->setAndGet($key, $callable, $ttl, $dependency);
     }
 
-    public function remove($key): bool
+    public function remove($key): void
     {
         $key = $this->buildKey($key);
 
-        if ($this->handler->delete($key)) {
-            $this->metadata->remove($key);
-            return true;
+        if (!$this->handler->delete($key)) {
+            throw new RemoveCacheException($key);
         }
 
-        return false;
+        $this->metadata->remove($key);
     }
 
     private function getValue(string $key, float $beta)

@@ -64,8 +64,6 @@ interface CacheInterface
      * Removes a value with the specified key from cache.
      *
      * @param mixed $key a key identifying the value to be deleted from cache.
-     *
-     * @return bool If no error happens during deletion.
      */
-    public function remove($key): bool;
+    public function remove($key): void;
 }
