@@ -29,6 +29,7 @@ final class CacheItem
     public function expiry(?int $expiry): void
     {
         $this->expiry = $expiry;
+        $this->created = microtime(true);
     }
 
     public function expired(float $beta): bool
