@@ -32,64 +32,8 @@ use Yiisoft\Cache\Dependency\Dependency;
  *
  * @see \Psr\SimpleCache\CacheInterface
  */
-interface CacheInterface extends \Psr\SimpleCache\CacheInterface
+interface CacheInterface
 {
-    /**
-     * Stores a value identified by a key into cache.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
-     *
-     * @param string $key a key identifying the value to be cached.
-     * @param mixed $value the value to be cached
-     * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @return bool whether the value is successfully stored into cache
-     */
-    public function set($key, $value, $ttl = null, Dependency $dependency = null): bool;
-
-    /**
-     * Stores multiple values in cache. Each value is identified by a key.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
-     *
-     * @param iterable $values the values to be cached, as key-value pairs.
-     * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @return bool
-     */
-    public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool;
-
-    /**
-     * Stores a value identified by a key into cache if the cache does not contain this key.
-     * Nothing will be done if the cache already contains the key.
-     *
-     * @param string $key a key identifying the value to be cached.
-     * @param mixed $value the value to be cached
-     * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @return bool whether the value is successfully stored into cache
-     */
-    public function add(string $key, $value, $ttl = 0, Dependency $dependency = null): bool;
-
-    /**
-     * Stores multiple values in cache. Each value is identified by a key.
-     * If the cache already contains such a key, the existing value and expiration time will be preserved.
-     *
-     * @param array $values the values to be cached, as key-value pairs.
-     * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @return bool
-     */
-    public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool;
-
     /**
      * Method combines both {@see CacheInterface::set()} and {@see CacheInterface::get()} methods to retrieve value identified by a $key,
      * or to store the result of $callable execution if there is no cache available for the $key.
@@ -98,23 +42,39 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      *
      * ```php
      * public function getTopProducts($count = 10) {
-     *     $cache = $this->cache; // Could be Yii::getApp()->cache
-     *     return $cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
+     *     $cache = $this->cache;
+     *     return $this->cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
      *         return $this->getTopNProductsFromDatabase($count);
      *     }, 1000);
      * }
      * ```
      *
-     * @param string $key a key identifying the value to be cached.
+     * @param mixed $key a key identifying the value to be cached.
      * @param callable $callable the callable or closure that will be used to generate a value to be cached.
      * In case $callable returns `false`, the value will not be cached.
      * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency dependency of the value. If the dependency changes,
      * the corresponding value in the cache will be invalidated when it is fetched via {@see get()}.
      *
-     * @return mixed result of $callable execution
+     * @return mixed Result of $callable execution
      */
-    public function getOrSet(string $key, callable $callable, $ttl = null, Dependency $dependency = null);
+    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0);
 
-    public function setKeyPrefix(string $keyPrefix): void;
+    /**
+     * Removes a value with the specified key from cache.
+     *
+     * @param mixed $key a key identifying the value to be deleted from cache.
+     *
+     * @return bool If no error happens during deletion.
+     */
+    public function remove($key): bool;
+
+    /**
+     * Removes all values from cache.
+     *
+     * Be careful of performing this operation if the cache is shared among multiple applications.
+     *
+     * @return bool Whether the flush operation was successful.
+     */
+    public function clear(): bool;
 }

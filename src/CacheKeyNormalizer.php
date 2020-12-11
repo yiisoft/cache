@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
-use function ctype_alnum;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
 
+use function ctype_alnum;
 use function is_int;
 use function is_string;
 use function json_encode;
 use function json_last_error_msg;
 use function mb_strlen;
 use function md5;
-use Yiisoft\Cache\Exception\InvalidArgumentException;
 
+/**
+ * CacheKeyNormalizer normalizes the cache key to a string.
+ *
+ * @internal
+ */
 final class CacheKeyNormalizer
 {
     /**
-     * Normalizes cache key from a given key.
+     * Normalizes the cache key from a given key.
      *
      * If the given key is a string containing alphanumeric characters only and no more than 32 characters,
      * then the key will be returned back as it is, integers will be converted to strings. Otherwise,

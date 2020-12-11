@@ -6,9 +6,14 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Psr\SimpleCache\InvalidArgumentException;
+use InvalidArgumentException;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\SetCacheException;
+use Yiisoft\Cache\Metadata\CacheItems;
+
+use function gettype;
+use function is_array;
+use function is_int;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies.
@@ -42,397 +47,116 @@ final class Cache implements CacheInterface
      */
     private \Psr\SimpleCache\CacheInterface $handler;
 
+    private CacheItems $metadata;
+    private CacheKeyNormalizer $keyNormalizer;
+
     /**
      * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
      * It is recommended that you set a unique cache key prefix for each application if the same cache
      * storage is being used by different applications.
      */
-    private string $keyPrefix = '';
+    private string $keyPrefix;
 
     /**
      * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
      * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
      */
-    private ?int $defaultTtl = null;
+    private ?int $defaultTtl;
 
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler)
+    /**
+     * @param \Psr\SimpleCache\CacheInterface $handler
+     * @param DateInterval|int|null $defaultTtl
+     * @param string $keyPrefix
+     */
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null, string $keyPrefix = '')
     {
         $this->handler = $handler;
-    }
-
-    /**
-     * Builds a normalized cache key from a given key by appending key prefix.
-     *
-     * @param mixed|string $key the key to be normalized
-     *
-     * @return string the generated cache key
-     */
-    private function buildKey($key): string
-    {
-        if (!is_scalar($key)) {
-            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid key.');
-        }
-        return $this->keyPrefix . $key;
-    }
-
-    public function get($key, $default = null)
-    {
-        $key = $this->buildKey($key);
-        $value = $this->handler->get($key, $default);
-        return $this->getValueOrDefaultIfDependencyChanged($value, $default);
-    }
-
-    public function has($key): bool
-    {
-        $key = $this->buildKey($key);
-        return $this->handler->has($key);
-    }
-
-    /**
-     * Retrieves multiple values from cache with the specified keys.
-     * Some caches, such as memcached or apcu, allow retrieving multiple cached values at the same time,
-     * which may improve the performance. In case a cache does not support this feature natively,
-     * this method will try to simulate it.
-     *
-     * @param iterable $keys list of string keys identifying the cached values
-     * @param mixed $default Default value to return for keys that do not exist.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return iterable list of cached values corresponding to the specified keys. The array
-     * is returned in terms of (key, value) pairs.
-     * If a value is not cached or expired, the corresponding array value will be false.
-     * @psalm-suppress InvalidThrow
-     */
-    public function getMultiple($keys, $default = null): iterable
-    {
-        $keyMap = $this->buildKeyMap($this->iterableToArray($keys));
-        $values = $this->handler->getMultiple($this->getKeys($keyMap), $default);
-        $values = $this->restoreKeys($values, $keyMap);
-        return $this->getValuesOrDefaultIfDependencyChanged($values, $default);
-    }
-
-    /**
-     * Stores a value identified by a key into cache.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
-     *
-     * @param string $key a key identifying the value to be cached.
-     * @param mixed $value the value to be cached
-     * @param \DateInterval|int|null $ttl the TTL of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool whether the value is successfully stored into cache
-     * @psalm-suppress InvalidThrow
-     */
-    public function set($key, $value, $ttl = null, Dependency $dependency = null): bool
-    {
-        $key = $this->buildKey($key);
-        $dependency = $this->evaluateDependency($dependency);
-        $value = $this->addDependencyToValue($value, $dependency);
-        $ttl = $this->normalizeTtl($ttl);
-
-        return $this->handler->set($key, $value, $ttl);
-    }
-
-    /**
-     * Stores multiple values in cache. Each value contains a value identified by a key.
-     * If the cache already contains such a key, the existing value and
-     * expiration time will be replaced with the new ones, respectively.
-     *
-     * @param iterable $values the values to be cached, as key-value pairs.
-     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool True on success and false on failure.
-     * @psalm-suppress InvalidThrow
-     */
-    public function setMultiple($values, $ttl = null, Dependency $dependency = null): bool
-    {
-        $values = $this->prepareDataForSetOrAddMultiple($values, $dependency);
-        $ttl = $this->normalizeTtl($ttl);
-        return $this->handler->setMultiple($values, $ttl);
-    }
-
-    public function deleteMultiple($keys): bool
-    {
-        $keyMap = $this->buildKeyMap($this->iterableToArray($keys));
-        return $this->handler->deleteMultiple($this->getKeys($keyMap));
-    }
-
-    /**
-     * Stores multiple values in cache. Each value contains a value identified by a key.
-     * If the cache already contains such a key, the existing value and expiration time will be preserved.
-     *
-     * @param array $values the values to be cached, as key-value pairs.
-     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached values. If the dependency changes,
-     * the corresponding values in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool
-     * @psalm-suppress InvalidThrow
-     */
-    public function addMultiple(array $values, $ttl = null, Dependency $dependency = null): bool
-    {
-        $values = $this->prepareDataForSetOrAddMultiple($values, $dependency);
-        $values = $this->excludeExistingValues($values);
-        $ttl = $this->normalizeTtl($ttl);
-
-        return $this->handler->setMultiple($values, $ttl);
-    }
-
-    private function prepareDataForSetOrAddMultiple(iterable $values, ?Dependency $dependency): array
-    {
-        $data = [];
-        $dependency = $this->evaluateDependency($dependency);
-        foreach ($values as $key => $value) {
-            $value = $this->addDependencyToValue($value, $dependency);
-            $key = $this->buildKey($key);
-            $data[$key] = $value;
-        }
-
-        return $data;
-    }
-
-    /**
-     * Stores a value identified by a key into cache if the cache does not contain this key.
-     * Nothing will be done if the cache already contains the key.
-     *
-     * @param string $key a key identifying the value to be cached.
-     * @param mixed $value the value to be cached
-     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool whether the value is successfully stored into cache
-     * @psalm-suppress InvalidThrow
-     */
-    public function add(string $key, $value, $ttl = null, Dependency $dependency = null): bool
-    {
-        $key = $this->buildKey($key);
-
-        if ($this->handler->has($key)) {
-            return false;
-        }
-
-        $dependency = $this->evaluateDependency($dependency);
-        $value = $this->addDependencyToValue($value, $dependency);
-        $ttl = $this->normalizeTtl($ttl);
-
-        return $this->handler->set($key, $value, $ttl);
-    }
-
-    /**
-     * Deletes a value with the specified key from cache.
-     *
-     * @param mixed $key a key identifying the value to be deleted from cache.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return bool if no error happens during deletion
-     * @psalm-suppress InvalidThrow
-     */
-    public function delete($key): bool
-    {
-        $key = $this->buildKey($key);
-
-        return $this->handler->delete($key);
-    }
-
-    /**
-     * Deletes all values from cache.
-     * Be careful of performing this operation if the cache is shared among multiple applications.
-     *
-     * @return bool whether the flush operation was successful.
-     */
-    public function clear(): bool
-    {
-        return $this->handler->clear();
-    }
-
-    /**
-     * Method combines both {@see CacheInterface::set()} and {@see CacheInterface::get()} methods to retrieve
-     * value identified by a $key, or to store the result of $callable execution if there is no cache available
-     * for the $key.
-     *
-     * Usage example:
-     *
-     * ```php
-     * public function getTopProducts($count = 10) {
-     *     $cache = $this->cache;
-     *     return $cache->getOrSet(['top-n-products', 'n' => $count], function ($cache) use ($count) {
-     *         return $this->getTopNProductsFromDatabase($count);
-     *     }, 1000);
-     * }
-     * ```
-     *
-     * @param string $key a key identifying the value to be cached.
-     * @param callable|\Closure $callable the callable or closure that will be used to generate a value to be cached.
-     * In case $callable returns `false`, the value will not be cached.
-     * @param \DateInterval|int|null $ttl the TTL value of this value. If not set, default value is used.
-     * @param Dependency|null $dependency dependency of the cached value. If the dependency changes,
-     * the corresponding value in the cache will be invalidated when it is fetched via {@see CacheInterface::get()}.
-     *
-     * @throws SetCacheException
-     * @throws InvalidArgumentException
-     *
-     * @return mixed result of $callable execution
-     * @psalm-suppress InvalidThrow
-     */
-    public function getOrSet(string $key, callable $callable, $ttl = null, Dependency $dependency = null)
-    {
-        if (($value = $this->get($key)) !== null) {
-            return $value;
-        }
-
-        $value = $callable($this);
-        $ttl = $this->normalizeTtl($ttl);
-        if (!$this->set($key, $value, $ttl, $dependency)) {
-            throw new SetCacheException($key, $value, $this);
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param string $keyPrefix a string prefixed to every cache key so that it is unique globally in the whole cache storage.
-     * It is recommended that you set a unique cache key prefix for each application if the same cache
-     * storage is being used by different applications.
-     */
-    public function setKeyPrefix(string $keyPrefix): void
-    {
+        $this->metadata = new CacheItems();
+        $this->keyNormalizer = new CacheKeyNormalizer();
         $this->keyPrefix = $keyPrefix;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getDefaultTtl(): ?int
-    {
-        return $this->defaultTtl;
-    }
-
-    /**
-     * @param DateInterval|int|null $defaultTtl
-     */
-    public function setDefaultTtl($defaultTtl): void
-    {
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
     }
 
-    /**
-     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
-     *
-     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
-     *
-     * @param DateInterval|int|null $ttl raw TTL.
-     *
-     * @return int|null TTL value as UNIX timestamp or null meaning infinity
-     * @suppress PhanPossiblyFalseTypeReturn
-     */
-    protected function normalizeTtl($ttl): ?int
+    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
     {
-        if ($ttl === null) {
-            return $this->defaultTtl;
+        $key = $this->buildKey($key);
+
+        if (!$this->metadata->expired($key, $beta)) {
+            $value = $this->getValueOrDefaultIfDependencyChanged($this->handler->get($key));
+
+            if ($value !== null) {
+                return $value;
+            }
         }
 
-        if ($ttl instanceof DateInterval) {
-            return (new DateTime('@0'))->add($ttl)->getTimestamp();
+        $ttl = ($ttl = $this->normalizeTtl($ttl)) ?? $this->defaultTtl;
+        $value = $this->addDependencyToValue($callable, $dependency);
+
+        if (!$this->handler->set($key, $value, $ttl)) {
+            throw new SetCacheException($key, $value, $this);
         }
 
-        return $ttl;
+        $this->metadata->set($key, $ttl);
+        return $value;
+    }
+
+    public function remove($key): bool
+    {
+        $key = $this->buildKey($key);
+
+        if ($this->handler->delete($key)) {
+            $this->metadata->remove($key);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function clear(): bool
+    {
+        if ($this->handler->clear()) {
+            $this->metadata->clear();
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Converts iterable to array
+     * Returns array of value and dependency or just value if dependency is null.
      *
-     * @param iterable $iterable
-     *
-     * @return array
-     */
-    private function iterableToArray(iterable $iterable): array
-    {
-        /** @psalm-suppress RedundantCast */
-        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
-    }
-
-    /**
-     * Evaluates dependency if it is not null
-     *
-     * @param Dependency|null $dependency
-     *
-     * @return Dependency|null
-     */
-    private function evaluateDependency(?Dependency $dependency): ?Dependency
-    {
-        if ($dependency !== null) {
-            $dependency->evaluateDependency($this);
-        }
-
-        return $dependency;
-    }
-
-    /**
-     * Returns array of value and dependency or just value if dependency is null
-     *
-     * @param mixed $value
+     * @param callable $callable
      * @param Dependency|null $dependency
      *
      * @return mixed
      */
-    private function addDependencyToValue($value, ?Dependency $dependency)
+    private function addDependencyToValue(callable $callable, ?Dependency $dependency)
     {
+        $value = $callable($this);
+
         if ($dependency === null) {
             return $value;
         }
 
+        $dependency->evaluateDependency($this);
         return [$value, $dependency];
-    }
-
-    /**
-     * Checks for the existing values and returns only values that are not in the cache yet.
-     *
-     * @param array $values
-     *
-     * @return array
-     */
-    private function excludeExistingValues(array $values): array
-    {
-        $existingValues = $this->handler->getMultiple($this->getKeys($values));
-        foreach ($existingValues as $key => $value) {
-            if ($value !== null) {
-                unset($values[$key]);
-            }
-        }
-
-        return $values;
     }
 
     /**
      * Returns value if there is no dependency or it has not been changed and default value otherwise.
      *
      * @param mixed $value
-     * @param mixed $default
      *
      * @return mixed
      */
-    private function getValueOrDefaultIfDependencyChanged($value, $default)
+    private function getValueOrDefaultIfDependencyChanged($value)
     {
-        if (\is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
+        if (is_array($value) && isset($value[1]) && $value[1] instanceof Dependency) {
             /** @var Dependency $dependency */
             [$value, $dependency] = $value;
+
             if ($dependency->isChanged($this)) {
-                return $default;
+                return null;
             }
         }
 
@@ -440,69 +164,43 @@ final class Cache implements CacheInterface
     }
 
     /**
-     * Returns values without dependencies or if dependency has not been changed and default values otherwise.
+     * Builds a normalized cache key from a given key by appending key prefix.
      *
-     * @param iterable $values
-     * @param mixed $default
+     * @param mixed $key The key to be normalized.
      *
-     * @return array
+     * @return string The generated cache key.
      */
-    private function getValuesOrDefaultIfDependencyChanged(iterable $values, $default): array
+    private function buildKey($key): string
     {
-        $results = [];
-        foreach ($values as $key => $value) {
-            $results[$key] = $this->getValueOrDefaultIfDependencyChanged($value, $default);
-        }
-
-        return $results;
+        return $this->keyPrefix . $this->keyNormalizer->normalize($key);
     }
 
     /**
-     * Builds key map `[built_key => key]`
+     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      *
-     * @param array $keys
+     * @param DateInterval|int|null $ttl raw TTL.
      *
-     * @return array
+     * @throws InvalidArgumentException For invalid TTL.
+     *
+     * @return int|null TTL value as UNIX timestamp or null meaning infinity.
      */
-    private function buildKeyMap(array $keys): array
+    private function normalizeTtl($ttl): ?int
     {
-        $keyMap = [];
-        foreach ($keys as $key) {
-            $keyMap[$this->buildKey($key)] = $key;
+        if ($ttl === null) {
+            return null;
         }
 
-        return $keyMap;
-    }
-
-    /**
-     * Restores original keys
-     *
-     * @param iterable $values
-     * @param array $keyMap
-     *
-     * @return array
-     */
-    private function restoreKeys(iterable $values, array $keyMap): array
-    {
-        $results = [];
-        foreach ($values as $key => $value) {
-            $restoredKey = $key;
-            if (array_key_exists($key, $keyMap)) {
-                $restoredKey = $keyMap[$key];
-            }
-            $results[$restoredKey] = $value;
+        if ($ttl instanceof DateInterval) {
+            return (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
-        return $results;
-    }
+        if (is_int($ttl)) {
+            return $ttl;
+        }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
-    private function getKeys(array $data): array
-    {
-        return array_map('strval', array_keys($data));
+        throw new InvalidArgumentException(sprintf(
+            'Invalid TTL "%s" specified. It must be a \DateInterval instance, an integer, or null.',
+            gettype($ttl),
+        ));
     }
 }
