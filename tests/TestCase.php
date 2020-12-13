@@ -6,6 +6,13 @@ namespace Yiisoft\Cache\Tests;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionObject;
+use stdClass;
+
+use function is_array;
+use function is_object;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
@@ -17,16 +24,17 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      *
      * @return mixed
      */
     protected function invokeMethod($object, $method, array $args = [], bool $revoke = true)
     {
-        $reflection = new \ReflectionObject($object);
+        $reflection = new ReflectionObject($object);
         $method = $reflection->getMethod($method);
         $method->setAccessible(true);
         $result = $method->invokeArgs($object, $args);
+
         if ($revoke) {
             $method->setAccessible(false);
         }
@@ -40,19 +48,20 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param $object
      * @param $propertyName
      * @param $value
-     * @param bool $revoke whether to make property inaccessible after setting
-     *
-     * @throws \ReflectionException
+     * @param bool $revoke Whether to make property inaccessible after setting.
      */
     protected function setInaccessibleProperty($object, $propertyName, $value, bool $revoke = true): void
     {
-        $class = new \ReflectionClass($object);
+        $class = new ReflectionClass($object);
+
         while (!$class->hasProperty($propertyName)) {
             $class = $class->getParentClass();
         }
+
         $property = $class->getProperty($propertyName);
         $property->setAccessible(true);
         $property->setValue($object, $value);
+
         if ($revoke) {
             $property->setAccessible(false);
         }
@@ -63,21 +72,21 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      *
      * @param $object
      * @param $propertyName
-     * @param bool $revoke whether to make property inaccessible after getting
-     *
-     * @throws \ReflectionException
+     * @param bool $revoke Whether to make property inaccessible after getting.
      *
      * @return mixed
      */
     protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
     {
-        $class = new \ReflectionClass($object);
+        $class = new ReflectionClass($object);
         while (!$class->hasProperty($propertyName)) {
             $class = $class->getParentClass();
         }
+
         $property = $class->getProperty($propertyName);
         $property->setAccessible(true);
         $result = $property->getValue($object);
+
         if ($revoke) {
             $property->setAccessible(false);
         }
@@ -87,8 +96,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     public function dataProvider(): array
     {
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->test_field = 'test_value';
+
         return [
             'integer' => ['test_integer', 1],
             'double' => ['test_double', 1.1],
@@ -109,6 +119,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     {
         $dataProvider = $this->dataProvider();
         $data = [];
+
         foreach ($dataProvider as $item) {
             $data[$keyPrefix . $item[0]] = $item[1];
         }
@@ -117,7 +128,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * This function configures given cache to match some expectations
+     * This function configures given cache to match some expectations.
      *
      * @param CacheInterface $cache
      *
