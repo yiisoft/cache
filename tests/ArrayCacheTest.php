@@ -18,7 +18,7 @@ use function is_object;
 use function sleep;
 use function time;
 
-class ArrayCacheTest extends TestCase
+final class ArrayCacheTest extends TestCase
 {
     private ArrayCache $cache;
 

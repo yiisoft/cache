@@ -10,6 +10,7 @@ use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
 use Yiisoft\Cache\Exception\SetCacheException;
+use Yiisoft\Cache\Metadata\CacheItem;
 use Yiisoft\Cache\Metadata\CacheItems;
 
 use function ctype_alnum;
@@ -38,7 +39,7 @@ final class Cache implements CacheInterface
     /**
      * @var CacheItems The items that store the metadata of each cache.
      */
-    private CacheItems $metadata;
+    private CacheItems $items;
 
     /**
      * @var int|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
@@ -61,7 +62,7 @@ final class Cache implements CacheInterface
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null, string $keyPrefix = '')
     {
         $this->handler = $handler;
-        $this->metadata = new CacheItems();
+        $this->items = new CacheItems();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
         $this->keyPrefix = $keyPrefix;
     }
@@ -86,7 +87,7 @@ final class Cache implements CacheInterface
             throw new RemoveCacheException($key);
         }
 
-        $this->metadata->remove($key);
+        $this->items->remove($key);
     }
 
     /**
@@ -99,17 +100,18 @@ final class Cache implements CacheInterface
      */
     private function getValue(string $key, float $beta)
     {
-        if ($this->metadata->expired($key, $beta)) {
+        if ($this->items->expired($key, $beta, $this->handler)) {
             return null;
         }
 
-        $dependency = $this->metadata->dependency($key);
+        $value = $this->handler->get($key);
 
-        if ($dependency !== null && $dependency->isChanged($this->handler)) {
-            return null;
+        if ($value instanceof CacheItem) {
+            $this->items->set($value);
+            return $value->expired($beta, $this->handler) ? null : $value->value();
         }
 
-        return $this->handler->get($key);
+        return $value;
     }
 
     /**
@@ -135,11 +137,13 @@ final class Cache implements CacheInterface
             $dependency->evaluateDependency($this->handler);
         }
 
-        if (!$this->handler->set($key, $value, $ttl)) {
-            throw new SetCacheException($key, $value, $ttl);
+        $item = new CacheItem($key, $value, $ttl, $dependency);
+
+        if (!$this->handler->set($key, $item, $ttl)) {
+            throw new SetCacheException($key, $item, $ttl);
         }
 
-        $this->metadata->set($key, $ttl, $dependency);
+        $this->items->set($item);
         return $value;
     }
 

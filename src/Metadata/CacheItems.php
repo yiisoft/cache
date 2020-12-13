@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Metadata;
 
+use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Dependency\Dependency;
 
 /**
@@ -18,9 +19,9 @@ final class CacheItems
      */
     private array $items = [];
 
-    public function expired(string $key, float $beta): bool
+    public function expired(string $key, float $beta, CacheInterface $cache): bool
     {
-        return isset($this->items[$key]) && $this->items[$key]->expired($beta);
+        return isset($this->items[$key]) && $this->items[$key]->expired($beta, $cache);
     }
 
     public function dependency(string $key): ?Dependency
@@ -32,14 +33,21 @@ final class CacheItems
         return null;
     }
 
-    public function set(string $key, ?int $expiry, ?Dependency $dependency): void
+    public function get(string $key): ?CacheItem
     {
-        if (isset($this->items[$key])) {
-            $this->items[$key]->update($expiry, $dependency);
+        return $this->items[$key] ?? null;
+    }
+
+    public function set(CacheItem $item): void
+    {
+        $key = $item->key();
+
+        if (!isset($this->items[$key])) {
+            $this->items[$key] = $item;
             return;
         }
 
-        $this->items[$key] = new CacheItem($expiry, $dependency);
+        $this->items[$key]->update($item->value(), $item->expiry(), $item->dependency());
     }
 
     public function remove(string $key): void

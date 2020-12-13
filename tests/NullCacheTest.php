@@ -7,7 +7,7 @@ namespace Yiisoft\Cache\Tests;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\NullCache;
 
-class NullCacheTest extends TestCase
+final class NullCacheTest extends TestCase
 {
     private NullCache $cache;
 
