@@ -7,7 +7,18 @@ namespace Yiisoft\Cache;
 use DateInterval;
 use DateTime;
 use Psr\SimpleCache\CacheInterface;
+use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
+
+use function array_keys;
+use function array_map;
+use function gettype;
+use function is_iterable;
+use function is_object;
+use function is_string;
+use function iterator_to_array;
+use function strpbrk;
+use function time;
 
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
@@ -21,20 +32,13 @@ final class ArrayCache implements CacheInterface
 
     private array $cache = [];
 
-    /**
-     * @param string $key
-     * @param mixed $default
-     *
-     * @return mixed|null
-     */
     public function get($key, $default = null)
     {
-        $this->validateKey($key);
-        if (isset($this->cache[$key]) && !$this->isExpired($key)) {
-            /** @var mixed */
+        if ($this->has($key)) {
             $value = $this->cache[$key][0];
+
             if (is_object($value)) {
-                $value = clone $value;
+                return clone $value;
             }
 
             return $value;
@@ -47,12 +51,15 @@ final class ArrayCache implements CacheInterface
     {
         $this->validateKey($key);
         $expiration = $this->ttlToExpiration($ttl);
+
         if ($expiration < 0) {
             return $this->delete($key);
         }
+
         if (is_object($value)) {
             $value = clone $value;
         }
+
         $this->cache[$key] = [$value, $expiration];
         return true;
     }
@@ -75,11 +82,12 @@ final class ArrayCache implements CacheInterface
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         $results = [];
+
         foreach ($keys as $key) {
-            assert(is_string($key));
             $value = $this->get($key, $default);
             $results[$key] = $value;
         }
+
         return $results;
     }
 
@@ -87,9 +95,11 @@ final class ArrayCache implements CacheInterface
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
+
         foreach ($values as $key => $value) {
-            $this->set((string)$key, $value, $ttl);
+            $this->set((string) $key, $value, $ttl);
         }
+
         return true;
     }
 
@@ -97,17 +107,18 @@ final class ArrayCache implements CacheInterface
     {
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
+
         foreach ($keys as $key) {
-            assert(is_string($key));
             $this->delete($key);
         }
+
         return true;
     }
 
     public function has($key): bool
     {
         $this->validateKey($key);
-        return isset($this->cache[$key]) && !$this->isExpired($key);
+        return !$this->isExpired($key);
     }
 
     /**
@@ -119,7 +130,7 @@ final class ArrayCache implements CacheInterface
      */
     private function isExpired(string $key): bool
     {
-        return $this->cache[$key][1] !== 0 && $this->cache[$key][1] <= time();
+        return !isset($this->cache[$key]) || ($this->cache[$key][1] !== 0 && $this->cache[$key][1] <= time());
     }
 
     /**
@@ -145,8 +156,6 @@ final class ArrayCache implements CacheInterface
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection DateTime won't throw exception because constant string is passed as time
-     *
      * Normalizes cache TTL handling strings and {@see DateInterval} objects.
      *
      * @param DateInterval|int|string|null $ttl raw TTL.
@@ -159,29 +168,28 @@ final class ArrayCache implements CacheInterface
             return (new DateTime('@0'))->add($ttl)->getTimestamp();
         }
 
-        if (is_string($ttl)) {
-            return (int)$ttl;
+        if ($ttl === null) {
+            return null;
         }
 
-        return $ttl;
+        return (int) $ttl;
     }
 
     /**
      * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
      *
-     * @param iterable $iterable
+     * @param mixed $iterable
      *
      * @return array
      */
     private function iterableToArray($iterable): array
     {
-        /** @psalm-suppress DocblockTypeContradiction */
         if (!is_iterable($iterable)) {
             throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
         }
 
         /** @psalm-suppress RedundantCast */
-        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
     }
 
     /**
@@ -189,7 +197,7 @@ final class ArrayCache implements CacheInterface
      */
     private function validateKey($key): void
     {
-        if (!\is_string($key) || strpbrk($key, '{}()/\@:')) {
+        if (!is_string($key) || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
@@ -204,9 +212,6 @@ final class ArrayCache implements CacheInterface
         }
     }
 
-    /**
-     * @param array $values
-     */
     private function validateKeysOfValues(array $values): void
     {
         $keys = array_map('strval', array_keys($values));

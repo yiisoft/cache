@@ -105,7 +105,7 @@ final class Cache implements CacheInterface
 
         $dependency = $this->metadata->dependency($key);
 
-        if ($dependency !== null && $dependency->isChanged($this)) {
+        if ($dependency !== null && $dependency->isChanged($this->handler)) {
             return null;
         }
 
@@ -132,7 +132,7 @@ final class Cache implements CacheInterface
         $value = $callable($this);
 
         if ($dependency !== null) {
-            $dependency->evaluateDependency($this);
+            $dependency->evaluateDependency($this->handler);
         }
 
         if (!$this->handler->set($key, $value, $ttl)) {
