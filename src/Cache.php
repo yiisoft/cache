@@ -22,56 +22,41 @@ use function mb_strlen;
 use function md5;
 
 /**
- * Cache provides support for the data caching, including cache key composition and dependencies.
- * The actual data caching is performed via {@see Cache::$handler}, which should be configured
- * to be {@see \Psr\SimpleCache\CacheInterface} instance.
+ * Cache provides support for the data caching, including cache key composition and dependencies, and supports
+ * "Probably early expiration". The actual data caching is performed via {@see Cache::$handler},
+ * which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
  *
- * A value can be stored in the cache by calling {@see CacheInterface::set()} and be retrieved back
- * later (in the same or different request) by {@see CacheInterface::get()}. In both operations,
- * a key identifying the value is required. An expiration time and/or a {@see Dependency}
- * can also be specified when calling {@see CacheInterface::set()}. If the value expires or the dependency
- * changes at the time of calling {@see CacheInterface::get()}, the cache will return no data.
- *
- * A typical usage pattern of cache is like the following:
- *
- * ```php
- * $key = 'demo';
- * $data = $cache->get($key);
- * if ($data === null) {
- *     // ...generate $data here...
- *     $cache->set($key, $data, $ttl, $dependency);
- * }
- * ```
- *
- * For more details and usage information on Cache, see
- * [PSR-16 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-16-simple-cache.md).
+ * @see \Yiisoft\Cache\CacheInterface
  */
 final class Cache implements CacheInterface
 {
     /**
-     * @var \Psr\SimpleCache\CacheInterface actual cache handler.
+     * @var \Psr\SimpleCache\CacheInterface The actual cache handler.
      */
     private \Psr\SimpleCache\CacheInterface $handler;
 
+    /**
+     * @var CacheItems The items that store the metadata of each cache.
+     */
     private CacheItems $metadata;
 
     /**
-     * @var string a string prefixed to every cache key so that it is unique globally in the whole cache storage.
+     * @var int|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
+     * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
+     */
+    private ?int $defaultTtl;
+
+    /**
+     * @var string The string prefixed to every cache key so that it is unique globally in the whole cache storage.
      * It is recommended that you set a unique cache key prefix for each application if the same cache
      * storage is being used by different applications.
      */
     private string $keyPrefix;
 
     /**
-     * @var int|null default TTL for a cache entry. null meaning infinity, negative or zero results in cache key deletion.
-     * This value is used by {@see set()} and {@see setMultiple()}, if the duration is not explicitly given.
-     */
-    private ?int $defaultTtl;
-
-    /**
-     * @param \Psr\SimpleCache\CacheInterface $handler
-     * @param DateInterval|int|null $defaultTtl
-     * @param string $keyPrefix
+     * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
+     * @param DateInterval|int|null $defaultTtl The default TTL for a cache entry.
+     * @param string $keyPrefix The string prefixed to every cache key.
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null, string $keyPrefix = '')
     {
@@ -104,6 +89,14 @@ final class Cache implements CacheInterface
         $this->metadata->remove($key);
     }
 
+    /**
+     * Gets the cache value.
+     *
+     * @param string $key The unique key of this item in the cache.
+     * @param float $beta The value for calculating the range that is used for "Probably early expiration".
+     *
+     * @return mixed|null The cache value or `null` if the cache is outdated or a dependency has been changed.
+     */
     private function getValue(string $key, float $beta)
     {
         if ($this->metadata->expired($key, $beta)) {
@@ -119,6 +112,19 @@ final class Cache implements CacheInterface
         return $this->handler->get($key);
     }
 
+    /**
+     * Sets the cache value and metadata, and returns the cache value.
+     *
+     * @param string $key The unique key of this item in the cache.
+     * @param callable $callable The callable or closure that will be used to generate a value to be cached.
+     * @param DateInterval|int|null $ttl The TTL of this value. If not set, default value is used.
+     * @param Dependency|null $dependency The dependency of the cache value.
+     *
+     * @throws InvalidArgumentException Must be thrown if the `$key` or `$ttl` is not a legal value.
+     * @throws SetCacheException Must be thrown if the data could not be set in the cache.
+     *
+     * @return mixed|null The cache value.
+     */
     private function setAndGet(string $key, callable $callable, $ttl, ?Dependency $dependency)
     {
         $ttl = $this->normalizeTtl($ttl);

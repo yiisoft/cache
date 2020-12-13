@@ -6,6 +6,11 @@ namespace Yiisoft\Cache\Metadata;
 
 use Yiisoft\Cache\Dependency\Dependency;
 
+/**
+ * CacheItems store the metadata of each cache item.
+ *
+ * @internal
+ */
 final class CacheItems
 {
     /**

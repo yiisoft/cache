@@ -16,6 +16,11 @@ use function time;
 
 use const PHP_INT_MAX;
 
+/**
+ * CacheItem store the metadata of cache item.
+ *
+ * @internal
+ */
 final class CacheItem
 {
     private ?int $expiry;
