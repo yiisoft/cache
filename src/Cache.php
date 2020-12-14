@@ -23,9 +23,9 @@ use function mb_strlen;
 use function md5;
 
 /**
- * Cache provides support for the data caching, including cache key composition and dependencies, and supports
- * "Probably early expiration". The actual data caching is performed via {@see Cache::$handler},
- * which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
+ * Cache provides support for the data caching, including cache key composition and dependencies, and uses
+ * "Probably early expiration" for cache stampede prevention. The actual data caching is performed via
+ * {@see Cache::$handler}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
  *
  * @see \Yiisoft\Cache\CacheInterface
  */
