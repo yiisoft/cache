@@ -76,6 +76,7 @@ final class NullCache implements CacheInterface
 
     /**
      * @param mixed $iterable
+     *
      * @return array
      */
     private function iterableToArray($iterable): array

@@ -35,7 +35,7 @@ class CacheTest extends TestCase
     public function testGetOrSet(): void
     {
         $cache = new Cache($this->handler);
-        $cache->getOrSet('key', fn(CacheInterface $cache): string => get_class($cache));
+        $cache->getOrSet('key', fn (CacheInterface $cache): string => get_class($cache));
         $items = $this->getItems($cache);
 
         $this->assertSame('key', $items['key']->key());
@@ -48,7 +48,7 @@ class CacheTest extends TestCase
     public function testGetOrSetWithTtl(): void
     {
         $cache = new Cache($this->handler);
-        $cache->getOrSet('key', fn(): string => 'value', $ttl = time() + 3600);
+        $cache->getOrSet('key', fn (): string => 'value', $ttl = time() + 3600);
         $items = $this->getItems($cache);
 
         $this->assertSame('value', $items['key']->value());
@@ -59,7 +59,7 @@ class CacheTest extends TestCase
     public function testGetOrSetWithExpiredTtl(): void
     {
         $cache = new Cache($this->handler);
-        $cache->getOrSet('key', fn(): string => 'value', $ttl = time());
+        $cache->getOrSet('key', fn (): string => 'value', $ttl = time());
         $items = $this->getItems($cache);
 
         $this->assertSame('value', $items['key']->value());
@@ -71,14 +71,14 @@ class CacheTest extends TestCase
     {
         $cache = new Cache($this->handler);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value', null, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value', null, new TagDependency('tag'));
         $this->assertSame('value', $value);
 
-        $value = $cache->getOrSet('key', fn(): string => 'new-value', null, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'new-value', null, new TagDependency('tag'));
         $this->assertSame('value', $value);
 
         TagDependency::invalidate($this->handler, 'tag');
-        $value = $cache->getOrSet('key', fn(): string => 'new-value', null, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'new-value', null, new TagDependency('tag'));
         $this->assertSame('new-value', $value);
     }
 
@@ -86,23 +86,23 @@ class CacheTest extends TestCase
     {
         $cache = new Cache($this->handler);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-1', -1, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value-1', -1, new TagDependency('tag'));
         $this->assertSame('value-1', $value);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-2', time(), new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value-2', time(), new TagDependency('tag'));
         $this->assertSame('value-2', $value);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-3', time() + 3600, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value-3', time() + 3600, new TagDependency('tag'));
         $this->assertSame('value-3', $value);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-4', null, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value-4', null, new TagDependency('tag'));
         $this->assertSame('value-3', $value);
 
         TagDependency::invalidate($this->handler, 'tag');
-        $value = $cache->getOrSet('key', fn(): string => 'value-5', null, new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value-5', null, new TagDependency('tag'));
         $this->assertSame('value-5', $value);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-6');
+        $value = $cache->getOrSet('key', fn (): string => 'value-6');
         $this->assertSame('value-5', $value);
     }
 
@@ -110,12 +110,12 @@ class CacheTest extends TestCase
     {
         $cache = new Cache($this->handler);
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-1');
+        $value = $cache->getOrSet('key', fn (): string => 'value-1');
         $this->assertSame('value-1', $value);
 
         $cache->remove('key');
 
-        $value = $cache->getOrSet('key', fn(): string => 'value-2');
+        $value = $cache->getOrSet('key', fn (): string => 'value-2');
         $this->assertSame('value-2', $value);
     }
 
@@ -353,6 +353,7 @@ class CacheTest extends TestCase
 
     /**
      * @param \Yiisoft\Cache\CacheInterface $cache
+     *
      * @return array<string, CacheItem>
      */
     private function getItems(\Yiisoft\Cache\CacheInterface $cache): array

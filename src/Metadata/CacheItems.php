@@ -22,6 +22,7 @@ final class CacheItems
      * @param string $key
      * @param float $beta
      * @param CacheInterface $cache
+     *
      * @return mixed|null
      */
     public function getValue(string $key, float $beta, CacheInterface $cache)
