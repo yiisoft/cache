@@ -25,7 +25,8 @@ interface CacheInterface
      *
      * ```php
      * public function getTopProducts(int $count = 10) {
-     *     return $this->cache->getOrSet(['top-products', $count], function (CacheInterface $cache) use ($count) {
+     *     $key = ['top-products', $count];
+     *     return $this->cache->getOrSet($key, function (\Psr\SimpleCache\CacheInterface $cache) use ($count) {
      *         return $this->getTopNProductsFromDatabase($count);
      *     }, 1000);
      * }

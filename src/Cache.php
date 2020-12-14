@@ -131,7 +131,7 @@ final class Cache implements CacheInterface
     {
         $ttl = $this->normalizeTtl($ttl);
         $ttl ??= $this->defaultTtl;
-        $value = $callable($this);
+        $value = $callable($this->handler);
 
         if ($dependency !== null) {
             $dependency->evaluateDependency($this->handler);
