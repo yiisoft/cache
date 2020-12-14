@@ -6,7 +6,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use Psr\SimpleCache\CacheInterface;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 
@@ -25,7 +24,7 @@ use function time;
  *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that ArrayCache supports.
  */
-final class ArrayCache implements CacheInterface
+final class ArrayCache implements \Psr\SimpleCache\CacheInterface
 {
     private const EXPIRATION_INFINITY = 0;
     private const EXPIRATION_EXPIRED = -1;

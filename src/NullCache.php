@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
-use Psr\SimpleCache\CacheInterface;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 
@@ -22,7 +21,7 @@ use function strpbrk;
  *
  * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that NullCache supports.
  */
-final class NullCache implements CacheInterface
+final class NullCache implements \Psr\SimpleCache\CacheInterface
 {
     public function get($key, $default = null)
     {
