@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Cache\Metadata;
 
 use Psr\SimpleCache\CacheInterface;
-use Yiisoft\Cache\Dependency\Dependency;
 
 /**
  * CacheItems store the metadata of each cache item.
@@ -19,23 +18,19 @@ final class CacheItems
      */
     private array $items = [];
 
-    public function expired(string $key, float $beta, CacheInterface $cache): bool
+    /**
+     * @param string $key
+     * @param float $beta
+     * @param CacheInterface $cache
+     * @return mixed|null
+     */
+    public function getValue(string $key, float $beta, CacheInterface $cache)
     {
-        return isset($this->items[$key]) && $this->items[$key]->expired($beta, $cache);
-    }
-
-    public function dependency(string $key): ?Dependency
-    {
-        if (isset($this->items[$key])) {
-            return $this->items[$key]->dependency();
+        if (isset($this->items[$key]) && !$this->items[$key]->expired($beta, $cache)) {
+            return $this->items[$key]->value();
         }
 
         return null;
-    }
-
-    public function get(string $key): ?CacheItem
-    {
-        return $this->items[$key] ?? null;
     }
 
     public function set(CacheItem $item): void
@@ -55,5 +50,10 @@ final class CacheItems
         if (isset($this->items[$key])) {
             unset($this->items[$key]);
         }
+    }
+
+    public function has(string $key): bool
+    {
+        return isset($this->items[$key]);
     }
 }

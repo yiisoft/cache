@@ -100,15 +100,15 @@ final class Cache implements CacheInterface
      */
     private function getValue(string $key, float $beta)
     {
-        if ($this->items->expired($key, $beta, $this->handler)) {
-            return null;
+        if ($this->items->has($key)) {
+            return $this->items->getValue($key, $beta, $this->handler);
         }
 
         $value = $this->handler->get($key);
 
         if ($value instanceof CacheItem) {
             $this->items->set($value);
-            return $value->expired($beta, $this->handler) ? null : $value->value();
+            return $this->items->getValue($key, $beta, $this->handler);
         }
 
         return $value;
@@ -140,7 +140,7 @@ final class Cache implements CacheInterface
         $item = new CacheItem($key, $value, $ttl, $dependency);
 
         if (!$this->handler->set($key, $item, $ttl)) {
-            throw new SetCacheException($key, $item, $ttl);
+            throw new SetCacheException($key, $item);
         }
 
         $this->items->set($item);
