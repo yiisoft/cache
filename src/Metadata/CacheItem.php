@@ -91,6 +91,10 @@ final class CacheItem
             ));
         }
 
+        if ($this->dependency !== null && $this->dependency->isChanged($cache)) {
+            return true;
+        }
+
         if ($this->expiry === null) {
             return false;
         }
@@ -103,6 +107,6 @@ final class CacheItem
         $delta = ceil(1000 * ($now - $this->updated)) / 1000;
         $expired = $now - $delta * $beta * log(random_int(1, PHP_INT_MAX) / PHP_INT_MAX);
 
-        return $this->expiry <= $expired || ($this->dependency !== null && $this->dependency->isChanged($cache));
+        return $this->expiry <= $expired;
     }
 }
