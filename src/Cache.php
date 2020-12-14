@@ -75,11 +75,7 @@ final class Cache implements CacheInterface
         $key = $this->buildKey($key);
         $value = $this->getValue($key, $beta);
 
-        if ($value !== null) {
-            return $value;
-        }
-
-        return $this->setAndGet($key, $callable, $ttl, $dependency);
+        return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
     }
 
     public function remove($key): void
@@ -97,7 +93,7 @@ final class Cache implements CacheInterface
      * Gets the cache value.
      *
      * @param string $key The unique key of this item in the cache.
-     * @param float $beta The value for calculating the range that is used for "Probably early expiration".
+     * @param float $beta The value for calculating the range that is used for "Probably early expiration" algorithm.
      *
      * @return mixed|null The cache value or `null` if the cache is outdated or a dependency has been changed.
      */
