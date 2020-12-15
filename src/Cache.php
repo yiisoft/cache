@@ -43,7 +43,8 @@ final class Cache implements CacheInterface
     private CacheItems $items;
 
     /**
-     * @var int|null
+     * @var int|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
+     * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
     private ?int $defaultTtl;
 
