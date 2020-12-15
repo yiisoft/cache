@@ -66,7 +66,7 @@ final class CacheItem
     }
 
     /**
-     * Returns a cache expiry or null that meaning infinity.
+     * Returns a cache expiry or null that means infinity.
      *
      * @return int|null The cache expiry or null that meaning infinity.
      */
