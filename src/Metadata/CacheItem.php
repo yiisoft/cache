@@ -68,7 +68,7 @@ final class CacheItem
     /**
      * Returns a cache expiry or null that means infinity.
      *
-     * @return int|null The cache expiry or null that meaning infinity.
+     * @return int|null The cache expiry timestamp or null that means infinity.
      */
     public function expiry(): ?int
     {
