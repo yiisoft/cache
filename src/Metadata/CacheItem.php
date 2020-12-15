@@ -78,7 +78,7 @@ final class CacheItem
     /**
      * Returns a cache dependency or null if it is not assigned.
      *
-     * @return Dependency|null The cache dependency or null if it is not assigned.
+     * @return Dependency|null The cache dependency or null if there is none.
      */
     public function dependency(): ?Dependency
     {
