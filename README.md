@@ -15,7 +15,7 @@
 [![static analysis](https://github.com/yiisoft/cache/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/cache/actions?query=workflow%3A%22static+analysis%22)
 [![type-coverage](https://shepherd.dev/github/yiisoft/cache/coverage.svg)](https://shepherd.dev/github/yiisoft/cache)
 
-This library provides a wrapper around [PSR-16](https://www.php-fig.org/psr/psr-16/) compatible caching libraries
+This library is a wrapper around [PSR-16](https://www.php-fig.org/psr/psr-16/) compatible caching libraries
 providing own features. It is used in [Yii Framework](https://www.yiiframework.com/) but is usable separately.
 
 ## Features
