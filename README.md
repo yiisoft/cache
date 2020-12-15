@@ -6,12 +6,6 @@
     <br>
 </p>
 
-This library provides a wrapper around [PSR-16] compatible caching libraries adding more features.
-It is used in [Yii Framework] but is usable separately.
-
-[PSR-16]: https://www.php-fig.org/psr/psr-16/
-[Yii Framework]: https://www.yiiframework.com/
-
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/cache/v/stable.png)](https://packagist.org/packages/yiisoft/cache)
 [![Total Downloads](https://poser.pugx.org/yiisoft/cache/downloads.png)](https://packagist.org/packages/yiisoft/cache)
 [![Build status](https://github.com/yiisoft/cache/workflows/build/badge.svg)](https://github.com/yiisoft/cache/actions?query=workflow%3Abuild)
@@ -21,59 +15,59 @@ It is used in [Yii Framework] but is usable separately.
 [![static analysis](https://github.com/yiisoft/cache/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/cache/actions?query=workflow%3A%22static+analysis%22)
 [![type-coverage](https://shepherd.dev/github/yiisoft/cache/coverage.svg)](https://shepherd.dev/github/yiisoft/cache)
 
+This library provides a wrapper around [PSR-16](https://www.php-fig.org/psr/psr-16/) compatible caching libraries
+providing own features. It is used in [Yii Framework](https://www.yiiframework.com/) but is usable separately.
+
 ## Features
 
-- Built on top of PSR-16, could be used as PSR-16 cache or use any PSR-16 cache as backend.
-- Provides multiple cache backends: APC, PHP array, files, memcached, WinCache.
-- Customizable way of serializing data. Out of the box PHP, JSON, Igbinary and custom callbacks are supported.
+- Built on top of PSR-16, it can use any PSR-16 cache as a handler.
 - Ability to set default TTL and key prefix per cache instance.
-- Easy to implement your own cache backends extending from `SimpleCache`.
-- Adds cache invalidation dependencies on top of PSR-16. Out of the box supports invalidation by tag and invalidation by 
-  file modification time.
-- Adds support for `add()` and `addMultiple()` operations additionally to PSR-16.
-- Adds handy `getOrSet()` method additionally to PSR-16.
+- Provides a built-in behavior to cache stampede prevention.
+- Adds cache invalidation dependencies on top of PSR-16.
+  
+## Installation
+
+The package could be installed with composer:
+
+```
+composer install yiisoft/cache
+```
 
 ## Configuration
 
-There are two ways to get cache instance. If you need plain PSR-16 instance, you can simply create it:
+There are two ways to get cache instance. If you need PSR-16 instance, you can simply create it:
 
 ```php
-$cache = new ApcuCache();
+$arrayCache = new \Yiisoft\Cache\ArrayCache();
 ```
 
-If you need additional features such as invalidation dependencies, `add()`, `addMultiple()` or `getOrSet()` you should
-wrap PSR-16 cache instance with `Cache`:
+If you need a simpler yet more powerful way to cache values based on recomputation callbacks using just
+two methods `getOrSet()` and `remove()`. Plus additional features such as invalidation dependencies and
+"Probably early expiration", you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
 
 ```php
-$cache = new Cache(new ApcuCache());
+$cache = new \Yiisoft\Cache\Cache($arrayCache);
 ```
 
-In order to change default serializer you can use `setSerializer()` method:
+Set a default TTL:
 
 ```php
-$cache = new WinCache();
-$cache->setSerializer(new JsonSerializer());
+$cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 ```
 
-Default TTL could be set via `setDefaultTtl()`:
+Set a key prefix:
 
 ```php
-$cache = new ArrayCache();
-$cache->setDefaultTtl(60 * 60); // 1 hour
+$cache = new \Yiisoft\Cache\Cache($arrayCache, null, 'myapp');
 ```
 
-In order to set key prefix for a cache instance, use `setKeyPrefix()` method:
+## General usage
+
+Typical PSR-16 cache usage is the following:
 
 ```php
-$cache = new Memcached();
-$cache->setKeyPrefix('myapp');
-```
-
-## Usage
-
-Typical cache usage is the following:
-
-```php
+$cache = new \Yiisoft\Cache\ArrayCache();
+$parameters = ['user_id' => 42];
 $key = 'demo';
 
 // try retrieving $data from cache
@@ -93,6 +87,8 @@ In order to delete value you can use:
 
 ```php
 $cache->delete($key);
+// Or all cache
+$cache->clear();
 ```
 
 To work with values in a more efficient manner, batch operations should be used:
@@ -105,59 +101,88 @@ When using extended cache i.e. PSR-16 cache wrapped with `\Yiisoft\Cache\Cache`,
 is less repetitive:
 
 ```php
-$parameters = ['user_id' => 42];
-$data = $cache->getOrSet($key, function () use ($parameters) {
-    return $this->calculateSomething($parameters);
+$cache = new \Yiisoft\Cache\Cache(new \Yiisoft\Cache\ArrayCache());
+$key = ['top-products', $count = 10];
+
+$data = $cache->getOrSet($key, function (\Psr\SimpleCache\CacheInterface $cache) use ($count) {
+    return getTopProductsFromDatabase($count);
 }, 3600);
 ```
 
-Additionally, `add()` and `addMultiple()` are avaialble. These methods work like `set()` and `setMultiple()` except
-they store cache only if there is no existing value.
+In order to delete value you can use:
+
+```php
+$cache->remove($key);
+```
 
 ### Invalidation dependencies
 
-When using extended cache i.e. PSR-16 cache wrapped with `\Yiisoft\Cache\Cache`, additionally to TTL for `set()`,
-`setMultiple()`, `add()`, `addMultiple()` or `getOrSet()` methods you can specify a dependency that may trigger cache
-invalidation. Below is an example using tag dependency:
+When using `\Yiisoft\Cache\Cache`, additionally to TTL for `getOrSet()` method you can specify a dependency
+that may trigger cache invalidation. Below is an example using tag dependency:
 
 ```php
+/**
+ * @var callable $callable
+ * @var \Yiisoft\Cache\CacheInterface $cache
+ */
+
+use Yiisoft\Cache\Dependency\TagDependency;
+
 // set multiple cache values marking both with a tag
-$cache->set('item_42_price', 13, null, new TagDependency('item_42'));
-$cache->set('item_42_total', 26, null, new TagDependency('item_42'));
+$cache->getOrSet('item_42_price', $callable, null, new TagDependency('item_42'));
+$cache->set('item_42_total', $callable, 3600, new TagDependency('item_42'));
 
 // trigger invalidation by tag
 TagDependency::invalidate($cache, 'item_42');
 ```
 
-Out of there is file dependency that invalidates cache based on file modification time and callback dependency that
-invalidates cache when callback result changes.
+Out of there is `Yiisoft\Cache\Dependency\FileDependency` that invalidates cache based on file modification time
+and `Yiisoft\Cache\Dependency\CallbackDependency` that invalidates cache when callback result changes.
 
 In order to implement your own dependency extend from `Yiisoft\Cache\Dependency\Dependency`.
 
-You may combine multiple dependencies using `AnyDependency` or `AllDependencies`. 
+You may combine multiple dependencies using `Yiisoft\Cache\Dependency\AnyDependency`
+or `Yiisoft\Cache\Dependency\AllDependencies`. 
 
 
-## Implementing your own cache backend
+### Probably early expiration
 
-There are two ways to implement cache backend. You can start from scratch by implementing `\Psr\SimpleCache\CacheInterface`
-or you can inherit from `\Yiisoft\Cache\SimpleCache`. In the latter case you have to implement the following methods:
+The `\Yiisoft\Cache\Cache` uses a built-in "Probably early expiration" algorithm that prevents cache stampede.
+This algorithm randomly fakes a cache miss for one user while others are still served the cached value.
+You can control its behavior with the fifth optional parameter of `getOrSet()`, which is a float value called `$beta`.
+By default, beta is `1.0`, which is sufficient in most cases. The higher values mean earlier recompute.
 
-- `hasValue()` - check if value with a key exists in cache.
-- `getValue()` - retrieve the value with a key (if any) from cache
-- `setValue()` - store the value with a key into cache
-- `deleteValue()` - delete the value with the specified key from cache
-- `clear()` - delete all values from cache
+```php
+/**
+ * @var mixed $key
+ * @var callable $callable
+ * @var \DateInterval $ttl
+ * @var \Yiisoft\Cache\CacheInterface $cache
+ * @var \Yiisoft\Cache\Dependency\Dependency $dependency
+ */
 
-Additionally, you may override the following methods in case backend supports getting any/or setting multiple keys
-at once:
+$beta = 2.0;
+$cache->getOrSet($key, $callable, $ttl, $dependency, $beta);
+```
 
-- `getValues()` - retrieve multiple values from cache
-- `setValues()` - store multiple values into cache
-- `deleteValues()` - delete multiple values from cache
+### Cache handlers
 
-## Unit testing
+> Under the handler refers to the implementations of [PSR-16](https://www.php-fig.org/psr/psr-16/).
 
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
+This package contains two handlers:
+
+- `Yiisoft\Cache\ArrayCache` - provides caching for the current request only by storing the values in an array.
+- `Yiisoft\Cache\NullCache` - does not cache anything reporting success for all methods calls.
+
+Extra cache handlers are implemented as separate packages:
+
+- [APCu](https://github.com/yiisoft/cache-apcu)
+- [Database](https://github.com/yiisoft/cache-db)
+- [File](https://github.com/yiisoft/cache-file)
+- [Memcached](https://github.com/yiisoft/cache-memcached)
+- [Wincache](https://github.com/yiisoft/cache-wincache)
+
+### Unit testing
 
 ```php
 ./vendor/bin/phpunit
@@ -171,7 +196,7 @@ The package tests are checked with [Infection](https://infection.github.io/) mut
 ./vendor/bin/infection
 ```
 
-## Static analysis
+### Static analysis
 
 The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
 
