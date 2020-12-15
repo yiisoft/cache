@@ -25,7 +25,7 @@ final class CacheItems
      * @param float $beta The value for calculating the range that is used for "Probably early expiration" algorithm.
      * @param CacheInterface $cache The actual cache handler.
      *
-     * @return bool Whether the dependency has been changed and whether the cache expires.
+     * @return bool Whether the dependency has been changed or whether the cache expired.
      */
     public function expired(string $key, float $beta, CacheInterface $cache): bool
     {
