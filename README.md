@@ -149,7 +149,7 @@ or `Yiisoft\Cache\Dependency\AllDependencies`.
 The `\Yiisoft\Cache\Cache` uses a built-in "Probably early expiration" algorithm that prevents cache stampede.
 This algorithm randomly fakes a cache miss for one user while others are still served the cached value.
 You can control its behavior with the fifth optional parameter of `getOrSet()`, which is a float value called `$beta`.
-By default, beta is `1.0`, which is sufficient in most cases. The higher values mean earlier recompute.
+By default, beta is `1.0`, which is sufficient in most cases. The higher the velue the earlier cache will be re-created.
 
 ```php
 /**
