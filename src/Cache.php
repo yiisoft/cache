@@ -49,32 +49,21 @@ final class Cache implements CacheInterface
     private ?int $defaultTtl;
 
     /**
-     * @var string The string prefixed to every cache key so that it is unique globally in the whole cache storage.
-     * It is recommended that you set a unique cache key prefix for each application if the same cache
-     * storage is being used by different applications.
-     */
-    private string $keyPrefix;
-
-    /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
      * @param DateInterval|int|null $defaultTtl The default TTL for a cache entry.
      * null meaning infinity, negative orzero results in the cache key deletion.
      * This value is used by {@see getOrSet()}, if the duration is not explicitly given.
-     * @param string $keyPrefix The string prefixed to every cache key so that it is unique globally
-     * in the whole cache storage. It is recommended that you set a unique cache key prefix for each
-     * application if the same cache storage is being used by different applications.
      */
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null, string $keyPrefix = '')
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null)
     {
         $this->handler = $handler;
         $this->items = new CacheItems();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
-        $this->keyPrefix = $keyPrefix;
     }
 
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
     {
-        $key = $this->buildKey($key);
+        $key = $this->normalizeKey($key);
         $value = $this->getValue($key, $beta);
 
         return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
@@ -82,7 +71,7 @@ final class Cache implements CacheInterface
 
     public function remove($key): void
     {
-        $key = $this->buildKey($key);
+        $key = $this->normalizeKey($key);
 
         if (!$this->handler->delete($key)) {
             throw new RemoveCacheException($key);
@@ -151,18 +140,6 @@ final class Cache implements CacheInterface
 
         $this->items->set($item);
         return $value;
-    }
-
-    /**
-     * Builds a normalized cache key from a given key by appending key prefix.
-     *
-     * @param mixed $key The key to be normalized.
-     *
-     * @return string The generated cache key.
-     */
-    private function buildKey($key): string
-    {
-        return $this->keyPrefix . $this->normalizeKey($key);
     }
 
     /**
