@@ -41,6 +41,12 @@ There are two ways to get cache instance. If you need PSR-16 instance, you can s
 $arrayCache = new \Yiisoft\Cache\ArrayCache();
 ```
 
+In order to set a global key prefix:
+
+```php
+$arrayCacheWithPrefix = new \Yiisoft\Cache\PrefixedCache(new \Yiisoft\Cache\ArrayCache(), 'myapp_');
+```
+
 If you need a simpler yet more powerful way to cache values based on recomputation callbacks use `getOrSet()` and `remove()`, additional features such as invalidation dependencies and
 "Probably early expiration" stampede prevention, you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
 
@@ -52,12 +58,6 @@ Set a default TTL:
 
 ```php
 $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
-```
-
-Set a key prefix:
-
-```php
-$cache = new \Yiisoft\Cache\Cache($arrayCache, null, 'myapp');
 ```
 
 ## General usage
