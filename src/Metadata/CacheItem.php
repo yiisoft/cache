@@ -32,7 +32,7 @@ final class CacheItem
     /**
      * @param string $key The key that identifies the cache item.
      * @param int|null $expiry The cache expiry. null means infinity.
-     * @param Dependency|null $dependency The cache dependency or null if it is not assigned.
+     * @param Dependency|null $dependency The cache invalidation dependency or null for none.
      */
     public function __construct(string $key, ?int $expiry, ?Dependency $dependency)
     {
