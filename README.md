@@ -144,7 +144,7 @@ You may combine multiple dependencies using `Yiisoft\Cache\Dependency\AnyDepende
 or `Yiisoft\Cache\Dependency\AllDependencies`. 
 
 
-### Probably early expiration
+### Cache stampede prevention
 
 The `\Yiisoft\Cache\Cache` uses a built-in "Probably early expiration" algorithm that prevents cache stampede.
 This algorithm randomly fakes a cache miss for one user while others are still served the cached value.
