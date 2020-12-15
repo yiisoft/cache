@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
-use \Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * PrefixedCache decorates any PSR-16 cache to add global prefix. It is added to every cache key so that it is unique
@@ -65,7 +65,7 @@ final class PrefixedCache implements CacheInterface
     {
         $prefixedValues = [];
         foreach ($values as $key => $value) {
-            $prefixedValues[$this->prefix .$key] = $value;
+            $prefixedValues[$this->prefix . $key] = $value;
         }
         return $this->cache->setMultiple($prefixedValues, $ttl);
     }
