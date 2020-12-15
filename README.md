@@ -166,7 +166,7 @@ $cache->getOrSet($key, $callable, $ttl, $dependency, $beta);
 
 ### Cache handlers
 
-> Under the handler refers to the implementations of [PSR-16](https://www.php-fig.org/psr/psr-16/).
+> Below the handler refers to the implementations of [PSR-16](https://www.php-fig.org/psr/psr-16/).
 
 This package contains two handlers:
 
