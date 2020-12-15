@@ -86,7 +86,7 @@ final class CacheItem
     }
 
     /**
-     * Checks whether the dependency has been changed and whether the cache expires.
+     * Checks whether the dependency has been changed or whether the cache expired.
      *
      * @param float $beta The value for calculating the range that is used for "Probably early expiration" algorithm.
      * @param CacheInterface $cache The actual cache handler.
