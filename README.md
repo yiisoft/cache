@@ -41,9 +41,8 @@ There are two ways to get cache instance. If you need PSR-16 instance, you can s
 $arrayCache = new \Yiisoft\Cache\ArrayCache();
 ```
 
-If you need a simpler yet more powerful way to cache values based on recomputation callbacks using just
-two methods `getOrSet()` and `remove()`. Plus additional features such as invalidation dependencies and
-"Probably early expiration", you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
+If you need a simpler yet more powerful way to cache values based on recomputation callbacks use `getOrSet()` and `remove()`, additional features such as invalidation dependencies and
+"Probably early expiration" stampede prevention, you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
 
 ```php
 $cache = new \Yiisoft\Cache\Cache($arrayCache);
