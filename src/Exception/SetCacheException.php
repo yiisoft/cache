@@ -4,40 +4,26 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Exception;
 
-use Yiisoft\Cache\CacheInterface;
+use Yiisoft\Cache\Metadata\CacheItem;
 
 final class SetCacheException extends CacheException
 {
-    /** @var string $key */
-    private string $key;
-    /** @var mixed $value */
+    /**
+     * @var mixed
+     */
     private $value;
+    private CacheItem $item;
 
     /**
-     * @var CacheInterface
-     */
-    private CacheInterface $cache;
-
-    /**
+     * @param string $key
      * @param mixed $value
+     * @param CacheItem $item
      */
-    public function __construct(
-        string $key,
-        $value,
-        CacheInterface $cache,
-        string $message = 'Could not store the value in the cache',
-        int $code = 0,
-        \Throwable $previous = null
-    ) {
-        $this->key = $key;
-        $this->value = $value;
-        $this->cache = $cache;
-        parent::__construct($message, $code, $previous);
-    }
-
-    public function getKey(): string
+    public function __construct(string $key, $value, CacheItem $item)
     {
-        return $this->key;
+        $this->value = $value;
+        $this->item = $item;
+        parent::__construct($key, 'Failed to store the value in the cache.');
     }
 
     /**
@@ -48,8 +34,8 @@ final class SetCacheException extends CacheException
         return $this->value;
     }
 
-    public function getCache(): CacheInterface
+    public function getItem(): CacheItem
     {
-        return $this->cache;
+        return $this->item;
     }
 }

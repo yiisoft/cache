@@ -8,7 +8,7 @@ use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\FileDependency;
 
-class FileDependencyTest extends DependencyTestCase
+final class FileDependencyTest extends DependencyTestCase
 {
     private function getFilePath(): string
     {
@@ -41,12 +41,12 @@ class FileDependencyTest extends DependencyTestCase
         $this->touchFile();
         $dependency = $this->createDependency();
         $dependency->markAsReusable();
-        $cache->set('a', 1, null, $dependency);
-        $cache->set('b', 2, null, $dependency);
-        $this->assertSame(1, $cache->get('a'));
+        $cache->getOrSet('a', static fn () => 1, null, $dependency);
+        $cache->getOrSet('b', static fn () => 2, null, $dependency);
+        $this->assertSame(1, $cache->getOrSet('a', static fn () => null));
         sleep(1);
         $this->touchFile();
-        $this->assertSame(2, $cache->get('b'));
+        $this->assertSame(2, $cache->getOrSet('b', static fn () => null));
     }
 
     private function createDirectory(string $path, int $mode): bool
