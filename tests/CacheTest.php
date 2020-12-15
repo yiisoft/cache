@@ -166,14 +166,14 @@ class CacheTest extends TestCase
      * @dataProvider keyDataProvider
      *
      * @param mixed $key
-     * @param string $excepted
+     * @param string $expected
      */
-    public function testConstructorWithKeyPrefixAndGetOrSetWithOtherKeys($key, string $excepted): void
+    public function testConstructorWithKeyPrefixAndGetOrSetWithOtherKeys($key, string $expected): void
     {
-        $cache = new Cache($this->handler, null, 'prefix-');
+        $cache = new Cache($this->handler, null);
         $cache->getOrSet($key, static fn (): string => 'value');
         $items = $this->getItems($cache);
-        $this->assertSame("prefix-{$excepted}", $items["prefix-{$excepted}"]->key());
+        $this->assertSame($expected, $items[$expected]->key());
     }
 
     public function testGetOrSetThrowExceptionForInvalidKey(): void
