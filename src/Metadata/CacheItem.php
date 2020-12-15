@@ -46,7 +46,7 @@ final class CacheItem
      * Updates the metadata of the cache item.
      *
      * @param int|null $expiry The cache expiry. null means infinity.
-     * @param Dependency|null $dependency The cache dependency or null if it is not assigned.
+     * @param Dependency|null $dependency The cache invalidation dependency or null for none.
      */
     public function update(?int $expiry, ?Dependency $dependency): void
     {
