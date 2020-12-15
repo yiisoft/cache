@@ -144,14 +144,14 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         $ttl = $this->normalizeTtl($ttl);
 
         if ($ttl === null) {
-            $expiration = self::EXPIRATION_INFINITY;
-        } elseif ($ttl <= 0) {
-            $expiration = self::EXPIRATION_EXPIRED;
-        } else {
-            $expiration = $ttl + time();
+            return self::EXPIRATION_INFINITY;
         }
 
-        return $expiration;
+        if ($ttl <= 0) {
+            return self::EXPIRATION_EXPIRED;
+        }
+
+        return $ttl + time();
     }
 
     /**
