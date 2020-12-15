@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Dependency;
 
-use Yiisoft\Cache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
+use Traversable;
+
+use function array_key_exists;
+use function iterator_to_array;
+use function serialize;
+use function sha1;
 
 /**
  * Dependency is the base class for cache dependency classes.
  *
- * Child classes should override its {@see Dependency::generateDependencyData()} for generating
- * the actual dependency data.
+ * Child classes should override its {@see Dependency::generateDependencyData()}
+ * for generating the actual dependency data.
  */
 abstract class Dependency
 {
     /**
-     * @var mixed the dependency data that is saved in cache and later is compared with the
-     * latest dependency data
+     * @var mixed The dependency data that is saved in cache and later is compared with the latest dependency data.
      */
     protected $data;
 
@@ -45,43 +50,47 @@ abstract class Dependency
 
     /**
      * Evaluates the dependency by generating and saving the data related with dependency.
+     *
      * This method is invoked by cache before writing data into it.
      *
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache The cache component that is currently evaluating this dependency.
      */
     public function evaluateDependency(CacheInterface $cache): void
     {
-        if ($this->isReusable) {
-            $hash = $this->generateReusableHash();
-            if (!\array_key_exists($hash, self::$reusableData)) {
-                self::$reusableData[$hash] = $this->generateDependencyData($cache);
-            }
-            $this->data = self::$reusableData[$hash];
-        } else {
+        if (!$this->isReusable) {
             $this->data = $this->generateDependencyData($cache);
+            return;
         }
+
+        $hash = $this->generateReusableHash();
+
+        if (!array_key_exists($hash, self::$reusableData)) {
+            self::$reusableData[$hash] = $this->generateDependencyData($cache);
+        }
+
+        $this->data = self::$reusableData[$hash];
     }
 
     /**
      * Checks whether the dependency is changed.
      *
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache The cache component that is currently evaluating this dependency
      *
-     * @return bool whether the dependency has changed.
+     * @return bool Whether the dependency has changed.
      */
     public function isChanged(CacheInterface $cache): bool
     {
-        if ($this->isReusable) {
-            $hash = $this->generateReusableHash();
-            if (!\array_key_exists($hash, self::$reusableData)) {
-                self::$reusableData[$hash] = $this->generateDependencyData($cache);
-            }
-            $data = self::$reusableData[$hash];
-        } else {
-            $data = $this->generateDependencyData($cache);
+        if (!$this->isReusable) {
+            return $this->data !== $this->generateDependencyData($cache);
         }
 
-        return $data !== $this->data;
+        $hash = $this->generateReusableHash();
+
+        if (!array_key_exists($hash, self::$reusableData)) {
+            self::$reusableData[$hash] = $this->generateDependencyData($cache);
+        }
+
+        return $this->data !== self::$reusableData[$hash];
     }
 
     /**
@@ -97,12 +106,12 @@ abstract class Dependency
      *
      * @return string a unique hash value for this cache dependency.
      *
-     * @see isReusable
+     * @see isReusable()
      */
     protected function generateReusableHash(): string
     {
         $data = $this->data;
-        $this->data = null;  // https://github.com/yiisoft/yii2/issues/3052
+        $this->data = null; // https://github.com/yiisoft/yii2/issues/3052
         $key = sha1(serialize($this));
         $this->data = $data;
         return $key;
@@ -118,16 +127,17 @@ abstract class Dependency
     protected function iterableToArray(iterable $iterable): array
     {
         /** @psalm-suppress RedundantCast */
-        return $iterable instanceof \Traversable ? iterator_to_array($iterable) : (array)$iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
     }
 
     /**
      * Generates the data needed to determine if dependency is changed.
+     *
      * Derived classes should override this method to generate the actual dependency data.
      *
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache The cache component that is currently evaluating this dependency
      *
-     * @return mixed the data needed to determine if dependency has been changed.
+     * @return mixed The data needed to determine if dependency has been changed.
      */
     abstract protected function generateDependencyData(CacheInterface $cache);
 }

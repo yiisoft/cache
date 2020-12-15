@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Dependency;
 
-use Yiisoft\Cache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * CallbackDependency represents a dependency based on the result of a callback.
@@ -12,7 +12,7 @@ use Yiisoft\Cache\CacheInterface;
  * The dependency is reported as unchanged if and only if the result of the callback is
  * the same as the one evaluated when storing the data to cache.
  */
-class CallbackDependency extends Dependency
+final class CallbackDependency extends Dependency
 {
     private $callback;
 

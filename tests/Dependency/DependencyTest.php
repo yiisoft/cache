@@ -14,12 +14,12 @@ use Yiisoft\Cache\Dependency\TagDependency;
  *
  * @group caching
  */
-class DependencyTest extends DependencyTestCase
+final class DependencyTest extends DependencyTestCase
 {
     public function testResetReusableData(): void
     {
         $value = ['dummy'];
-        $dependency = new MockDependency();
+        $dependency = $this->createMockDependency();
         $this->setInaccessibleProperty($dependency, 'reusableData', $value, false);
         $this->assertSameExceptObject($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
 
@@ -64,13 +64,14 @@ class DependencyTest extends DependencyTestCase
 
     public function testEvaluateDependencyReusable()
     {
-        $cache = new Cache(new ArrayCache());
+        $arrayCache = new ArrayCache();
+        $cache = new Cache($arrayCache);
         $dependency = new TagDependency('test');
         $dependency->markAsReusable();
-        $cache->set('a', 1, null, $dependency);
-        TagDependency::invalidate($cache, 'test');
+        $cache->getOrSet('a', static fn () => 1, null, $dependency);
+        TagDependency::invalidate($arrayCache, 'test');
         $data1 = $this->getInaccessibleProperty($dependency, 'data');
-        $cache->set('b', 2, null, $dependency);
+        $cache->getOrSet('b', static fn () => 2, null, $dependency);
         $data2 = $this->getInaccessibleProperty($dependency, 'data');
         $this->assertEquals($data1, $data2);
     }

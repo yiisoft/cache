@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Dependency;
 
-use Yiisoft\Cache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
+
+use function clearstatcache;
+use function filemtime;
 
 /**
  * FileDependency represents a dependency based on a file's last modification time.
@@ -28,7 +31,7 @@ final class FileDependency extends Dependency
     /**
      * @param CacheInterface $cache
      *
-     * @return false|int|mixed
+     * @return false|int
      */
     protected function generateDependencyData(CacheInterface $cache)
     {

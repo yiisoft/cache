@@ -7,7 +7,7 @@ namespace Yiisoft\Cache\Tests\Dependency;
 use Yiisoft\Cache\Dependency\CallbackDependency;
 use Yiisoft\Cache\Dependency\Dependency;
 
-class CallbackDependencyTest extends DependencyTestCase
+final class CallbackDependencyTest extends DependencyTestCase
 {
     private function createDependency(callable $callback, $dependencyData): Dependency
     {

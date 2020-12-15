@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests\Dependency;
 
-use Yiisoft\Cache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\NullCache;
 use Yiisoft\Cache\Tests\TestCase;
@@ -31,5 +31,15 @@ abstract class DependencyTestCase extends TestCase
     protected function assertDependencyNotChanged(Dependency $dependency): void
     {
         $this->assertFalse($dependency->isChanged($this->getCache()), 'Dependency data was changed');
+    }
+
+    protected function createMockDependency(): Dependency
+    {
+        return new class() extends Dependency {
+            protected function generateDependencyData(CacheInterface $cache)
+            {
+                return $this->data;
+            }
+        };
     }
 }

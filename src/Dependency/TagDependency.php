@@ -5,17 +5,24 @@ declare(strict_types=1);
 namespace Yiisoft\Cache\Dependency;
 
 use Psr\SimpleCache\InvalidArgumentException;
-use Yiisoft\Cache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
+
+use function array_merge;
+use function json_encode;
+use function json_last_error_msg;
+use function md5;
+use function microtime;
 
 /**
  * TagDependency associates a cached value with one or multiple {@see TagDependency::$tags}.
  *
- * By calling {@see TagDependency::invalidate()}, you can invalidate all cached values that are associated with the specified tag name(s).
+ * By calling {@see TagDependency::invalidate()}, you can invalidate all
+ * cached values that are associated with the specified tag name(s).
  *
  * ```php
  * // setting multiple cache keys to store data forever and tagging them with "user-123"
- * $cache->set('user_42_profile', '', 0, new TagDependency('user-123'));
- * $cache->set('user_42_stats', '', 0, new TagDependency('user-123'));
+ * $cache->getOrSet('user_42_profile', '', null, new TagDependency('user-123'));
+ * $cache->getOrSet('user_42_stats', '', null, new TagDependency('user-123'));
  *
  * // invalidating all keys tagged with "user-123"
  * TagDependency::invalidate($cache, 'user-123');
@@ -24,22 +31,23 @@ use Yiisoft\Cache\CacheInterface;
 final class TagDependency extends Dependency
 {
     /**
-     * @var array a list of tag names for this dependency
+     * @var array List of tag names for this dependency.
      */
     private array $tags;
 
     /**
-     * @param array|string $tags a list of tag names for this dependency. For a single tag, you may specify it as a string
+     * @param array|string $tags List of tag names for this dependency.
+     * For a single tag, you may specify it as a string.
      */
     public function __construct($tags)
     {
-        $this->tags = (array)$tags;
+        $this->tags = (array) $tags;
     }
 
     /**
      * Generates the data needed to determine if dependency has been changed.
      *
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache the cache component that is currently evaluating this dependency.
      *
      * @throws InvalidArgumentException
      *
@@ -61,7 +69,7 @@ final class TagDependency extends Dependency
     /**
      * Invalidates all of the cached values that are associated with any of the specified {@see tags}.
      *
-     * @param CacheInterface $cache the cache component that caches the values
+     * @param CacheInterface $cache The cache component that caches the values.
      * @param array|string $tags
      */
     public static function invalidate(CacheInterface $cache, $tags): void
@@ -76,15 +84,17 @@ final class TagDependency extends Dependency
      * @param CacheInterface $cache
      * @param string[] $keys
      *
-     * @return array the timestamp indexed by cache keys
+     * @return array The timestamp indexed by cache keys.
      */
     private static function touchKeys(CacheInterface $cache, array $keys): array
     {
         $values = [];
         $time = microtime();
+
         foreach ($keys as $key) {
             $values[$key] = $time;
         }
+
         $cache->setMultiple($values);
         return $values;
     }
@@ -107,7 +117,6 @@ final class TagDependency extends Dependency
         }
 
         $keys = self::buildCacheKeys($tags);
-
         return $cache->getMultiple($keys);
     }
 
@@ -115,13 +124,14 @@ final class TagDependency extends Dependency
      * Builds a normalized cache key from a given tag, making sure it is short enough and safe
      * for any particular cache storage.
      *
-     * @param string $tag tag name.
+     * @param string $tag The tag name.
      *
-     * @return string cache key.
+     * @return string The cache key.
      */
     private static function buildCacheKey(string $tag): string
     {
         $jsonTag = json_encode([__CLASS__, $tag]);
+
         if ($jsonTag === false) {
             throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid tag. ' . json_last_error_msg());
         }
@@ -130,7 +140,7 @@ final class TagDependency extends Dependency
     }
 
     /**
-     * Builds array of keys from a given tags
+     * Builds array of keys from a given tags.
      *
      * @param mixed $tags
      *
@@ -139,6 +149,7 @@ final class TagDependency extends Dependency
     private static function buildCacheKeys($tags): array
     {
         $keys = [];
+
         foreach ((array)$tags as $tag) {
             $keys[] = self::buildCacheKey((string)$tag);
         }
@@ -157,12 +168,15 @@ final class TagDependency extends Dependency
     private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps): array
     {
         $newKeys = [];
+
         foreach ($timestamps as $key => $timestamp) {
             if ($timestamp === null) {
                 $newKeys[] = $key;
             }
         }
+
         $timestamps = $this->iterableToArray($timestamps);
+
         if (!empty($newKeys)) {
             $timestamps = array_merge($timestamps, self::touchKeys($cache, $newKeys));
         }
