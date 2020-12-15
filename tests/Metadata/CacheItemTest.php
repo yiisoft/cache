@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Cache\Tests;
+namespace Yiisoft\Cache\Tests\Metadata;
 
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Dependency\TagDependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Metadata\CacheItem;
+use Yiisoft\Cache\Tests\TestCase;
 
 use function time;
 
@@ -27,13 +28,11 @@ class CacheItemTest extends TestCase
     {
         $item = new CacheItem(
             $key = 'key',
-            $value = 'value',
             $expiry = time() + 3600,
             $this->dependency,
         );
 
         $this->assertSame($key, $item->key());
-        $this->assertSame($value, $item->value());
         $this->assertSame($expiry, $item->expiry());
         $this->assertSame($this->dependency, $item->dependency());
         $this->assertFalse($item->expired(1.0, $this->cache));
@@ -41,7 +40,7 @@ class CacheItemTest extends TestCase
 
     public function testExpiredThatNeverExpires(): void
     {
-        $item = new CacheItem('key', 'value', null, null);
+        $item = new CacheItem('key', null, null);
         $this->assertNull($item->expiry());
         $this->assertNull($item->dependency());
         $this->assertFalse($item->expired(1.0, $this->cache));
@@ -49,16 +48,16 @@ class CacheItemTest extends TestCase
 
     public function testExpiredAndUpdate(): void
     {
-        $item = new CacheItem('key', 'value', time() + 3600, $this->dependency);
+        $item = new CacheItem('key', time() + 3600, $this->dependency);
         $this->assertFalse($item->expired(1.0, $this->cache));
 
-        $item->update('new-value', time(), $this->dependency);
+        $item->update(time(), $this->dependency);
         $this->assertTrue($item->expired(1.0, $this->cache));
     }
 
     public function testExpiredWithChangeDependency(): void
     {
-        $item = new CacheItem('key', 'value', time() + 3600, $this->dependency);
+        $item = new CacheItem('key', time() + 3600, $this->dependency);
         $this->assertFalse($item->expired(1.0, $this->cache));
 
         TagDependency::invalidate($this->cache, 'tag');
@@ -85,7 +84,7 @@ class CacheItemTest extends TestCase
      */
     public function testExpiredWithProbablyEarlyExpiration(float $beta, int $expiry, bool $expired): void
     {
-        $item = new CacheItem('key', 'value', (time() + $expiry), $this->dependency);
+        $item = new CacheItem('key', (time() + $expiry), $this->dependency);
 
         if ($expired) {
             $this->assertTrue($item->expired($beta, $this->cache));
@@ -96,7 +95,7 @@ class CacheItemTest extends TestCase
 
     public function testExpiredThrownExceptionForInvalidBeta(): void
     {
-        $item = new CacheItem('key', 'value', null, null);
+        $item = new CacheItem('key', null, null);
         $this->expectException(InvalidArgumentException::class);
         $item->expired(-0.1, $this->cache);
     }

@@ -35,11 +35,11 @@ class CacheTest extends TestCase
     public function testGetOrSet(): void
     {
         $cache = new Cache($this->handler);
-        $cache->getOrSet('key', fn (CacheInterface $cache): string => get_class($cache));
+        $value = $cache->getOrSet('key', fn (CacheInterface $cache): string => get_class($cache));
         $items = $this->getItems($cache);
 
         $this->assertSame('key', $items['key']->key());
-        $this->assertSame(get_class($this->handler), $items['key']->value());
+        $this->assertSame(get_class($this->handler), $value);
         $this->assertNull($items['key']->dependency());
         $this->assertNull($items['key']->expiry());
         $this->assertFalse($items['key']->expired(1.0, $this->handler));
@@ -48,10 +48,10 @@ class CacheTest extends TestCase
     public function testGetOrSetWithTtl(): void
     {
         $cache = new Cache($this->handler);
-        $cache->getOrSet('key', fn (): string => 'value', $ttl = time() + 3600);
+        $value = $cache->getOrSet('key', fn (): string => 'value', $ttl = time() + 3600);
         $items = $this->getItems($cache);
 
-        $this->assertSame('value', $items['key']->value());
+        $this->assertSame('value', $value);
         $this->assertSame($ttl, $items['key']->expiry());
         $this->assertFalse($items['key']->expired(1.0, $this->handler));
     }
@@ -59,10 +59,10 @@ class CacheTest extends TestCase
     public function testGetOrSetWithExpiredTtl(): void
     {
         $cache = new Cache($this->handler);
-        $cache->getOrSet('key', fn (): string => 'value', $ttl = time());
+        $value = $cache->getOrSet('key', fn (): string => 'value', $ttl = time());
         $items = $this->getItems($cache);
 
-        $this->assertSame('value', $items['key']->value());
+        $this->assertSame('value', $value);
         $this->assertSame($ttl, $items['key']->expiry());
         $this->assertTrue($items['key']->expired(1.0, $this->handler));
     }
@@ -284,6 +284,7 @@ class CacheTest extends TestCase
             $cache->getOrSet('key', static fn (): string => 'value');
         } catch (SetCacheException $e) {
             $this->assertSame('key', $e->getKey());
+            $this->assertSame('value', $e->getValue());
             $this->assertInstanceOf(CacheItem::class, $e->getItem());
         }
     }

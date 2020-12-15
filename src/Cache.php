@@ -15,6 +15,7 @@ use Yiisoft\Cache\Metadata\CacheItems;
 
 use function ctype_alnum;
 use function gettype;
+use function is_array;
 use function is_int;
 use function is_string;
 use function json_encode;
@@ -23,9 +24,9 @@ use function mb_strlen;
 use function md5;
 
 /**
- * Cache provides support for the data caching, including cache key composition and dependencies, and supports
- * "Probably early expiration". The actual data caching is performed via {@see Cache::$handler},
- * which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
+ * Cache provides support for the data caching, including cache key composition and dependencies, and uses
+ * "Probably early expiration" for cache stampede prevention. The actual data caching is performed via
+ * {@see Cache::$handler}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
  *
  * @see \Yiisoft\Cache\CacheInterface
  */
@@ -56,8 +57,11 @@ final class Cache implements CacheInterface
 
     /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
-     * @param DateInterval|int|null $defaultTtl The default TTL for a cache entry.
-     * @param string $keyPrefix The string prefixed to every cache key.
+     * @param DateInterval|int|null $defaultTtl The default TTL for a cache entry. null meaning infinity, negative or zero results in the
+     * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
+     * @param string $keyPrefix The string prefixed to every cache key so that it is unique globally in the whole cache storage.
+     * It is recommended that you set a unique cache key prefix for each application if the same cache
+     * storage is being used by different applications.
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null, string $keyPrefix = '')
     {
@@ -72,11 +76,7 @@ final class Cache implements CacheInterface
         $key = $this->buildKey($key);
         $value = $this->getValue($key, $beta);
 
-        if ($value !== null) {
-            return $value;
-        }
-
-        return $this->setAndGet($key, $callable, $ttl, $dependency);
+        return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
     }
 
     public function remove($key): void
@@ -94,21 +94,26 @@ final class Cache implements CacheInterface
      * Gets the cache value.
      *
      * @param string $key The unique key of this item in the cache.
-     * @param float $beta The value for calculating the range that is used for "Probably early expiration".
+     * @param float $beta The value for calculating the range that is used for "Probably early expiration" algorithm.
      *
      * @return mixed|null The cache value or `null` if the cache is outdated or a dependency has been changed.
      */
     private function getValue(string $key, float $beta)
     {
-        if ($this->items->has($key)) {
-            return $this->items->getValue($key, $beta, $this->handler);
+        if ($this->items->expired($key, $beta, $this->handler)) {
+            return null;
         }
 
         $value = $this->handler->get($key);
 
-        if ($value instanceof CacheItem) {
-            $this->items->set($value);
-            return $this->items->getValue($key, $beta, $this->handler);
+        if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
+            [$value, $item] = $value;
+
+            if ($item->key() !== $key || $item->expired($beta, $this->handler)) {
+                return null;
+            }
+
+            $this->items->set($item);
         }
 
         return $value;
@@ -137,10 +142,10 @@ final class Cache implements CacheInterface
             $dependency->evaluateDependency($this->handler);
         }
 
-        $item = new CacheItem($key, $value, $ttl, $dependency);
+        $item = new CacheItem($key, $ttl, $dependency);
 
-        if (!$this->handler->set($key, $item, $ttl)) {
-            throw new SetCacheException($key, $item);
+        if (!$this->handler->set($key, [$value, $item], $ttl)) {
+            throw new SetCacheException($key, $value, $item);
         }
 
         $this->items->set($item);

@@ -25,63 +25,74 @@ use const PHP_INT_MAX;
 final class CacheItem
 {
     private string $key;
-    /** @var mixed */
-    private $value;
     private ?int $expiry;
     private ?Dependency $dependency;
     private float $updated;
 
     /**
-     * @param string $key
-     * @param mixed $value
-     * @param int|null $expiry
-     * @param Dependency|null $dependency
+     * @param string $key The key that identifies the cache item.
+     * @param int|null $expiry The cache expiry or null that meaning infinity.
+     * @param Dependency|null $dependency The cache dependency or null if it is not assigned.
      */
-    public function __construct(string $key, $value, ?int $expiry, ?Dependency $dependency)
+    public function __construct(string $key, ?int $expiry, ?Dependency $dependency)
     {
         $this->key = $key;
-        $this->value = $value;
         $this->expiry = $expiry;
         $this->dependency = $dependency;
         $this->updated = microtime(true);
     }
 
     /**
-     * @param mixed $value
-     * @param int|null $expiry
-     * @param Dependency|null $dependency
+     * Updates the metadata of the cache item.
+     *
+     * @param int|null $expiry The cache expiry or null that meaning infinity.
+     * @param Dependency|null $dependency The cache dependency or null if it is not assigned.
      */
-    public function update($value, ?int $expiry, ?Dependency $dependency): void
+    public function update(?int $expiry, ?Dependency $dependency): void
     {
-        $this->value = $value;
         $this->expiry = $expiry;
         $this->dependency = $dependency;
         $this->updated = microtime(true);
     }
 
+    /**
+     * Returns a key that identifies the cache item.
+     *
+     * @return string The key that identifies the cache item.
+     */
     public function key(): string
     {
         return $this->key;
     }
 
     /**
-     * @return mixed
+     * Returns a cache expiry or null that meaning infinity.
+     *
+     * @return int|null The cache expiry or null that meaning infinity.
      */
-    public function value()
-    {
-        return $this->value;
-    }
-
     public function expiry(): ?int
     {
         return $this->expiry;
     }
 
+    /**
+     * Returns a cache dependency or null if it is not assigned.
+     *
+     * @return Dependency|null The cache dependency or null if it is not assigned.
+     */
     public function dependency(): ?Dependency
     {
         return $this->dependency;
     }
 
+    /**
+     * Checks whether the dependency has been changed and whether the cache expires.
+     *
+     * @param float $beta The value for calculating the range that is used for "Probably early expiration" algorithm.
+     * @param CacheInterface $cache The actual cache handler.
+     *
+     * @return bool Whether the dependency has been changed and whether the cache expires.
+     */
     public function expired(float $beta, CacheInterface $cache): bool
     {
         if ($beta < 0) {

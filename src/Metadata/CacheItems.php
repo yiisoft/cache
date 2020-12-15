@@ -19,21 +19,24 @@ final class CacheItems
     private array $items = [];
 
     /**
-     * @param string $key
-     * @param float $beta
-     * @param CacheInterface $cache
+     * Checks whether the dependency has been changed and whether the cache expires.
      *
-     * @return mixed|null
+     * @param string $key The key that identifies the cache item.
+     * @param float $beta The value for calculating the range that is used for "Probably early expiration" algorithm.
+     * @param CacheInterface $cache The actual cache handler.
+     *
+     * @return bool Whether the dependency has been changed and whether the cache expires.
      */
-    public function getValue(string $key, float $beta, CacheInterface $cache)
+    public function expired(string $key, float $beta, CacheInterface $cache): bool
     {
-        if (isset($this->items[$key]) && !$this->items[$key]->expired($beta, $cache)) {
-            return $this->items[$key]->value();
-        }
-
-        return null;
+        return isset($this->items[$key]) && $this->items[$key]->expired($beta, $cache);
     }
 
+    /**
+     * Adds or updates a cache item.
+     *
+     * @param CacheItem $item The cache item.
+     */
     public function set(CacheItem $item): void
     {
         $key = $item->key();
@@ -43,18 +46,18 @@ final class CacheItems
             return;
         }
 
-        $this->items[$key]->update($item->value(), $item->expiry(), $item->dependency());
+        $this->items[$key]->update($item->expiry(), $item->dependency());
     }
 
+    /**
+     * Removes a cache item with the specified key.
+     *
+     * @param string $key The key that identifies the cache item.
+     */
     public function remove(string $key): void
     {
         if (isset($this->items[$key])) {
             unset($this->items[$key]);
         }
-    }
-
-    public function has(string $key): bool
-    {
-        return isset($this->items[$key]);
     }
 }
