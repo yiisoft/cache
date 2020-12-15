@@ -76,7 +76,7 @@ final class CacheItem
     }
 
     /**
-     * Returns a cache dependency or null if it is not assigned.
+     * Returns a cache dependency or null if there is none.
      *
      * @return Dependency|null The cache dependency or null if there is none.
      */
