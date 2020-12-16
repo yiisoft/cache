@@ -31,13 +31,13 @@ final class CacheItem
 
     /**
      * @param string $key The key that identifies the cache item.
-     * @param int|null $expiry The cache expiry. null means infinity.
+     * @param int|null $ttl The TTL value of this item. null means infinity.
      * @param Dependency|null $dependency The cache invalidation dependency or null for none.
      */
-    public function __construct(string $key, ?int $expiry, ?Dependency $dependency)
+    public function __construct(string $key, ?int $ttl, ?Dependency $dependency)
     {
         $this->key = $key;
-        $this->expiry = $expiry;
+        $this->expiry = ($ttl > 0) ? time() + $ttl : $ttl;
         $this->dependency = $dependency;
         $this->updated = microtime(true);
     }
