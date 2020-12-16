@@ -29,7 +29,7 @@ class CacheItemsTest extends TestCase
     public function testSet(): void
     {
         $item1 = new CacheItem('key-1', null, null);
-        $item2 = new CacheItem('key-2', time() + 3600, $this->dependency);
+        $item2 = new CacheItem('key-2', 3600, $this->dependency);
 
         $this->items->set($item1);
         $this->items->set($item2);
@@ -41,7 +41,7 @@ class CacheItemsTest extends TestCase
     public function testRemoveAndExpired(): void
     {
         $this->items->set(new CacheItem('key-1', -1, null));
-        $this->items->set(new CacheItem('key-2', time(), null));
+        $this->items->set(new CacheItem('key-2', 0, null));
 
         $this->assertTrue($this->items->expired('key-1', 1.0, $this->cache));
         $this->assertTrue($this->items->expired('key-2', 1.0, $this->cache));
@@ -63,7 +63,7 @@ class CacheItemsTest extends TestCase
         $this->items->set(new CacheItem('key', -1, null));
         $this->assertTrue($this->items->expired('key', 1.0, $this->cache));
 
-        $this->items->set(new CacheItem('key', time(), null));
+        $this->items->set(new CacheItem('key', 0, null));
         $this->assertTrue($this->items->expired('key', 1.0, $this->cache));
 
         $this->items->set(new CacheItem('key', time() + 3600, null));
@@ -72,10 +72,10 @@ class CacheItemsTest extends TestCase
 
     public function testExpiredWithDependency(): void
     {
-        $this->items->set(new CacheItem('key', time() + 3600, $this->dependency));
+        $this->items->set(new CacheItem('key', 3600, $this->dependency));
         $this->assertFalse($this->items->expired('key', 1.0, $this->cache));
 
-        $this->items->set(new CacheItem('key', time() + 3600, $this->dependency));
+        $this->items->set(new CacheItem('key', 3600, $this->dependency));
         TagDependency::invalidate($this->cache, 'tag');
         $this->assertTrue($this->items->expired('key', 1.0, $this->cache));
     }

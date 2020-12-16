@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Cache\Tests;
 
 use DateInterval;
-use DateTime;
 use Psr\SimpleCache\CacheInterface;
 use stdClass;
 use Yiisoft\Cache\ArrayCache;
@@ -48,22 +47,22 @@ class CacheTest extends TestCase
     public function testGetOrSetWithTtl(): void
     {
         $cache = new Cache($this->handler);
-        $value = $cache->getOrSet('key', fn (): string => 'value', $ttl = time() + 3600);
+        $value = $cache->getOrSet('key', fn (): string => 'value', 3600);
         $items = $this->getItems($cache);
 
         $this->assertSame('value', $value);
-        $this->assertSame($ttl, $items['key']->expiry());
+        $this->assertSame(time() + 3600, $items['key']->expiry());
         $this->assertFalse($items['key']->expired(1.0, $this->handler));
     }
 
     public function testGetOrSetWithExpiredTtl(): void
     {
         $cache = new Cache($this->handler);
-        $value = $cache->getOrSet('key', fn (): string => 'value', $ttl = time());
+        $value = $cache->getOrSet('key', fn (): string => 'value', -1);
         $items = $this->getItems($cache);
 
         $this->assertSame('value', $value);
-        $this->assertSame($ttl, $items['key']->expiry());
+        $this->assertSame(-1, $items['key']->expiry());
         $this->assertTrue($items['key']->expired(1.0, $this->handler));
     }
 
@@ -89,7 +88,7 @@ class CacheTest extends TestCase
         $value = $cache->getOrSet('key', fn (): string => 'value-1', -1, new TagDependency('tag'));
         $this->assertSame('value-1', $value);
 
-        $value = $cache->getOrSet('key', fn (): string => 'value-2', time(), new TagDependency('tag'));
+        $value = $cache->getOrSet('key', fn (): string => 'value-2', 0, new TagDependency('tag'));
         $this->assertSame('value-2', $value);
 
         $value = $cache->getOrSet('key', fn (): string => 'value-3', time() + 3600, new TagDependency('tag'));
@@ -197,12 +196,11 @@ class CacheTest extends TestCase
     public function ttlDataProvider(): array
     {
         $interval = new DateInterval('P2Y4DT6H8M');
-        $time = time();
 
         return [
-            'null' => [null, null],
-            'int' => [$time, $time],
-            'DateInterval' => [$interval, (new DateTime('@0'))->add($interval)->getTimestamp()],
+            'null' => [null],
+            'int' => [3600],
+            'DateInterval' => [$interval],
         ];
     }
 
@@ -210,28 +208,26 @@ class CacheTest extends TestCase
      * @dataProvider ttlDataProvider
      *
      * @param mixed $ttl
-     * @param int|null $excepted
      */
-    public function testConstructorWithOtherDefaultTtl($ttl, ?int $excepted): void
+    public function testConstructorWithOtherDefaultTtl($ttl): void
     {
         $cache = new Cache($this->handler, $ttl);
         $cache->getOrSet('key', static fn (): string => 'value');
         $items = $this->getItems($cache);
-        $this->assertSame($excepted, $items['key']->expiry());
+        $this->assertFalse($items['key']->expired(1.0, $this->handler));
     }
 
     /**
      * @dataProvider ttlDataProvider
      *
      * @param mixed $ttl
-     * @param int|null $excepted
      */
-    public function testGetOrSetWithOtherTtl($ttl, ?int $excepted): void
+    public function testGetOrSetWithOtherTtl($ttl): void
     {
         $cache = new Cache($this->handler);
         $cache->getOrSet('key', static fn (): string => 'value', $ttl);
         $items = $this->getItems($cache);
-        $this->assertSame($excepted, $items['key']->expiry());
+        $this->assertFalse($items['key']->expired(1.0, $this->handler));
     }
 
     public function invalidTtlDataProvider(): array
