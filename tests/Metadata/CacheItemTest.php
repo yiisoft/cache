@@ -28,12 +28,12 @@ class CacheItemTest extends TestCase
     {
         $item = new CacheItem(
             $key = 'key',
-            $expiry = time() + 3600,
+            $ttl = 3600,
             $this->dependency,
         );
 
         $this->assertSame($key, $item->key());
-        $this->assertSame($expiry, $item->expiry());
+        $this->assertSame(time() + $ttl, $item->expiry());
         $this->assertSame($this->dependency, $item->dependency());
         $this->assertFalse($item->expired(1.0, $this->cache));
     }
@@ -79,12 +79,12 @@ class CacheItemTest extends TestCase
      * @dataProvider probablyEarlyExpirationProvider
      *
      * @param float $beta
-     * @param int $expiry
+     * @param int $ttl
      * @param bool $expired
      */
-    public function testExpiredWithProbablyEarlyExpiration(float $beta, int $expiry, bool $expired): void
+    public function testExpiredWithProbablyEarlyExpiration(float $beta, int $ttl, bool $expired): void
     {
-        $item = new CacheItem('key', (time() + $expiry), $this->dependency);
+        $item = new CacheItem('key', $ttl, $this->dependency);
 
         if ($expired) {
             $this->assertTrue($item->expired($beta, $this->cache));

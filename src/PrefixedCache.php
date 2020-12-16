@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as PsrSimpleCacheInterface;
 
 /**
  * PrefixedCache decorates any PSR-16 cache to add global prefix. It is added to every cache key so that it is unique
@@ -16,16 +16,16 @@ use Psr\SimpleCache\CacheInterface;
  * $cache->set('answer', 42); // Will set 42 to my_app_answer key.
  * ```
  */
-final class PrefixedCache implements CacheInterface
+final class PrefixedCache implements PsrSimpleCacheInterface
 {
-    private CacheInterface $cache;
+    private PsrSimpleCacheInterface $cache;
     private string $prefix;
 
     /**
-     * @param CacheInterface $cache PSR-16 cache to add prefix to.
+     * @param PsrSimpleCacheInterface $cache PSR-16 cache to add prefix to.
      * @param string $prefix Prefix to use for all cache keys.
      */
-    public function __construct(CacheInterface $cache, string $prefix)
+    public function __construct(PsrSimpleCacheInterface $cache, string $prefix)
     {
         $this->cache = $cache;
         $this->prefix = $prefix;
@@ -54,6 +54,7 @@ final class PrefixedCache implements CacheInterface
     public function getMultiple($keys, $default = null)
     {
         $prefixedKeys = [];
+
         foreach ($keys as $key) {
             $prefixedKeys[] = $this->prefix . $key;
         }
@@ -64,15 +65,18 @@ final class PrefixedCache implements CacheInterface
     public function setMultiple($values, $ttl = null)
     {
         $prefixedValues = [];
+
         foreach ($values as $key => $value) {
             $prefixedValues[$this->prefix . $key] = $value;
         }
+
         return $this->cache->setMultiple($prefixedValues, $ttl);
     }
 
     public function deleteMultiple($keys)
     {
         $prefixedKeys = [];
+
         foreach ($keys as $key) {
             $prefixedKeys[] = $this->prefix . $key;
         }
