@@ -26,7 +26,7 @@ use function md5;
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies, and uses
  * "Probably early expiration" for cache stampede prevention. The actual data caching is performed via
- * {@see Cache::$handler}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
+ * {@see Cache::handler()}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
  *
  * @see \Yiisoft\Cache\CacheInterface
  */
@@ -59,6 +59,11 @@ final class Cache implements CacheInterface
         $this->handler = $handler;
         $this->items = new CacheItems();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
+    }
+
+    public function handler(): \Psr\SimpleCache\CacheInterface
+    {
+        return $this->handler;
     }
 
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)

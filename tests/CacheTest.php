@@ -31,6 +31,15 @@ class CacheTest extends TestCase
         $this->handler = new ArrayCache();
     }
 
+    public function testHandler(): void
+    {
+        $cache = new Cache($this->handler);
+
+        $this->assertInstanceOf(CacheInterface::class, $cache->handler());
+        $this->assertInstanceOf(ArrayCache::class, $cache->handler());
+        $this->assertSame($this->handler, $cache->handler());
+    }
+
     public function testGetOrSet(): void
     {
         $cache = new Cache($this->handler);
