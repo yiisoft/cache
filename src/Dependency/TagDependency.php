@@ -1,0 +1,134 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yiisoft\Cache\Dependency;
+
+use Yiisoft\Cache\CacheInterface;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
+
+use function json_encode;
+use function json_last_error_msg;
+use function md5;
+
+/**
+ * TagDependency associates a cached value with one or multiple {@see TagDependency::$tags}.
+ *
+ * By calling {@see TagDependency::invalidate()}, you can invalidate all
+ * cached values that are associated with the specified tag name(s).
+ *
+ * ```php
+ * // setting multiple cache keys to store data forever and tagging them with "user-123"
+ * $cache->getOrSet('user_42_profile', '', null, new TagDependency('user-123'));
+ * $cache->getOrSet('user_42_stats', '', null, new TagDependency('user-123'));
+ *
+ *  // setting a cache key to store data and tagging them with "user-123" with the specified TTL for the tag
+ * $cache->getOrSet('user_42_profile', '', null, new TagDependency('user-123', 3600));
+ *
+ * // invalidating all keys tagged with "user-123"
+ * TagDependency::invalidate($cache, 'user-123');
+ * ```
+ */
+final class TagDependency extends Dependency
+{
+    /**
+     * @var array List of tag names for this dependency.
+     */
+    private array $tags;
+
+    /**
+     * @var int|null The TTL value of this item. null means infinity.
+     */
+    private ?int $ttl;
+
+    /**
+     * @param array|string $tags List of tag names for this dependency.
+     * For a single tag, you may specify it as a string.
+     * @param int|null $ttl The TTL value of this item. null means infinity.
+     */
+    public function __construct($tags, int $ttl = null)
+    {
+        $this->tags = (array) $tags;
+
+        if ($ttl !== null && $ttl < 1) {
+            throw new InvalidArgumentException(
+                'TTL must be a positive number or null, to invalidate tags, use the'
+                . ' static `\Yiisoft\Cache\Dependency\TagDependency::invalidate()` method.',
+            );
+        }
+
+        $this->ttl = $ttl;
+    }
+
+    protected function generateDependencyData(CacheInterface $cache): array
+    {
+        if (empty($this->tags)) {
+            return [];
+        }
+
+        $tags = [];
+
+        foreach ($this->tags as $tag) {
+            $tag = (string) $tag;
+            $tags[self::buildCacheKey($tag)] = $tag;
+        }
+
+        $cache->handler()->setMultiple($tags, $this->ttl);
+
+        return $tags;
+    }
+
+    public function isChanged(CacheInterface $cache): bool
+    {
+        $tags = empty($this->tags) ? [] : $cache->handler()->getMultiple(self::buildCacheKeys($this->tags));
+        return $this->data !== $tags;
+    }
+
+    /**
+     * Invalidates all of the cached values that are associated with any of the specified {@see tags}.
+     *
+     * @param CacheInterface $cache The cache component that caches the values.
+     * @param array|string $tags
+     */
+    public static function invalidate(CacheInterface $cache, $tags): void
+    {
+        $cache->handler()->deleteMultiple(self::buildCacheKeys($tags));
+    }
+
+    /**
+     * Builds a normalized cache key from a given tag, making sure it is short enough and safe
+     * for any particular cache storage.
+     *
+     * @param string $tag The tag name.
+     *
+     * @return string The cache key.
+     */
+    private static function buildCacheKey(string $tag): string
+    {
+        $jsonTag = json_encode([__CLASS__, $tag]);
+
+        if ($jsonTag === false) {
+            throw new InvalidArgumentException('Invalid tag. ' . json_last_error_msg());
+        }
+
+        return md5($jsonTag);
+    }
+
+    /**
+     * Builds array of keys from a given tags.
+     *
+     * @param mixed $tags
+     *
+     * @return array
+     */
+    private static function buildCacheKeys($tags): array
+    {
+        $keys = [];
+
+        foreach ((array) $tags as $tag) {
+            $keys[] = self::buildCacheKey((string) $tag);
+        }
+
+        return $keys;
+    }
+}
