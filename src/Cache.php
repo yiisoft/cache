@@ -95,7 +95,7 @@ final class Cache implements CacheInterface
      */
     private function getValue(string $key, float $beta)
     {
-        if ($this->items->expired($key, $beta, $this->handler)) {
+        if ($this->items->expired($key, $beta, $this)) {
             return null;
         }
 
@@ -104,7 +104,7 @@ final class Cache implements CacheInterface
         if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
             [$value, $item] = $value;
 
-            if ($item->key() !== $key || $item->expired($beta, $this->handler)) {
+            if ($item->key() !== $key || $item->expired($beta, $this)) {
                 return null;
             }
 
@@ -134,7 +134,7 @@ final class Cache implements CacheInterface
         $value = $callable($this->handler);
 
         if ($dependency !== null) {
-            $dependency->evaluateDependency($this->handler);
+            $dependency->evaluateDependency($this);
         }
 
         $item = new CacheItem($key, $ttl, $dependency);

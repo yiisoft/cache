@@ -28,7 +28,7 @@ final class CallbackDependencyTest extends DependencyTestCase
     public function testScopeWithObject(): void
     {
         $dataObject = new class() {
-            public $value = 42;
+            public int $value = 42;
         };
 
         $dependency = $this->createDependency(static function () use ($dataObject) {

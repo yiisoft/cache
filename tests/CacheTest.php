@@ -22,7 +22,7 @@ use function json_encode;
 use function md5;
 use function time;
 
-class CacheTest extends TestCase
+final class CacheTest extends TestCase
 {
     private ArrayCache $handler;
 
@@ -50,7 +50,7 @@ class CacheTest extends TestCase
         $this->assertSame(get_class($this->handler), $value);
         $this->assertNull($items['key']->dependency());
         $this->assertNull($items['key']->expiry());
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     public function testGetOrSetWithTtl(): void
@@ -61,7 +61,7 @@ class CacheTest extends TestCase
 
         $this->assertSame('value', $value);
         $this->assertSame(time() + 3600, $items['key']->expiry());
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     public function testGetOrSetWithExpiredTtl(): void
@@ -72,7 +72,7 @@ class CacheTest extends TestCase
 
         $this->assertSame('value', $value);
         $this->assertSame(-1, $items['key']->expiry());
-        $this->assertTrue($items['key']->expired(1.0, $this->handler));
+        $this->assertTrue($items['key']->expired(1.0, $cache));
     }
 
     public function testGetOrSetWithDependency(): void
@@ -85,7 +85,7 @@ class CacheTest extends TestCase
         $value = $cache->getOrSet('key', fn (): string => 'new-value', null, new TagDependency('tag'));
         $this->assertSame('value', $value);
 
-        TagDependency::invalidate($this->handler, 'tag');
+        TagDependency::invalidate($cache, 'tag');
         $value = $cache->getOrSet('key', fn (): string => 'new-value', null, new TagDependency('tag'));
         $this->assertSame('new-value', $value);
     }
@@ -106,7 +106,7 @@ class CacheTest extends TestCase
         $value = $cache->getOrSet('key', fn (): string => 'value-4', null, new TagDependency('tag'));
         $this->assertSame('value-3', $value);
 
-        TagDependency::invalidate($this->handler, 'tag');
+        TagDependency::invalidate($cache, 'tag');
         $value = $cache->getOrSet('key', fn (): string => 'value-5', null, new TagDependency('tag'));
         $this->assertSame('value-5', $value);
 
@@ -223,7 +223,7 @@ class CacheTest extends TestCase
         $cache = new Cache($this->handler, $ttl);
         $cache->getOrSet('key', static fn (): string => 'value');
         $items = $this->getItems($cache);
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     /**
@@ -236,7 +236,7 @@ class CacheTest extends TestCase
         $cache = new Cache($this->handler);
         $cache->getOrSet('key', static fn (): string => 'value', $ttl);
         $items = $this->getItems($cache);
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     public function invalidTtlDataProvider(): array

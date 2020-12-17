@@ -34,7 +34,7 @@ interface CacheInterface
      * ```php
      * public function getTopProducts(int $count = 10) {
      *     $key = ['top-products', $count];
-     *     return $this->cache->getOrSet($key, function (\Psr\SimpleCache\CacheInterface $cache) use ($count) {
+     *     return $this->cache->getOrSet($key, function (\Yiisoft\Cache\CacheInterface $cache) use ($count) {
      *         return $this->getTopNProductsFromDatabase($count);
      *     }, 1000);
      * }

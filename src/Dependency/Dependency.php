@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Dependency;
 
-use Psr\SimpleCache\CacheInterface;
 use Traversable;
+use Yiisoft\Cache\CacheInterface;
 
 use function array_key_exists;
 use function iterator_to_array;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Cache\Tests\Metadata;
 
 use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
 use Yiisoft\Cache\Metadata\CacheItem;
 use Yiisoft\Cache\Metadata\CacheItems;
@@ -12,16 +13,16 @@ use Yiisoft\Cache\Tests\TestCase;
 
 use function time;
 
-class CacheItemsTest extends TestCase
+final class CacheItemsTest extends TestCase
 {
     private CacheItems $items;
-    private ArrayCache $cache;
+    private Cache $cache;
     private TagDependency $dependency;
 
     public function setUp(): void
     {
         $this->items = new CacheItems();
-        $this->cache = new ArrayCache();
+        $this->cache = new Cache(new ArrayCache());
         $this->dependency = new TagDependency('tag');
         $this->dependency->evaluateDependency($this->cache);
     }

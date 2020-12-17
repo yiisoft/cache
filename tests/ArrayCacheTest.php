@@ -161,10 +161,15 @@ final class ArrayCacheTest extends TestCase
      */
     public function testClear($key, $value): void
     {
-        $cache = $this->prepare($this->cache);
+        $this->cache->clear();
+        $data = $this->dataProvider();
 
-        $this->assertTrue($cache->clear());
-        $this->assertNull($cache->get($key));
+        foreach ($data as $datum) {
+            $this->cache->set($datum[0], $datum[1]);
+        }
+
+        $this->assertTrue($this->cache->clear());
+        $this->assertNull($this->cache->get($key));
     }
 
     /**

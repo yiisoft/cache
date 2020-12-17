@@ -64,12 +64,11 @@ final class DependencyTest extends DependencyTestCase
 
     public function testEvaluateDependencyReusable()
     {
-        $arrayCache = new ArrayCache();
-        $cache = new Cache($arrayCache);
+        $cache = new Cache(new ArrayCache());
         $dependency = new TagDependency('test');
         $dependency->markAsReusable();
         $cache->getOrSet('a', static fn () => 1, null, $dependency);
-        TagDependency::invalidate($arrayCache, 'test');
+        TagDependency::invalidate($cache, 'test');
         $data1 = $this->getInaccessibleProperty($dependency, 'data');
         $cache->getOrSet('b', static fn () => 2, null, $dependency);
         $data2 = $this->getInaccessibleProperty($dependency, 'data');
