@@ -9,6 +9,7 @@ use Psr\SimpleCache\CacheInterface;
 use stdClass;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Cache\Dependency\TagDependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
@@ -18,7 +19,6 @@ use Yiisoft\Cache\Metadata\CacheItem;
 use function fclose;
 use function fopen;
 use function get_class;
-use function json_encode;
 use function md5;
 use function time;
 
@@ -29,15 +29,6 @@ final class CacheTest extends TestCase
     public function setUp(): void
     {
         $this->handler = new ArrayCache();
-    }
-
-    public function testHandler(): void
-    {
-        $cache = new Cache($this->handler);
-
-        $this->assertInstanceOf(CacheInterface::class, $cache->handler());
-        $this->assertInstanceOf(ArrayCache::class, $cache->handler());
-        $this->assertSame($this->handler, $cache->handler());
     }
 
     public function testGetOrSet(): void
@@ -127,33 +118,81 @@ final class CacheTest extends TestCase
         $this->assertSame('value-2', $value);
     }
 
-    public function keyDataProvider(): array
+    public function testHandler(): void
+    {
+        $cache = new Cache($this->handler);
+
+        $this->assertInstanceOf(CacheInterface::class, $cache->handler());
+        $this->assertInstanceOf(ArrayCache::class, $cache->handler());
+        $this->assertSame($this->handler, $cache->handler());
+    }
+
+    public function stringKeyDataProvider(): array
     {
         return [
-            'int' => [1, '1'],
-            'string' => ['asd123', 'asd123'],
-            'string-md5' => [$string = 'asd_123-{z4x}', md5($string)],
-            'null' => [null, $this->encode(null)],
-            'bool' => [true, $this->encode(true)],
-            'float' => [$float = 1.1, $this->encode($float)],
-            'array' => [
-                $array = [1, 'key' => 'value', 'nested' => [1, 2, 'asd_123-{z4x}']],
-                $this->encode($array),
-            ],
-            'empty-array' => [$array = [], $this->encode($array)],
-            'object' => [
-                $object = new class() {
-                    public string $name = 'object';
-                },
-                $this->encode($object),
-            ],
-            'empty-object' => [$object = new stdClass(), $this->encode($object)],
-            'callable' => [$callable = fn () => null, $this->encode($callable)],
+            'simple-key' => ['simple-key', true, false],
+            '64-characters' => ['abs-123djj85&!%kfk^%dkk_yhfjdkfkvuywp;a#dkk2728mv&-dfl;k84_kdufu', true, false],
+            '65-characters' => ['abs-123djj85&!%kfk^%dkk_yhfjdkfkvuywp;a#dkk2728mv&-dfl;k84_kdufu0', false, false],
+            'psr-reserved' => ['{}()/\@:', false, true],
+            'empty-string' => ['', false, true],
         ];
     }
 
     /**
-     * @dataProvider keyDataProvider
+     * @dataProvider stringKeyDataProvider
+     *
+     * @param string $key
+     * @param bool $matched
+     * @param bool $exception
+     */
+    public function testKeyMatchingToHandler(string $key, bool $matched, bool $exception): void
+    {
+        $cache = new Cache($this->handler);
+        $cache->getOrSet($key, fn () => 'value');
+
+        $this->assertSame('value', $cache->getOrSet($key, fn () => null));
+
+        if ($matched) {
+            $this->assertTrue($cache->handler()->has($key));
+            $this->assertSame('value', $cache->handler()->get($key)[0]);
+        } else {
+            if ($exception) {
+                $this->expectException(InvalidArgumentException::class);
+            }
+            $this->assertFalse($cache->handler()->has($key));
+            $this->assertSame(null, $cache->handler()->get($key));
+        }
+    }
+
+    public function normalizeKeyDataProvider(): array
+    {
+        $keyNormalizer = new CacheKeyNormalizer();
+
+        return [
+            'int' => [1, '1'],
+            'string' => ['asd123', 'asd123'],
+            'string-md5' => [$string = 'asd_123-{z4x}', md5($string)],
+            'null' => [null, $keyNormalizer->normalize(null)],
+            'bool' => [true, $keyNormalizer->normalize(true)],
+            'float' => [$float = 1.1, $keyNormalizer->normalize($float)],
+            'array' => [
+                $array = [1, 'key' => 'value', 'nested' => [1, 2, 'asd_123-{z4x}']],
+                $keyNormalizer->normalize($array),
+            ],
+            'empty-array' => [$array = [], $keyNormalizer->normalize($array)],
+            'object' => [
+                $object = new class() {
+                    public string $name = 'object';
+                },
+                $keyNormalizer->normalize($object),
+            ],
+            'empty-object' => [$object = new stdClass(), $keyNormalizer->normalize($object)],
+            'callable' => [$callable = fn () => null, $keyNormalizer->normalize($callable)],
+        ];
+    }
+
+    /**
+     * @dataProvider normalizeKeyDataProvider
      *
      * @param mixed $key
      * @param string $excepted
@@ -168,20 +207,6 @@ final class CacheTest extends TestCase
         $cache->remove($key);
         $items = $this->getItems($cache);
         $this->assertSame($items, []);
-    }
-
-    /**
-     * @dataProvider keyDataProvider
-     *
-     * @param mixed $key
-     * @param string $expected
-     */
-    public function testConstructorWithKeyPrefixAndGetOrSetWithOtherKeys($key, string $expected): void
-    {
-        $cache = new Cache($this->handler, null);
-        $cache->getOrSet($key, static fn (): string => 'value');
-        $items = $this->getItems($cache);
-        $this->assertSame($expected, $items[$expected]->key());
     }
 
     public function testGetOrSetThrowExceptionForInvalidKey(): void
@@ -366,15 +391,5 @@ final class CacheTest extends TestCase
     {
         $items = $this->getInaccessibleProperty($cache, 'items');
         return $this->getInaccessibleProperty($items, 'items');
-    }
-
-    /**
-     * @param mixed $key
-     *
-     * @return string
-     */
-    private function encode($key): string
-    {
-        return md5(json_encode($key));
     }
 }
