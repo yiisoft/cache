@@ -28,7 +28,8 @@ final class TagDependencyTest extends DependencyTestCase
         $cache = $this->getCache();
 
         $cache->getOrSet('key', static fn () => 'value', null, new TagDependency('tag', 3600));
-        $data = $this->getInaccessibleProperty($cache->handler(), 'cache');
+        $arrayHandler = $this->getInaccessibleProperty($cache->handler(), 'handler');
+        $data = $this->getInaccessibleProperty($arrayHandler, 'cache');
         $key = md5(json_encode([TagDependency::class, 'tag']));
 
         $this->assertTrue(isset($data[$key]));

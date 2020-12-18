@@ -15,6 +15,7 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
 use Yiisoft\Cache\Exception\SetCacheException;
 use Yiisoft\Cache\Metadata\CacheItem;
+use Yiisoft\Cache\PsrSimpleCache;
 
 use function fclose;
 use function fopen;
@@ -38,7 +39,7 @@ final class CacheTest extends TestCase
         $items = $this->getItems($cache);
 
         $this->assertSame('key', $items['key']->key());
-        $this->assertSame(get_class($this->handler), $value);
+        $this->assertSame(PsrSimpleCache::class, $value);
         $this->assertNull($items['key']->dependency());
         $this->assertNull($items['key']->expiry());
         $this->assertFalse($items['key']->expired(1.0, $cache));
@@ -123,8 +124,8 @@ final class CacheTest extends TestCase
         $cache = new Cache($this->handler);
 
         $this->assertInstanceOf(CacheInterface::class, $cache->handler());
-        $this->assertInstanceOf(ArrayCache::class, $cache->handler());
-        $this->assertSame($this->handler, $cache->handler());
+        $this->assertInstanceOf(PsrSimpleCache::class, $cache->handler());
+        $this->assertSame($this->getInaccessibleProperty($cache, 'handler'), $cache->handler());
     }
 
     public function stringKeyDataProvider(): array
@@ -154,7 +155,7 @@ final class CacheTest extends TestCase
 
         if ($matched) {
             $this->assertTrue($cache->handler()->has($key));
-            $this->assertSame('value', $cache->handler()->get($key)[0]);
+            $this->assertSame('value', $cache->handler()->get($key));
         } else {
             if ($exception) {
                 $this->expectException(InvalidArgumentException::class);

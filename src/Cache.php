@@ -55,7 +55,7 @@ final class Cache implements CacheInterface
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null)
     {
-        $this->handler = $handler;
+        $this->handler = new PsrSimpleCache($this, $handler);
         $this->items = new CacheItems();
         $this->keyNormalizer = new CacheKeyNormalizer();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
