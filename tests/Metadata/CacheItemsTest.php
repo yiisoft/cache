@@ -11,8 +11,6 @@ use Yiisoft\Cache\Metadata\CacheItem;
 use Yiisoft\Cache\Metadata\CacheItems;
 use Yiisoft\Cache\Tests\TestCase;
 
-use function time;
-
 final class CacheItemsTest extends TestCase
 {
     private CacheItems $items;
