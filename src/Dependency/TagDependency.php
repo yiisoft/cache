@@ -80,8 +80,11 @@ final class TagDependency extends Dependency
 
     public function isChanged(CacheInterface $cache): bool
     {
-        $tags = empty($this->tags) ? [] : $cache->psr()->getMultiple(self::buildCacheKeys($this->tags));
-        return $this->data !== $tags;
+        if (empty($this->tags)) {
+            return $this->data !== [];
+        }
+
+        return $this->data !== $this->iterableToArray($cache->psr()->getMultiple(self::buildCacheKeys($this->tags)));
     }
 
     /**
