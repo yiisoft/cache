@@ -21,7 +21,7 @@ interface CacheInterface
      *
      * @return \Psr\SimpleCache\CacheInterface The actual cache handler.
      */
-    public function handler(): \Psr\SimpleCache\CacheInterface;
+    public function psr(): \Psr\SimpleCache\CacheInterface;
 
     /**
      * The method combines retrieving and setting the value identified by the `$key`.

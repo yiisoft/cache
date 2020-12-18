@@ -123,9 +123,9 @@ final class CacheTest extends TestCase
     {
         $cache = new Cache($this->handler);
 
-        $this->assertInstanceOf(CacheInterface::class, $cache->handler());
-        $this->assertInstanceOf(PsrSimpleCache::class, $cache->handler());
-        $this->assertSame($this->getInaccessibleProperty($cache, 'handler'), $cache->handler());
+        $this->assertInstanceOf(CacheInterface::class, $cache->psr());
+        $this->assertInstanceOf(PsrSimpleCache::class, $cache->psr());
+        $this->assertSame($this->getInaccessibleProperty($cache, 'psr'), $cache->psr());
     }
 
     public function stringKeyDataProvider(): array
@@ -154,14 +154,14 @@ final class CacheTest extends TestCase
         $this->assertSame('value', $cache->getOrSet($key, fn () => null));
 
         if ($matched) {
-            $this->assertTrue($cache->handler()->has($key));
-            $this->assertSame('value', $cache->handler()->get($key));
+            $this->assertTrue($cache->psr()->has($key));
+            $this->assertSame('value', $cache->psr()->get($key));
         } else {
             if ($exception) {
                 $this->expectException(InvalidArgumentException::class);
             }
-            $this->assertFalse($cache->handler()->has($key));
-            $this->assertSame(null, $cache->handler()->get($key));
+            $this->assertFalse($cache->psr()->has($key));
+            $this->assertSame(null, $cache->psr()->get($key));
         }
     }
 

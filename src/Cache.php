@@ -20,16 +20,16 @@ use function is_int;
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies, and uses
  * "Probably early expiration" for cache stampede prevention. The actual data caching is performed via
- * {@see Cache::handler()}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
+ * {@see Cache::psr()}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
  *
  * @see \Yiisoft\Cache\CacheInterface
  */
 final class Cache implements CacheInterface
 {
     /**
-     * @var \Psr\SimpleCache\CacheInterface The actual cache handler.
+     * @var PsrSimpleCache Decorator over the actual cache handler.
      */
-    private \Psr\SimpleCache\CacheInterface $handler;
+    private PsrSimpleCache $psr;
 
     /**
      * @var CacheItems The items that store the metadata of each cache.
@@ -55,15 +55,15 @@ final class Cache implements CacheInterface
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null)
     {
-        $this->handler = new PsrSimpleCache($this, $handler);
+        $this->psr = new PsrSimpleCache($this, $handler);
         $this->items = new CacheItems();
         $this->keyNormalizer = new CacheKeyNormalizer();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
     }
 
-    public function handler(): \Psr\SimpleCache\CacheInterface
+    public function psr(): \Psr\SimpleCache\CacheInterface
     {
-        return $this->handler;
+        return $this->psr;
     }
 
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
@@ -78,7 +78,7 @@ final class Cache implements CacheInterface
     {
         $key = $this->keyNormalizer->normalize($key);
 
-        if (!$this->handler->delete($key)) {
+        if (!$this->psr->delete($key)) {
             throw new RemoveCacheException($key);
         }
 
@@ -99,7 +99,7 @@ final class Cache implements CacheInterface
             return null;
         }
 
-        $value = $this->handler->get($key);
+        $value = $this->psr->get($key);
 
         if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
             [$value, $item] = $value;
@@ -131,7 +131,7 @@ final class Cache implements CacheInterface
     {
         $ttl = $this->normalizeTtl($ttl);
         $ttl ??= $this->defaultTtl;
-        $value = $callable($this->handler);
+        $value = $callable($this->psr);
 
         if ($dependency !== null) {
             $dependency->evaluateDependency($this);
@@ -139,7 +139,7 @@ final class Cache implements CacheInterface
 
         $item = new CacheItem($key, $ttl, $dependency);
 
-        if (!$this->handler->set($key, [$value, $item], $ttl)) {
+        if (!$this->psr->set($key, [$value, $item], $ttl)) {
             throw new SetCacheException($key, $value, $item);
         }
 

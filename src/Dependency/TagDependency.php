@@ -73,14 +73,14 @@ final class TagDependency extends Dependency
             $tags[self::buildCacheKey($tag)] = $tag;
         }
 
-        $cache->handler()->setMultiple($tags, $this->ttl);
+        $cache->psr()->setMultiple($tags, $this->ttl);
 
         return $tags;
     }
 
     public function isChanged(CacheInterface $cache): bool
     {
-        $tags = empty($this->tags) ? [] : $cache->handler()->getMultiple(self::buildCacheKeys($this->tags));
+        $tags = empty($this->tags) ? [] : $cache->psr()->getMultiple(self::buildCacheKeys($this->tags));
         return $this->data !== $tags;
     }
 
@@ -92,7 +92,7 @@ final class TagDependency extends Dependency
      */
     public static function invalidate(CacheInterface $cache, $tags): void
     {
-        $cache->handler()->deleteMultiple(self::buildCacheKeys($tags));
+        $cache->psr()->deleteMultiple(self::buildCacheKeys($tags));
     }
 
     /**
