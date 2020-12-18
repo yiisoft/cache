@@ -21,14 +21,8 @@ final class CallbackDependency extends Dependency
         $this->callback = $callback;
     }
 
-    /**
-     * @param CacheInterface $cache
-     *
-     * @return mixed
-     */
     protected function generateDependencyData(CacheInterface $cache)
     {
-        $callback = $this->callback;
-        return $callback();
+        return ($this->callback)($cache);
     }
 }

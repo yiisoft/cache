@@ -24,11 +24,6 @@ final class ValueDependency extends Dependency
         $this->value = $value;
     }
 
-    /**
-     * @param CacheInterface $cache
-     *
-     * @return mixed
-     */
     protected function generateDependencyData(CacheInterface $cache)
     {
         return $this->value;
