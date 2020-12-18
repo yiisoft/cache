@@ -196,7 +196,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
      */
     private function validateKey($key): void
     {
-        if (!is_string($key) || strpbrk($key, '{}()/\@:')) {
+        if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
