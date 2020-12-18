@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests;
 
-use Psr\SimpleCache\CacheInterface;
-use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
@@ -125,28 +123,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         }
 
         return $data;
-    }
-
-    /**
-     * This function configures given cache to match some expectations.
-     *
-     * @param CacheInterface $cache
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return CacheInterface
-     */
-    public function prepare(CacheInterface $cache): CacheInterface
-    {
-        $cache->clear();
-
-        $data = $this->dataProvider();
-
-        foreach ($data as $datum) {
-            $cache->set($datum[0], $datum[1]);
-        }
-
-        return $cache;
     }
 
     public function assertSameExceptObject($expected, $actual): void

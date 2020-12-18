@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Dependency;
 
-use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\CacheInterface;
 
 /**
  * CallbackDependency represents a dependency based on the result of a callback.
