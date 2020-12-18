@@ -20,16 +20,17 @@ use function is_int;
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies, and uses
  * "Probably early expiration" for cache stampede prevention. The actual data caching is performed via
- * {@see Cache::psr()}, which should be configured to be {@see \Psr\SimpleCache\CacheInterface} instance.
+ * {@see \Psr\SimpleCache\CacheInterface} instance passed to constructor.
+ * You can obtain its decorator using {@see Cache::psr()} method.
  *
  * @see \Yiisoft\Cache\CacheInterface
  */
 final class Cache implements CacheInterface
 {
     /**
-     * @var PsrSimpleCache Decorator over the actual cache handler.
+     * @var DependencyAwareCache Decorator over the actual cache handler.
      */
-    private PsrSimpleCache $psr;
+    private DependencyAwareCache $psr;
 
     /**
      * @var CacheItems The items that store the metadata of each cache.
@@ -55,7 +56,7 @@ final class Cache implements CacheInterface
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null)
     {
-        $this->psr = new PsrSimpleCache($this, $handler);
+        $this->psr = new DependencyAwareCache($this, $handler);
         $this->items = new CacheItems();
         $this->keyNormalizer = new CacheKeyNormalizer();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);

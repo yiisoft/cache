@@ -15,7 +15,7 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
 use Yiisoft\Cache\Exception\SetCacheException;
 use Yiisoft\Cache\Metadata\CacheItem;
-use Yiisoft\Cache\PsrSimpleCache;
+use Yiisoft\Cache\DependencyAwareCache;
 
 use function fclose;
 use function fopen;
@@ -39,7 +39,7 @@ final class CacheTest extends TestCase
         $items = $this->getItems($cache);
 
         $this->assertSame('key', $items['key']->key());
-        $this->assertSame(PsrSimpleCache::class, $value);
+        $this->assertSame(DependencyAwareCache::class, $value);
         $this->assertNull($items['key']->dependency());
         $this->assertNull($items['key']->expiry());
         $this->assertFalse($items['key']->expired(1.0, $cache));
@@ -124,7 +124,7 @@ final class CacheTest extends TestCase
         $cache = new Cache($this->handler);
 
         $this->assertInstanceOf(CacheInterface::class, $cache->psr());
-        $this->assertInstanceOf(PsrSimpleCache::class, $cache->psr());
+        $this->assertInstanceOf(DependencyAwareCache::class, $cache->psr());
         $this->assertSame($this->getInaccessibleProperty($cache, 'psr'), $cache->psr());
     }
 

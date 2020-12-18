@@ -11,9 +11,9 @@ use function is_array;
 
 /**
  * Cache provides support for the data caching, including dependencies.
- * The actual data caching is performed via {@see PsrSimpleCache::handler()}.
+ * The actual data caching is performed via {@see DependencyAwareCache::handler()}.
  */
-final class PsrSimpleCache implements PsrSimpleCacheInterface
+final class DependencyAwareCache implements PsrSimpleCacheInterface
 {
     /**
      * @var CacheInterface The actual cache.

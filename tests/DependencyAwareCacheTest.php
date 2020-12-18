@@ -7,19 +7,19 @@ namespace Yiisoft\Cache\Tests;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
-use Yiisoft\Cache\PsrSimpleCache;
+use Yiisoft\Cache\DependencyAwareCache;
 
-final class PsrSimpleCacheTest extends TestCase
+final class DependencyAwareCacheTest extends TestCase
 {
     private Cache $cache;
     private ArrayCache $handler;
-    private PsrSimpleCache $psr;
+    private DependencyAwareCache $psr;
 
     public function setUp(): void
     {
         $this->handler = new ArrayCache();
         $this->cache = new Cache($this->handler);
-        $this->psr = new PsrSimpleCache($this->cache, $this->handler);
+        $this->psr = new DependencyAwareCache($this->cache, $this->handler);
     }
 
     public function testSetAndGetAndDelete(): void
