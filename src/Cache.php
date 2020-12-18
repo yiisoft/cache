@@ -20,8 +20,8 @@ use function is_int;
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies, and uses
  * "Probably early expiration" for cache stampede prevention. The actual data caching is performed via
- * {@see \Psr\SimpleCache\CacheInterface} instance passed to constructor.
- * You can obtain its decorator using {@see Cache::psr()} method.
+ * PSR-16 {@see \Psr\SimpleCache\CacheInterface} instance passed to constructor.
+ * You can use PSR-16 methods via {@see Cache::psr()}.
  *
  * @see \Yiisoft\Cache\CacheInterface
  */
@@ -38,7 +38,7 @@ final class Cache implements CacheInterface
     private CacheItems $items;
 
     /**
-     * @var CacheKeyNormalizer Normalizes the cache key to a string.
+     * @var CacheKeyNormalizer Normalizes the cache key into a valid string.
      */
     private CacheKeyNormalizer $keyNormalizer;
 

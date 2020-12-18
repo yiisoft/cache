@@ -117,8 +117,12 @@ In order to delete value you can use:
 $cache->remove($key);
 ```
 
-You can use PR-16 methods via the `psr()` proxy method, but remember that getting and
+You can use PSR-16 methods the following way, but remember that getting and
 setting the cache separately violates the "Probably early expiration" algorithm.
+
+```php
+$value = $cache->psr()->get('myKey');
+```
 
 ### Invalidation dependencies
 
@@ -135,7 +139,7 @@ use Yiisoft\Cache\Dependency\TagDependency;
 
 // set multiple cache values marking both with a tag
 $cache->getOrSet('item_42_price', $callable, null, new TagDependency('item_42'));
-$cache->set('item_42_total', $callable, 3600, new TagDependency('item_42'));
+$cache->getOrSet('item_42_total', $callable, 3600, new TagDependency('item_42'));
 
 // trigger invalidation by tag
 TagDependency::invalidate($cache, 'item_42');
@@ -189,7 +193,7 @@ Extra cache handlers are implemented as separate packages:
 
 ### Unit testing
 
-```php
+```shell
 ./vendor/bin/phpunit
 ```
 
@@ -197,7 +201,7 @@ Extra cache handlers are implemented as separate packages:
 
 The package tests are checked with [Infection](https://infection.github.io/) mutation framework. To run it:
 
-```php
+```shell
 ./vendor/bin/infection
 ```
 
@@ -205,7 +209,7 @@ The package tests are checked with [Infection](https://infection.github.io/) mut
 
 The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
 
-```php
+```shell
 ./vendor/bin/psalm
 ```
 

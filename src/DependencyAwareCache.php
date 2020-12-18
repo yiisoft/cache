@@ -12,6 +12,8 @@ use function is_array;
 /**
  * Cache provides support for the data caching, including dependencies.
  * The actual data caching is performed via {@see DependencyAwareCache::handler()}.
+ *
+ * @internal
  */
 final class DependencyAwareCache implements PsrSimpleCacheInterface
 {
