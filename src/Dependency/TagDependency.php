@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Dependency;
 
-use Psr\SimpleCache\InvalidArgumentException;
-use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\CacheInterface;
+use Yiisoft\Cache\Exception\InvalidArgumentException;
 
-use function array_merge;
 use function json_encode;
 use function json_last_error_msg;
 use function md5;
-use function microtime;
 
 /**
  * TagDependency associates a cached value with one or multiple {@see TagDependency::$tags}.
@@ -23,6 +21,9 @@ use function microtime;
  * // setting multiple cache keys to store data forever and tagging them with "user-123"
  * $cache->getOrSet('user_42_profile', '', null, new TagDependency('user-123'));
  * $cache->getOrSet('user_42_stats', '', null, new TagDependency('user-123'));
+ *
+ *  // setting a cache key to store data and tagging them with "user-123" with the specified TTL for the tag
+ * $cache->getOrSet('user_42_profile', '', null, new TagDependency('user-123', 3600));
  *
  * // invalidating all keys tagged with "user-123"
  * TagDependency::invalidate($cache, 'user-123');
@@ -36,34 +37,51 @@ final class TagDependency extends Dependency
     private array $tags;
 
     /**
-     * @param array|string $tags List of tag names for this dependency.
-     * For a single tag, you may specify it as a string.
+     * @var int|null The TTL value of this item. null means infinity.
      */
-    public function __construct($tags)
-    {
-        $this->tags = (array) $tags;
-    }
+    private ?int $ttl;
 
     /**
-     * Generates the data needed to determine if dependency has been changed.
-     *
-     * @param CacheInterface $cache the cache component that is currently evaluating this dependency.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return array the data needed to determine if dependency has been changed.
-     * @psalm-suppress InvalidThrow
+     * @param array|string $tags List of tag names for this dependency.
+     * For a single tag, you may specify it as a string.
+     * @param int|null $ttl The TTL value of this item. null means infinity.
      */
+    public function __construct($tags, int $ttl = null)
+    {
+        $this->tags = (array) $tags;
+
+        if ($ttl !== null && $ttl < 1) {
+            throw new InvalidArgumentException(
+                'TTL must be a positive number or null, to invalidate tags, use the'
+                . ' static `\Yiisoft\Cache\Dependency\TagDependency::invalidate()` method.',
+            );
+        }
+
+        $this->ttl = $ttl;
+    }
+
     protected function generateDependencyData(CacheInterface $cache): array
     {
-        $timestamps = $this->getStoredTagTimestamps($cache, $this->tags);
-        return $this->storeTimestampsForNewTags($cache, $timestamps);
+        if (empty($this->tags)) {
+            return [];
+        }
+
+        $tags = [];
+
+        foreach ($this->tags as $tag) {
+            $tag = (string) $tag;
+            $tags[self::buildCacheKey($tag)] = $tag;
+        }
+
+        $cache->psr()->setMultiple($tags, $this->ttl);
+
+        return $tags;
     }
 
     public function isChanged(CacheInterface $cache): bool
     {
-        $timestamps = $this->getStoredTagTimestamps($cache, $this->tags);
-        return $timestamps !== $this->data;
+        $tags = empty($this->tags) ? [] : $cache->psr()->getMultiple(self::buildCacheKeys($this->tags));
+        return $this->data !== $tags;
     }
 
     /**
@@ -74,50 +92,7 @@ final class TagDependency extends Dependency
      */
     public static function invalidate(CacheInterface $cache, $tags): void
     {
-        $keys = self::buildCacheKeys($tags);
-        self::touchKeys($cache, $keys);
-    }
-
-    /**
-     * Generates the timestamp for the specified cache keys.
-     *
-     * @param CacheInterface $cache
-     * @param string[] $keys
-     *
-     * @return array The timestamp indexed by cache keys.
-     */
-    private static function touchKeys(CacheInterface $cache, array $keys): array
-    {
-        $values = [];
-        $time = microtime();
-
-        foreach ($keys as $key) {
-            $values[$key] = $time;
-        }
-
-        $cache->setMultiple($values);
-        return $values;
-    }
-
-    /**
-     * Returns the timestamps for the specified tags.
-     *
-     * @param CacheInterface $cache
-     * @param string[] $tags
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return iterable the timestamps indexed by the specified tags.
-     * @psalm-suppress InvalidThrow
-     */
-    private function getStoredTagTimestamps(CacheInterface $cache, array $tags): iterable
-    {
-        if (empty($tags)) {
-            return [];
-        }
-
-        $keys = self::buildCacheKeys($tags);
-        return $cache->getMultiple($keys);
+        $cache->psr()->deleteMultiple(self::buildCacheKeys($tags));
     }
 
     /**
@@ -133,7 +108,7 @@ final class TagDependency extends Dependency
         $jsonTag = json_encode([__CLASS__, $tag]);
 
         if ($jsonTag === false) {
-            throw new \Yiisoft\Cache\Exception\InvalidArgumentException('Invalid tag. ' . json_last_error_msg());
+            throw new InvalidArgumentException('Invalid tag. ' . json_last_error_msg());
         }
 
         return md5($jsonTag);
@@ -150,37 +125,10 @@ final class TagDependency extends Dependency
     {
         $keys = [];
 
-        foreach ((array)$tags as $tag) {
-            $keys[] = self::buildCacheKey((string)$tag);
+        foreach ((array) $tags as $tag) {
+            $keys[] = self::buildCacheKey((string) $tag);
         }
 
         return $keys;
-    }
-
-    /**
-     * Generates and stores timestamps for tags that are not stored in the cache yet.
-     *
-     * @param CacheInterface $cache
-     * @param iterable $timestamps
-     *
-     * @return array
-     */
-    private function storeTimestampsForNewTags(CacheInterface $cache, iterable $timestamps): array
-    {
-        $newKeys = [];
-
-        foreach ($timestamps as $key => $timestamp) {
-            if ($timestamp === null) {
-                $newKeys[] = $key;
-            }
-        }
-
-        $timestamps = $this->iterableToArray($timestamps);
-
-        if (!empty($newKeys)) {
-            $timestamps = array_merge($timestamps, self::touchKeys($cache, $newKeys));
-        }
-
-        return $timestamps;
     }
 }

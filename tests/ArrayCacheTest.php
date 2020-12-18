@@ -10,6 +10,7 @@ use Exception;
 use IteratorAggregate;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
+use stdClass;
 use Yiisoft\Cache\ArrayCache;
 
 use function array_keys;
@@ -161,10 +162,15 @@ final class ArrayCacheTest extends TestCase
      */
     public function testClear($key, $value): void
     {
-        $cache = $this->prepare($this->cache);
+        $this->cache->clear();
+        $data = $this->dataProvider();
 
-        $this->assertTrue($cache->clear());
-        $this->assertNull($cache->get($key));
+        foreach ($data as $datum) {
+            $this->cache->set($datum[0], $datum[1]);
+        }
+
+        $this->assertTrue($this->cache->clear());
+        $this->assertNull($this->cache->get($key));
     }
 
     /**
@@ -367,57 +373,116 @@ final class ArrayCacheTest extends TestCase
         $this->assertSameExceptObject(['b' => 2], $this->cache->getMultiple(['b']));
     }
 
-    public function testGetInvalidKey(): void
+    public function invalidKeyProvider(): array
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->cache->get(1);
+        return [
+            'int' => [1],
+            'float' => [1.1],
+            'null' => [null],
+            'bool' => [true],
+            'object' => [new stdClass()],
+            'callable' => [fn () => 'key'],
+            'psr-reserved' => ['{}()/\@:'],
+            'empty-string' => [''],
+        ];
     }
 
-    public function testSetInvalidKey(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testGetInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->set(1, 1);
+        $this->cache->get($key);
     }
 
-    public function testDeleteInvalidKey(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testSetInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->delete(1);
+        $this->cache->set($key, 'value');
     }
 
-    public function testGetMultipleInvalidKeys(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testDeleteInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->getMultiple([true]);
+        $this->cache->delete($key);
     }
 
-    public function testGetMultipleInvalidKeysNotIterable(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testGetMultipleInvalidKeys($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->getMultiple(1);
+        $this->cache->getMultiple([$key]);
     }
 
-    public function testSetMultipleInvalidKeysNotIterable(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testGetMultipleInvalidKeysNotIterable($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->setMultiple(1);
+        $this->cache->getMultiple($key);
     }
 
-    public function testDeleteMultipleInvalidKeys(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testSetMultipleInvalidKeysNotIterable($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->deleteMultiple([true]);
+        $this->cache->setMultiple($key);
     }
 
-    public function testDeleteMultipleInvalidKeysNotIterable(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testDeleteMultipleInvalidKeys($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->deleteMultiple(1);
+        $this->cache->deleteMultiple([$key]);
     }
 
-    public function testHasInvalidKey(): void
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testDeleteMultipleInvalidKeysNotIterable($key): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->cache->has(1);
+        $this->cache->deleteMultiple($key);
+    }
+
+    /**
+     * @dataProvider invalidKeyProvider
+     *
+     * @param mixed $key
+     */
+    public function testHasInvalidKey($key): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->has($key);
     }
 }

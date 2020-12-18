@@ -36,22 +36,22 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->get($this->prefix . $key, $default);
     }
 
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         return $this->cache->set($this->prefix . $key, $value, $ttl);
     }
 
-    public function delete($key)
+    public function delete($key): bool
     {
         return $this->cache->delete($this->prefix . $key);
     }
 
-    public function clear()
+    public function clear(): bool
     {
         return $this->cache->clear();
     }
 
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $prefixedKeys = [];
 
@@ -62,7 +62,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->getMultiple($prefixedKeys, $default);
     }
 
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         $prefixedValues = [];
 
@@ -73,7 +73,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->setMultiple($prefixedValues, $ttl);
     }
 
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $prefixedKeys = [];
 
@@ -84,7 +84,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->deleteMultiple($prefixedKeys);
     }
 
-    public function has($key)
+    public function has($key): bool
     {
         return $this->cache->has($this->prefix . $key);
     }

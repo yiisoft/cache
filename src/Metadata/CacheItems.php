@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Metadata;
 
-use Psr\SimpleCache\CacheInterface;
+use Yiisoft\Cache\CacheInterface;
 
 /**
  * CacheItems store the metadata of each cache item.

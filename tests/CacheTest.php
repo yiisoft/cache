@@ -9,20 +9,21 @@ use Psr\SimpleCache\CacheInterface;
 use stdClass;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Cache\Dependency\TagDependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
 use Yiisoft\Cache\Exception\SetCacheException;
 use Yiisoft\Cache\Metadata\CacheItem;
+use Yiisoft\Cache\DependencyAwareCache;
 
 use function fclose;
 use function fopen;
 use function get_class;
-use function json_encode;
 use function md5;
 use function time;
 
-class CacheTest extends TestCase
+final class CacheTest extends TestCase
 {
     private ArrayCache $handler;
 
@@ -38,10 +39,10 @@ class CacheTest extends TestCase
         $items = $this->getItems($cache);
 
         $this->assertSame('key', $items['key']->key());
-        $this->assertSame(get_class($this->handler), $value);
+        $this->assertSame(DependencyAwareCache::class, $value);
         $this->assertNull($items['key']->dependency());
         $this->assertNull($items['key']->expiry());
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     public function testGetOrSetWithTtl(): void
@@ -52,7 +53,7 @@ class CacheTest extends TestCase
 
         $this->assertSame('value', $value);
         $this->assertSame(time() + 3600, $items['key']->expiry());
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     public function testGetOrSetWithExpiredTtl(): void
@@ -63,7 +64,7 @@ class CacheTest extends TestCase
 
         $this->assertSame('value', $value);
         $this->assertSame(-1, $items['key']->expiry());
-        $this->assertTrue($items['key']->expired(1.0, $this->handler));
+        $this->assertTrue($items['key']->expired(1.0, $cache));
     }
 
     public function testGetOrSetWithDependency(): void
@@ -76,7 +77,7 @@ class CacheTest extends TestCase
         $value = $cache->getOrSet('key', fn (): string => 'new-value', null, new TagDependency('tag'));
         $this->assertSame('value', $value);
 
-        TagDependency::invalidate($this->handler, 'tag');
+        TagDependency::invalidate($cache, 'tag');
         $value = $cache->getOrSet('key', fn (): string => 'new-value', null, new TagDependency('tag'));
         $this->assertSame('new-value', $value);
     }
@@ -97,7 +98,7 @@ class CacheTest extends TestCase
         $value = $cache->getOrSet('key', fn (): string => 'value-4', null, new TagDependency('tag'));
         $this->assertSame('value-3', $value);
 
-        TagDependency::invalidate($this->handler, 'tag');
+        TagDependency::invalidate($cache, 'tag');
         $value = $cache->getOrSet('key', fn (): string => 'value-5', null, new TagDependency('tag'));
         $this->assertSame('value-5', $value);
 
@@ -118,33 +119,81 @@ class CacheTest extends TestCase
         $this->assertSame('value-2', $value);
     }
 
-    public function keyDataProvider(): array
+    public function testHandler(): void
+    {
+        $cache = new Cache($this->handler);
+
+        $this->assertInstanceOf(CacheInterface::class, $cache->psr());
+        $this->assertInstanceOf(DependencyAwareCache::class, $cache->psr());
+        $this->assertSame($this->getInaccessibleProperty($cache, 'psr'), $cache->psr());
+    }
+
+    public function stringKeyDataProvider(): array
     {
         return [
-            'int' => [1, '1'],
-            'string' => ['asd123', 'asd123'],
-            'string-md5' => [$string = 'asd_123-{z4x}', md5($string)],
-            'null' => [null, $this->encode(null)],
-            'bool' => [true, $this->encode(true)],
-            'float' => [$float = 1.1, $this->encode($float)],
-            'array' => [
-                $array = [1, 'key' => 'value', 'nested' => [1, 2, 'asd_123-{z4x}']],
-                $this->encode($array),
-            ],
-            'empty-array' => [$array = [], $this->encode($array)],
-            'object' => [
-                $object = new class() {
-                    public string $name = 'object';
-                },
-                $this->encode($object),
-            ],
-            'empty-object' => [$object = new stdClass(), $this->encode($object)],
-            'callable' => [$callable = fn () => null, $this->encode($callable)],
+            'simple-key' => ['simple-key', true, false],
+            '64-characters' => ['abs-123djj85&!%kfk^%dkk_yhfjdkfkvuywp;a#dkk2728mv&-dfl;k84_kdufu', true, false],
+            '65-characters' => ['abs-123djj85&!%kfk^%dkk_yhfjdkfkvuywp;a#dkk2728mv&-dfl;k84_kdufu0', false, false],
+            'psr-reserved' => ['{}()/\@:', false, true],
+            'empty-string' => ['', false, true],
         ];
     }
 
     /**
-     * @dataProvider keyDataProvider
+     * @dataProvider stringKeyDataProvider
+     *
+     * @param string $key
+     * @param bool $matched
+     * @param bool $exception
+     */
+    public function testKeyMatchingToHandler(string $key, bool $matched, bool $exception): void
+    {
+        $cache = new Cache($this->handler);
+        $cache->getOrSet($key, fn () => 'value');
+
+        $this->assertSame('value', $cache->getOrSet($key, fn () => null));
+
+        if ($matched) {
+            $this->assertTrue($cache->psr()->has($key));
+            $this->assertSame('value', $cache->psr()->get($key));
+        } else {
+            if ($exception) {
+                $this->expectException(InvalidArgumentException::class);
+            }
+            $this->assertFalse($cache->psr()->has($key));
+            $this->assertSame(null, $cache->psr()->get($key));
+        }
+    }
+
+    public function normalizeKeyDataProvider(): array
+    {
+        $keyNormalizer = new CacheKeyNormalizer();
+
+        return [
+            'int' => [1, '1'],
+            'string' => ['asd123', 'asd123'],
+            'string-md5' => [$string = 'asd_123-{z4x}', md5($string)],
+            'null' => [null, $keyNormalizer->normalize(null)],
+            'bool' => [true, $keyNormalizer->normalize(true)],
+            'float' => [$float = 1.1, $keyNormalizer->normalize($float)],
+            'array' => [
+                $array = [1, 'key' => 'value', 'nested' => [1, 2, 'asd_123-{z4x}']],
+                $keyNormalizer->normalize($array),
+            ],
+            'empty-array' => [$array = [], $keyNormalizer->normalize($array)],
+            'object' => [
+                $object = new class() {
+                    public string $name = 'object';
+                },
+                $keyNormalizer->normalize($object),
+            ],
+            'empty-object' => [$object = new stdClass(), $keyNormalizer->normalize($object)],
+            'callable' => [$callable = fn () => null, $keyNormalizer->normalize($callable)],
+        ];
+    }
+
+    /**
+     * @dataProvider normalizeKeyDataProvider
      *
      * @param mixed $key
      * @param string $excepted
@@ -159,20 +208,6 @@ class CacheTest extends TestCase
         $cache->remove($key);
         $items = $this->getItems($cache);
         $this->assertSame($items, []);
-    }
-
-    /**
-     * @dataProvider keyDataProvider
-     *
-     * @param mixed $key
-     * @param string $expected
-     */
-    public function testConstructorWithKeyPrefixAndGetOrSetWithOtherKeys($key, string $expected): void
-    {
-        $cache = new Cache($this->handler, null);
-        $cache->getOrSet($key, static fn (): string => 'value');
-        $items = $this->getItems($cache);
-        $this->assertSame($expected, $items[$expected]->key());
     }
 
     public function testGetOrSetThrowExceptionForInvalidKey(): void
@@ -214,7 +249,7 @@ class CacheTest extends TestCase
         $cache = new Cache($this->handler, $ttl);
         $cache->getOrSet('key', static fn (): string => 'value');
         $items = $this->getItems($cache);
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     /**
@@ -227,7 +262,7 @@ class CacheTest extends TestCase
         $cache = new Cache($this->handler);
         $cache->getOrSet('key', static fn (): string => 'value', $ttl);
         $items = $this->getItems($cache);
-        $this->assertFalse($items['key']->expired(1.0, $this->handler));
+        $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
     public function invalidTtlDataProvider(): array
@@ -357,15 +392,5 @@ class CacheTest extends TestCase
     {
         $items = $this->getInaccessibleProperty($cache, 'items');
         return $this->getInaccessibleProperty($items, 'items');
-    }
-
-    /**
-     * @param mixed $key
-     *
-     * @return string
-     */
-    private function encode($key): string
-    {
-        return md5(json_encode($key));
     }
 }

@@ -11,10 +11,18 @@ use Yiisoft\Cache\Exception\RemoveCacheException;
 use Yiisoft\Cache\Exception\SetCacheException;
 
 /**
- * CacheInterface defines the common interface to be implemented by cache classes.
+ * CacheInterface is a wrapper over PSR-16 {@see \Psr\SimpleCache\CacheInterface} that allows you
+ * to implement the cache stampede prevention using the "Probably early expiration" algorithm.
  */
 interface CacheInterface
 {
+    /**
+     * Returns the actual handler of the cache.
+     *
+     * @return \Psr\SimpleCache\CacheInterface The actual cache handler.
+     */
+    public function psr(): \Psr\SimpleCache\CacheInterface;
+
     /**
      * The method combines retrieving and setting the value identified by the `$key`.
      *
@@ -26,7 +34,7 @@ interface CacheInterface
      * ```php
      * public function getTopProducts(int $count = 10) {
      *     $key = ['top-products', $count];
-     *     return $this->cache->getOrSet($key, function (\Psr\SimpleCache\CacheInterface $cache) use ($count) {
+     *     return $this->cache->getOrSet($key, function (\Yiisoft\Cache\CacheInterface $cache) use ($count) {
      *         return $this->getTopNProductsFromDatabase($count);
      *     }, 1000);
      * }
