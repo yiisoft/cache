@@ -380,7 +380,7 @@ final class ArrayCacheTest extends TestCase
             'float' => [1.1],
             'null' => [null],
             'bool' => [true],
-            'object' => [new stdClass],
+            'object' => [new stdClass()],
             'callable' => [fn () => 'key'],
             'psr-reserved' => ['{}()/\@:'],
             'empty-string' => [''],

@@ -49,6 +49,7 @@ final class CacheKeyNormalizerTest extends TestCase
 
     /**
      * @dataProvider keyDataProvider
+     *
      * @param mixed $key
      * @param string $excepted
      */
@@ -67,6 +68,7 @@ final class CacheKeyNormalizerTest extends TestCase
 
     /**
      * @param mixed $key
+     *
      * @return string
      */
     private function encode($key): string
