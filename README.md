@@ -47,8 +47,9 @@ In order to set a global key prefix:
 $arrayCacheWithPrefix = new \Yiisoft\Cache\PrefixedCache(new \Yiisoft\Cache\ArrayCache(), 'myapp_');
 ```
 
-If you need a simpler yet more powerful way to cache values based on recomputation callbacks use `getOrSet()` and `remove()`, additional features such as invalidation dependencies and
-"Probably early expiration" stampede prevention, you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
+If you need a simpler yet more powerful way to cache values based on recomputation callbacks use `getOrSet()`
+and `remove()`, additional features such as invalidation dependencies and "Probably early expiration" 
+stampede prevention, you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
 
 ```php
 $cache = new \Yiisoft\Cache\Cache($arrayCache);
@@ -108,11 +109,16 @@ $data = $cache->getOrSet($key, function (\Psr\SimpleCache\CacheInterface $cache)
 }, 3600);
 ```
 
+Normalization of the key occurs using the `Yiisoft\Cache\CacheKeyNormalizer`.
+
 In order to delete value you can use:
 
 ```php
 $cache->remove($key);
 ```
+
+You can use PR-16 methods via the `psr()` proxy method, but remember that getting and
+setting the cache separately violates the "Probably early expiration" algorithm.
 
 ### Invalidation dependencies
 
