@@ -49,7 +49,7 @@ final class CacheItemTest extends TestCase
 
     public function testExpiredAndUpdate(): void
     {
-        $item = new CacheItem('key', time() + 3600, $this->dependency);
+        $item = new CacheItem('key', 3600, $this->dependency);
         $this->assertFalse($item->expired(1.0, $this->cache));
 
         $item->update(time(), $this->dependency);
@@ -58,7 +58,7 @@ final class CacheItemTest extends TestCase
 
     public function testExpiredWithChangeDependency(): void
     {
-        $item = new CacheItem('key', time() + 3600, $this->dependency);
+        $item = new CacheItem('key', 3600, $this->dependency);
         $this->assertFalse($item->expired(1.0, $this->cache));
 
         TagDependency::invalidate($this->cache, 'tag');

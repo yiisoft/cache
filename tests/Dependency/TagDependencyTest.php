@@ -70,9 +70,8 @@ final class TagDependencyTest extends DependencyTestCase
 
     public function testInvalidTag(): void
     {
-        $cache = $this->getCache();
-        $dependency = new TagDependency(['test', [11]]);
-        $this->expectError();
-        $dependency->isChanged($cache);
+        $dependency = new TagDependency("\xB1\x31");
+        $this->expectException(InvalidArgumentException::class);
+        $dependency->evaluateDependency($this->getCache());
     }
 }

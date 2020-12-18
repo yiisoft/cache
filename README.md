@@ -145,14 +145,16 @@ $cache->getOrSet('item_42_total', $callable, 3600, new TagDependency('item_42'))
 TagDependency::invalidate($cache, 'item_42');
 ```
 
-There is `Yiisoft\Cache\Dependency\FileDependency` that invalidates cache based on file modification time
-and `Yiisoft\Cache\Dependency\CallbackDependency` that invalidates cache when callback result changes.
+Other dependencies:
 
-In order to implement your own dependency extend from `Yiisoft\Cache\Dependency\Dependency`.
+- `Yiisoft\Cache\Dependency\CallbackDependency` - invalidates the cache when callback result changes.
+- `Yiisoft\Cache\Dependency\FileDependency` - invalidates the cache based on file modification time.
+- `Yiisoft\Cache\Dependency\ValueDependency` - invalidates the cache when specified value changes.
 
 You may combine multiple dependencies using `Yiisoft\Cache\Dependency\AnyDependency`
-or `Yiisoft\Cache\Dependency\AllDependencies`. 
+or `Yiisoft\Cache\Dependency\AllDependencies`.
 
+In order to implement your own dependency extend from `Yiisoft\Cache\Dependency\Dependency`.
 
 ### Cache stampede prevention
 
