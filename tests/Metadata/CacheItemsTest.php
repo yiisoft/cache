@@ -67,7 +67,7 @@ final class CacheItemsTest extends TestCase
         $this->items->set(new CacheItem('key', 0, null));
         $this->assertTrue($this->items->expired('key', 1.0, $this->cache));
 
-        $this->items->set(new CacheItem('key', time() + 3600, null));
+        $this->items->set(new CacheItem('key', 3600, null));
         $this->assertFalse($this->items->expired('key', 1.0, $this->cache));
     }
 

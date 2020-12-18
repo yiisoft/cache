@@ -119,6 +119,16 @@ final class CacheTest extends TestCase
         $this->assertSame('value-2', $value);
     }
 
+    public function testGetOrSetIfNotExistItems(): void
+    {
+        $cache = new Cache($this->handler);
+        $cache->getOrSet('key', fn (): string => 'value', -1);
+        $items = $this->getInaccessibleProperty($cache, 'items');
+        $this->setInaccessibleProperty($items, 'items', []);
+
+        $this->assertSame('new-value', $cache->getOrSet('key', fn (): string => 'new-value'));
+    }
+
     public function testHandler(): void
     {
         $cache = new Cache($this->handler);

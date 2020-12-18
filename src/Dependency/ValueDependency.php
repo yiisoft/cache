@@ -19,6 +19,9 @@ final class ValueDependency extends Dependency
      */
     private $value;
 
+    /**
+     * @param mixed $value
+     */
     public function __construct($value)
     {
         $this->value = $value;
