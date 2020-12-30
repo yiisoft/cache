@@ -30,15 +30,15 @@
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.3"
     },
-    "suggest": {
-        "yiisoft/cache-apcu": "To store cache using APCu PECL extension",
-        "yiisoft/cache-db": "To store cache using database",
-        "yiisoft/cache-file": "To store cache using files",
-        "yiisoft/cache-memcached": "To store cache using Memcached PECL extension",
-        "yiisoft/cache-wincache": "To store cache using WinCache PECL extension"
-    },
     "provide": {
         "psr/simple-cache-implementation": "1.0.0"
+    },
+    "suggest": {
+        "yiisoft/cache-apcu": "Allows to store cache using APCu PECL extension",
+        "yiisoft/cache-db": "Allows storing cache to the database",
+        "yiisoft/cache-file": "Allows storing cache to the files",
+        "yiisoft/cache-memcached": "Allows to store cache using Memcached PECL extension",
+        "yiisoft/cache-wincache": "Allows to store cache using WinCache PECL extension"
     },
     "autoload": {
         "psr-4": {
