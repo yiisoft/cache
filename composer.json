@@ -31,10 +31,11 @@
         "vimeo/psalm": "^4.3"
     },
     "suggest": {
-        "yiisoft/cache-wincache": "To store cache using WinCache PECL extension",
-        "yiisoft/cache-memcached": "To store cache using memcached PECL extension",
-        "yiisoft/cache-file": "To store cache in files",
-        "yiisoft/cache-apcu": "To store cache using APCu PECL extension"
+        "yiisoft/cache-apcu": "To store cache using APCu PECL extension",
+        "yiisoft/cache-db": "To store cache using database",
+        "yiisoft/cache-file": "To store cache using files",
+        "yiisoft/cache-memcached": "To store cache using Memcached PECL extension",
+        "yiisoft/cache-wincache": "To store cache using WinCache PECL extension"
     },
     "provide": {
         "psr/simple-cache-implementation": "1.0.0"
