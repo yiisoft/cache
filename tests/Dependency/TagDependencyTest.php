@@ -12,7 +12,6 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
 
 use function json_encode;
 use function md5;
-use function time;
 
 final class TagDependencyTest extends DependencyTestCase
 {
@@ -30,10 +29,8 @@ final class TagDependencyTest extends DependencyTestCase
         $cache->getOrSet('key', static fn () => 'value', null, new TagDependency('tag', 3600));
         $arrayHandler = $this->getInaccessibleProperty($cache->psr(), 'handler');
         $data = $this->getInaccessibleProperty($arrayHandler, 'cache');
-        $key = md5(json_encode([TagDependency::class, 'tag']));
 
-        $this->assertTrue(isset($data[$key]));
-        $this->assertSame(['tag', time() + 3600], $data[$key]);
+        $this->assertTrue(isset($data[md5(json_encode([TagDependency::class, 'tag']))]));
         $this->assertSame('value', $cache->getOrSet('key', static fn () => null));
     }
 
@@ -44,13 +41,13 @@ final class TagDependencyTest extends DependencyTestCase
         $cache->getOrSet('item_42_price', static fn () => 13, null, new TagDependency('item_42'));
         $cache->getOrSet('item_42_total', static fn () => 26, null, new TagDependency('item_42'));
 
-        $this->assertSame(13, $cache->getOrSet('item_42_price', static fn () => 26));
-        $this->assertSame(26, $cache->getOrSet('item_42_total', static fn () => 13));
+        $this->assertSame(13, $cache->getOrSet('item_42_price', static fn () => 26, null, new TagDependency('item_42')));
+        $this->assertSame(26, $cache->getOrSet('item_42_total', static fn () => 13, null, new TagDependency('item_42')));
 
         TagDependency::invalidate($cache, 'item_42');
 
-        $this->assertNull($cache->getOrSet('item_42_price', static fn () => null));
-        $this->assertNull($cache->getOrSet('item_42_total', static fn () => null));
+        $this->assertNull($cache->getOrSet('item_42_price', static fn () => null, null, new TagDependency('item_42')));
+        $this->assertNull($cache->getOrSet('item_42_total', static fn () => null, null, new TagDependency('item_42')));
     }
 
     public function testEmptyTags(): void

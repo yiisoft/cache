@@ -10,6 +10,7 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
 use function json_encode;
 use function json_last_error_msg;
 use function md5;
+use function microtime;
 
 /**
  * TagDependency associates a cached value with one or multiple {@see TagDependency::$tags}.
@@ -68,9 +69,8 @@ final class TagDependency extends Dependency
 
         $tags = [];
 
-        foreach ($this->tags as $tag) {
-            $tag = (string) $tag;
-            $tags[self::buildCacheKey($tag)] = $tag;
+        foreach ($this->getTagsData($cache) as $tag => $time) {
+            $tags[$tag] = $time ?? microtime();
         }
 
         $cache->psr()->setMultiple($tags, $this->ttl);
@@ -84,7 +84,7 @@ final class TagDependency extends Dependency
             return $this->data !== [];
         }
 
-        return $this->data !== $this->iterableToArray($cache->psr()->getMultiple(self::buildCacheKeys($this->tags)));
+        return $this->data !== $this->getTagsData($cache);
     }
 
     /**
@@ -133,5 +133,17 @@ final class TagDependency extends Dependency
         }
 
         return $keys;
+    }
+
+    /**
+     * Gets the tags data from the cache storage.
+     *
+     * @param CacheInterface $cache
+     *
+     * @return array
+     */
+    private function getTagsData(CacheInterface $cache): array
+    {
+        return $this->iterableToArray($cache->psr()->getMultiple(self::buildCacheKeys($this->tags)));
     }
 }
