@@ -49,8 +49,8 @@ final class TagDependencyTest extends DependencyTestCase
 
         TagDependency::invalidate($cache, 'item_42');
 
-        $this->assertNull($cache->getOrSet('item_42_price', static fn () => null));
-        $this->assertNull($cache->getOrSet('item_42_total', static fn () => null));
+        $this->assertNull($cache->getOrSet('item_42_price', static fn () => null, null, new TagDependency('item_42')));
+        $this->assertNull($cache->getOrSet('item_42_total', static fn () => null, null, new TagDependency('item_42')));
     }
 
     public function testEmptyTags(): void
