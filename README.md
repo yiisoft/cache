@@ -30,7 +30,7 @@ providing own features. It is used in [Yii Framework](https://www.yiiframework.c
 The package could be installed with composer:
 
 ```
-composer install yiisoft/cache
+composer require yiisoft/cache
 ```
 
 ## Configuration
