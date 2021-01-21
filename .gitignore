@@ -11,19 +11,14 @@ Thumbs.db
 
 # composer vendor dir
 /vendor
-/composer.lock
 
 # composer itself is not needed
 composer.phar
+composer.lock
 
 # phpunit itself is not needed
 phpunit.phar
 # local phpunit config
 /phpunit.xml
-/.phpunit.result.cache
-
-/tests/runtime
-/tests/*/runtime
-
-# Phan
-analysis.txt
+# local phpunit cache
+.phpunit.result.cache
