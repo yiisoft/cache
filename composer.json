@@ -4,7 +4,8 @@
     "description": "Yii Caching Library",
     "keywords": [
         "yii",
-        "cache"
+        "cache",
+        "psr-16"
     ],
     "homepage": "http://www.yiiframework.com/",
     "license": "BSD-3-Clause",
@@ -15,8 +16,6 @@
         "wiki": "http://www.yiiframework.com/wiki/",
         "irc": "irc://irc.freenode.net/yii"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
         "ext-ctype": "*",
