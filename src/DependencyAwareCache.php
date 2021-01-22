@@ -25,7 +25,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
     /**
      * @var PsrSimpleCacheInterface The actual cache handler.
      */
-    public PsrSimpleCacheInterface $handler;
+    private PsrSimpleCacheInterface $handler;
 
     /**
      * @param CacheInterface $cache The actual cache handler.
