@@ -85,13 +85,25 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
     }
 
     /**
-     * Checks if the cache dependency has expired and returns a value
+     * Gets the raw cache value.
+     *
+     * @param string $key The unique key of this item in the cache.
+     *
+     * @return mixed The raw cache value or `null if the cache is outdated.
+     */
+    public function getRaw(string $key)
+    {
+        return $this->handler->get($key);
+    }
+
+    /**
+     * Checks if the cache dependency has expired and returns a value.
      *
      * @param string $key The unique key of this item in the cache.
      * @param mixed $value The value of this item in the cache.
-     * @param mixed $default Default value to return if the key does not exist.
+     * @param mixed $default Default value to return if the dependency has been changed.
      *
-     * @return mixed|null The cache value or `null` if the cache is outdated or a dependency has been changed.
+     * @return mixed The cache value or `$default` if the dependency has been changed.
      */
     private function checkAndGetValue(string $key, $value, $default = null)
     {

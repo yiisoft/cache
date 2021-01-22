@@ -100,7 +100,7 @@ final class Cache implements CacheInterface
             return null;
         }
 
-        $value = $this->psr->get($key);
+        $value = $this->psr->getRaw($key);
 
         if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
             [$value, $item] = $value;
