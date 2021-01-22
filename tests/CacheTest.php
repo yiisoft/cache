@@ -138,6 +138,19 @@ final class CacheTest extends TestCase
         $this->assertSame($this->getInaccessibleProperty($cache, 'psr'), $cache->psr());
     }
 
+    public function testGetOrSetForNotSameKeyAndCacheItemKey(): void
+    {
+        $cache = new Cache($this->handler);
+        $cache->getOrSet('key', fn (): string => 'value');
+
+        $this->assertSame('value', $value = $cache->getOrSet('key', fn (): string => 'new-value'));
+
+        $items = $this->getItems($cache);
+        $this->setInaccessibleProperty($items['key'], 'key', 'new-key');
+
+        $this->assertSame('new-value', $value = $cache->getOrSet('key', fn (): string => 'new-value'));
+    }
+
     public function stringKeyDataProvider(): array
     {
         return [
