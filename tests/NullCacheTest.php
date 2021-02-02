@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests;
 
+use Psr\SimpleCache\InvalidArgumentException;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\NullCache;
 
@@ -61,5 +62,23 @@ final class NullCacheTest extends TestCase
         $this->assertSame(42, (new Cache($this->cache))->getOrSet('key', static function () {
             return 42;
         }));
+    }
+
+    public function testGetThrowExceptionForInvalidKey(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->get('{}');
+    }
+
+    public function testHasThrowExceptionForInvalidKey(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->has('{}');
+    }
+
+    public function testDeleteThrowExceptionForInvalidKey(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->delete('{}');
     }
 }
