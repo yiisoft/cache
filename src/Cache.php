@@ -51,7 +51,7 @@ final class Cache implements CacheInterface
     /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
      * @param DateInterval|int|null $defaultTtl The default TTL for a cache entry.
-     * null meaning infinity, negative orzero results in the cache key deletion.
+     * null meaning infinity, negative or zero results in the cache key deletion.
      * This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
     public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null)

@@ -91,7 +91,7 @@ final class TagDependency extends Dependency
      * Invalidates all of the cached values that are associated with any of the specified {@see tags}.
      *
      * @param CacheInterface $cache The cache component that caches the values.
-     * @param array|string $tags
+     * @param array|string $tags List of tag names.
      */
     public static function invalidate(CacheInterface $cache, $tags): void
     {
@@ -111,7 +111,7 @@ final class TagDependency extends Dependency
         $jsonTag = json_encode([__CLASS__, $tag]);
 
         if ($jsonTag === false) {
-            throw new InvalidArgumentException('Invalid tag. ' . json_last_error_msg());
+            throw new InvalidArgumentException('Invalid tag. ' . json_last_error_msg() . '.');
         }
 
         return md5($jsonTag);

@@ -157,7 +157,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     /**
      * Normalizes cache TTL handling strings and {@see DateInterval} objects.
      *
-     * @param DateInterval|int|string|null $ttl raw TTL.
+     * @param DateInterval|int|string|null $ttl Raw TTL.
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      */
