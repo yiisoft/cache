@@ -54,6 +54,7 @@ final class AnyDependency extends Dependency
      * @codeCoverageIgnore method is not used
      *
      * @param CacheInterface $cache
+     *
      * @return mixed
      */
     protected function generateDependencyData(CacheInterface $cache)
