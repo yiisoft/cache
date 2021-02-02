@@ -20,7 +20,7 @@ final class FileDependency extends Dependency
     private string $fileName;
 
     /**
-     * @param string $fileName the file path whose last modification time is used to
+     * @param string $fileName The file path whose last modification time is used to
      * check if the dependency has been changed.
      */
     public function __construct(string $fileName)

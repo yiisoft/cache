@@ -23,7 +23,7 @@ final class ArrayCacheTest extends TestCase
 {
     private ArrayCache $cache;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->cache = new ArrayCache();
     }
@@ -209,7 +209,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->clear();
 
         $data = $this->getDataProviderData();
-        $keys = array_map('strval', array_keys($data));
+        $keys = array_map('\strval', array_keys($data));
 
         $this->cache->setMultiple($data);
 
@@ -221,7 +221,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->clear();
 
         $data = $this->getDataProviderData();
-        $keys = array_map('strval', array_keys($data));
+        $keys = array_map('\strval', array_keys($data));
 
         $this->cache->setMultiple($data);
 
@@ -236,7 +236,7 @@ final class ArrayCacheTest extends TestCase
         $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
     }
 
-    public function testZeroAndNegativeTtl()
+    public function testZeroAndNegativeTtl(): void
     {
         $this->cache->clear();
         $this->cache->setMultiple([
@@ -346,7 +346,7 @@ final class ArrayCacheTest extends TestCase
             'IteratorAggregate' => [
                 ['a' => 1, 'b' => 2,],
                 new class() implements IteratorAggregate {
-                    public function getIterator()
+                    public function getIterator(): ArrayIterator
                     {
                         return new ArrayIterator(['a' => 1, 'b' => 2,]);
                     }
@@ -362,7 +362,7 @@ final class ArrayCacheTest extends TestCase
         ];
     }
 
-    public function testSetWithDateIntervalTtl()
+    public function testSetWithDateIntervalTtl(): void
     {
         $this->cache->clear();
 

@@ -15,7 +15,7 @@ final class PrefixedCacheTest extends TestCase
     private PrefixedCache $cache;
     private string $prefix = 'myapp_';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->cache = new PrefixedCache(new ArrayCache(), $this->prefix);
     }

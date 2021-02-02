@@ -51,9 +51,11 @@ final class AllDependencies extends Dependency
     }
 
     /**
-     * @codeCoverageIgnore method is not used
+     * @codeCoverageIgnore Method is not used.
      *
      * @param CacheInterface $cache
+     *
+     * @return mixed
      */
     protected function generateDependencyData(CacheInterface $cache)
     {

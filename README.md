@@ -70,17 +70,17 @@ $cache = new \Yiisoft\Cache\ArrayCache();
 $parameters = ['user_id' => 42];
 $key = 'demo';
 
-// try retrieving $data from cache
+// Try retrieving $data from cache.
 $data = $cache->get($key);
 if ($data === null) {
-    // $data is not found in cache, calculate it from scratch
+    // $data is not found in cache, calculate it from scratch.
     $data = calculateData($parameters);
     
-    // store $data in cache for an hour so that it can be retrieved next time
+    // Store $data in cache for an hour so that it can be retrieved next time.
     $cache->set($key, $data, 3600);
 }
 
-// $data is available here
+// $data is available here.
 ```
 
 In order to delete value you can use:
@@ -137,11 +137,11 @@ that may trigger cache invalidation. Below is an example using tag dependency:
 
 use Yiisoft\Cache\Dependency\TagDependency;
 
-// set multiple cache values marking both with a tag
+// Set multiple cache values marking both with a tag.
 $cache->getOrSet('item_42_price', $callable, null, new TagDependency('item_42'));
 $cache->getOrSet('item_42_total', $callable, 3600, new TagDependency('item_42'));
 
-// trigger invalidation by tag
+// Trigger invalidation by tag.
 TagDependency::invalidate($cache, 'item_42');
 ```
 

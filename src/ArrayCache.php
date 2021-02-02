@@ -157,7 +157,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     /**
      * Normalizes cache TTL handling strings and {@see DateInterval} objects.
      *
-     * @param DateInterval|int|string|null $ttl raw TTL.
+     * @param DateInterval|int|string|null $ttl Raw TTL.
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      */
@@ -213,7 +213,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
 
     private function validateKeysOfValues(array $values): void
     {
-        $keys = array_map('strval', array_keys($values));
+        $keys = array_map('\strval', array_keys($values));
         $this->validateKeys($keys);
     }
 }

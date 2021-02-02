@@ -26,7 +26,7 @@ abstract class Dependency
     protected $data;
 
     /**
-     * @var bool whether this dependency is reusable or not. True value means that dependent
+     * @var bool Whether this dependency is reusable or not. True value means that dependent
      * data for this cache dependency will be generated only once per request. This allows you
      * to use the same cache dependency for multiple separate cache calls while generating the same
      * page without an overhead of re-evaluating dependency data each time. Defaults to false.
@@ -34,7 +34,7 @@ abstract class Dependency
     protected bool $isReusable = false;
 
     /**
-     * @var array static storage of cached data for reusable dependencies.
+     * @var array Static storage of cached data for reusable dependencies.
      */
     private static array $reusableData = [];
 
@@ -104,7 +104,7 @@ abstract class Dependency
     /**
      * Generates a unique hash that can be used for retrieving reusable dependency data.
      *
-     * @return string a unique hash value for this cache dependency.
+     * @return string A unique hash value for this cache dependency.
      *
      * @see isReusable()
      */
@@ -118,7 +118,7 @@ abstract class Dependency
     }
 
     /**
-     * Converts iterable to array
+     * Converts iterable to array.
      *
      * @param iterable $iterable
      *
@@ -135,7 +135,7 @@ abstract class Dependency
      *
      * Derived classes should override this method to generate the actual dependency data.
      *
-     * @param CacheInterface $cache The cache component that is currently evaluating this dependency
+     * @param CacheInterface $cache The cache component that is currently evaluating this dependency.
      *
      * @return mixed The data needed to determine if dependency has been changed.
      */

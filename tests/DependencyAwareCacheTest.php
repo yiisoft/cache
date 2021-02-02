@@ -16,7 +16,7 @@ final class DependencyAwareCacheTest extends TestCase
     private ArrayCache $handler;
     private DependencyAwareCache $psr;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->handler = new ArrayCache();
         $this->cache = new Cache($this->handler);

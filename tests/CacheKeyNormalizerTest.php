@@ -17,7 +17,7 @@ final class CacheKeyNormalizerTest extends TestCase
 {
     private CacheKeyNormalizer $normalizer;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->normalizer = new CacheKeyNormalizer();
     }

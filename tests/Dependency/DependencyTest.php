@@ -8,6 +8,7 @@ use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Dependency\TagDependency;
+use function strlen;
 
 /**
  * Dependency (abstract) tests.
@@ -23,7 +24,7 @@ final class DependencyTest extends DependencyTestCase
         $this->setInaccessibleProperty($dependency, 'reusableData', $value, false);
         $this->assertSameExceptObject($value, $this->getInaccessibleProperty($dependency, 'reusableData'));
 
-        $dependency->resetReusableData();
+        $dependency::resetReusableData();
 
         $this->assertSameExceptObject([], $this->getInaccessibleProperty($dependency, 'reusableData'));
     }
@@ -41,7 +42,7 @@ final class DependencyTest extends DependencyTestCase
 
     public function testIsChangedReusable(): void
     {
-        /* @var $dependency Dependency */
+        /** @var Dependency $dependency */
         $dependency = $this->getMockForAbstractClass(Dependency::class);
         $dependency->markAsReusable();
         $this->assertDependencyNotChanged($dependency);
@@ -53,7 +54,7 @@ final class DependencyTest extends DependencyTestCase
 
     public function testIsChanged(): void
     {
-        /* @var $dependency Dependency */
+        /** @var Dependency $dependency */
         $dependency = $this->getMockForAbstractClass(Dependency::class);
         $this->assertDependencyNotChanged($dependency);
 
@@ -62,7 +63,7 @@ final class DependencyTest extends DependencyTestCase
         $this->assertDependencyChanged($dependency);
     }
 
-    public function testEvaluateDependencyReusable()
+    public function testEvaluateDependencyReusable(): void
     {
         $cache = new Cache(new ArrayCache());
         $dependency = new TagDependency('test');

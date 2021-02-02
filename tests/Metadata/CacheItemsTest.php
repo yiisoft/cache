@@ -17,7 +17,7 @@ final class CacheItemsTest extends TestCase
     private Cache $cache;
     private TagDependency $dependency;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->items = new CacheItems();
         $this->cache = new Cache(new ArrayCache());
