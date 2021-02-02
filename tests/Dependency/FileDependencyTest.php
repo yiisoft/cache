@@ -7,6 +7,7 @@ namespace Yiisoft\Cache\Tests\Dependency;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\FileDependency;
+use function dirname;
 
 final class FileDependencyTest extends DependencyTestCase
 {
@@ -35,7 +36,7 @@ final class FileDependencyTest extends DependencyTestCase
         $this->assertDependencyChanged($dependency);
     }
 
-    public function testDependencyIsChangedReusable()
+    public function testDependencyIsChangedReusable(): void
     {
         $cache = new Cache(new ArrayCache());
         $this->touchFile();

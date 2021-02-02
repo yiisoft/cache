@@ -12,7 +12,7 @@ final class NullCacheTest extends TestCase
 {
     private NullCache $cache;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->cache = new NullCache();
     }

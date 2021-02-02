@@ -27,7 +27,7 @@ final class CacheTest extends TestCase
 {
     private ArrayCache $handler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->handler = new ArrayCache();
     }
@@ -184,7 +184,7 @@ final class CacheTest extends TestCase
                 $this->expectException(InvalidArgumentException::class);
             }
             $this->assertFalse($cache->psr()->has($key));
-            $this->assertSame(null, $cache->psr()->get($key));
+            $this->assertNull($cache->psr()->get($key));
         }
     }
 

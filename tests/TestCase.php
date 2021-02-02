@@ -143,10 +143,10 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
         // assert same for each element of the array except objects
         foreach ($expected as $key => $value) {
-            if (!is_object($value)) {
-                $this->assertSame($expected[$key], $actual[$key]);
-            } else {
+            if (is_object($value)) {
                 $this->assertEquals($expected[$key], $actual[$key]);
+            } else {
+                $this->assertSame($expected[$key], $actual[$key]);
             }
         }
     }
