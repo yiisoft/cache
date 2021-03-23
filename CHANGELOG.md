@@ -3,7 +3,7 @@
 
 ## 1.0.1 under development
 
-- no changes in this release.
+- Chg: Adjust config for new config plugin (samdark)
 
 ## 1.0.0 February 02, 2021
 
