@@ -1,7 +1,7 @@
 # Cache Change Log
 
 
-## 1.0.1 under development
+## 1.0.1 March 23, 2021
 
 - Chg: Adjust config for new config plugin (samdark)
 
