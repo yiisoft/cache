@@ -67,9 +67,15 @@ final class Cache implements CacheInterface
         return $this->psr;
     }
 
+    /**
+     * @param mixed $key
+     * @psalm-param callable(\Psr\SimpleCache\CacheInterface): mixed $callable
+     * @param DateInterval|int|null $ttl
+     */
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
     {
         $key = $this->keyNormalizer->normalize($key);
+        /** @var mixed $value */
         $value = $this->getValue($key, $beta);
 
         return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
@@ -100,6 +106,7 @@ final class Cache implements CacheInterface
             return null;
         }
 
+        /** @psalm-var mixed $value */
         $value = $this->psr->getRaw($key);
 
         if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
@@ -120,6 +127,7 @@ final class Cache implements CacheInterface
      *
      * @param string $key The unique key of this item in the cache.
      * @param callable $callable The callable or closure that will be used to generate a value to be cached.
+     * @psalm-param callable(\Psr\SimpleCache\CacheInterface): mixed $callable
      * @param DateInterval|int|null $ttl The TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency The dependency of the cache value.
      *
@@ -132,6 +140,7 @@ final class Cache implements CacheInterface
     {
         $ttl = $this->normalizeTtl($ttl);
         $ttl ??= $this->defaultTtl;
+        /** @var mixed $value */
         $value = $callable($this->psr);
 
         if ($dependency !== null) {

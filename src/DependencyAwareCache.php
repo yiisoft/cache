@@ -28,7 +28,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
     private PsrSimpleCacheInterface $handler;
 
     /**
-     * @param CacheInterface $cache The actual cache handler.
+     * @param CacheInterface $cache The actual cache.
      * @param PsrSimpleCacheInterface $handler The actual cache handler.
      */
     public function __construct(CacheInterface $cache, PsrSimpleCacheInterface $handler)
@@ -39,6 +39,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
 
     public function get($key, $default = null)
     {
+        /** @psalm-var mixed $value */
         $value = $this->handler->get($key, $default);
         return $this->checkAndGetValue($key, $value, $default);
     }
@@ -62,7 +63,12 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
     {
         $values = [];
 
+        /**
+         * @var string $key
+         * @var mixed $value
+         */
         foreach ($this->handler->getMultiple($keys, $default) as $key => $value) {
+            /** @var mixed */
             $values[$key] = $this->checkAndGetValue($key, $value, $default);
         }
 
