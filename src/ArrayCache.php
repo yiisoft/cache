@@ -29,7 +29,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     private const EXPIRATION_INFINITY = 0;
     private const EXPIRATION_EXPIRED = -1;
 
-    /** @psalm-var array<string, array> */
+    /** @psalm-var array<string, array{0: mixed, 1: int}> */
     private array $cache = [];
 
     public function get($key, $default = null)
