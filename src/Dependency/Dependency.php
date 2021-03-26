@@ -113,7 +113,7 @@ abstract class Dependency
      */
     protected function generateReusableHash(): string
     {
-        /** @psalm-var mixed $data */
+        /** @var mixed */
         $data = $this->data;
         $this->data = null; // https://github.com/yiisoft/yii2/issues/3052
         $key = sha1(serialize($this));

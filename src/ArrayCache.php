@@ -35,7 +35,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     public function get($key, $default = null)
     {
         if ($this->has($key)) {
-            /** @psalm-var mixed $value */
+            /** @var mixed */
             $value = $this->cache[$key][0];
 
             if (is_object($value)) {
@@ -86,7 +86,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
 
         /** @var string $key */
         foreach ($keys as $key) {
-            /** @var mixed $value */
+            /** @var mixed */
             $value = $this->get($key, $default);
             /** @var mixed */
             $results[$key] = $value;
@@ -100,7 +100,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
 
-        /** @psalm-var mixed $value */
+        /** @var mixed */
         foreach ($values as $key => $value) {
             $this->set((string) $key, $value, $ttl);
         }
@@ -214,7 +214,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
      */
     private function validateKeys(array $keys): void
     {
-        /** @psalm-var mixed $key */
+        /** @var mixed $key */
         foreach ($keys as $key) {
             $this->validateKey($key);
         }

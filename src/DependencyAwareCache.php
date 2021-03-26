@@ -39,7 +39,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
 
     public function get($key, $default = null)
     {
-        /** @psalm-var mixed $value */
+        /** @var mixed */
         $value = $this->handler->get($key, $default);
         return $this->checkAndGetValue($key, $value, $default);
     }

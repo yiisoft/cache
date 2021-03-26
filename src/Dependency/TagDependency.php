@@ -69,7 +69,6 @@ final class TagDependency extends Dependency
 
         $tags = [];
 
-        /** @var string|null $time */
         foreach ($this->getTagsData($cache) as $tag => $time) {
             $tags[$tag] = $time ?? microtime();
         }
@@ -129,7 +128,7 @@ final class TagDependency extends Dependency
     {
         $keys = [];
 
-        /** @psalm-var mixed $tag */
+        /** @var mixed $tag */
         foreach ((array) $tags as $tag) {
             $keys[] = self::buildCacheKey((string) $tag);
         }
@@ -143,9 +142,11 @@ final class TagDependency extends Dependency
      * @param CacheInterface $cache
      *
      * @return array
+     * @psalm-return array<array-key, string|null>
      */
     private function getTagsData(CacheInterface $cache): array
     {
+        /** @psalm-var array<array-key, string|null> */
         return $this->iterableToArray($cache->psr()->getMultiple(self::buildCacheKeys($this->tags)));
     }
 }
