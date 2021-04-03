@@ -84,7 +84,6 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         $this->validateKeys($keys);
         $results = [];
 
-        /** @var string $key */
         foreach ($keys as $key) {
             /** @var mixed */
             $value = $this->get($key, $default);
@@ -113,7 +112,6 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
 
-        /** @var string $key */
         foreach ($keys as $key) {
             $this->delete($key);
         }
