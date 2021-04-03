@@ -55,6 +55,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
     {
         $prefixedKeys = [];
 
+        /** @var string $key */
         foreach ($keys as $key) {
             $prefixedKeys[] = $this->prefix . $key;
         }
@@ -66,7 +67,12 @@ final class PrefixedCache implements PsrSimpleCacheInterface
     {
         $prefixedValues = [];
 
+        /**
+         * @var string $key
+         * @var mixed $value
+         */
         foreach ($values as $key => $value) {
+            /** @var mixed */
             $prefixedValues[$this->prefix . $key] = $value;
         }
 
@@ -77,6 +83,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
     {
         $prefixedKeys = [];
 
+        /** @var string $key */
         foreach ($keys as $key) {
             $prefixedKeys[] = $this->prefix . $key;
         }

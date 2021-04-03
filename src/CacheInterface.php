@@ -42,6 +42,8 @@ interface CacheInterface
      *
      * @param mixed $key The key identifying the value to be cached.
      * @param callable $callable The callable or closure that will be used to generate a value to be cached.
+     * @psalm-param callable(\Psr\SimpleCache\CacheInterface): mixed $callable
+     *
      * @param DateInterval|int|null $ttl The TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency The dependency of the cache value. If the dependency
      * changes, the corresponding value in the cache will be invalidated when it is fetched.

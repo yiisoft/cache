@@ -29,11 +29,13 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     private const EXPIRATION_INFINITY = 0;
     private const EXPIRATION_EXPIRED = -1;
 
+    /** @psalm-var array<string, array{0: mixed, 1: int}> */
     private array $cache = [];
 
     public function get($key, $default = null)
     {
         if ($this->has($key)) {
+            /** @var mixed */
             $value = $this->cache[$key][0];
 
             if (is_object($value)) {
@@ -83,7 +85,9 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         $results = [];
 
         foreach ($keys as $key) {
+            /** @var mixed */
             $value = $this->get($key, $default);
+            /** @var mixed */
             $results[$key] = $value;
         }
 
@@ -95,6 +99,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
 
+        /** @var mixed */
         foreach ($values as $key => $value) {
             $this->set((string) $key, $value, $ttl);
         }
@@ -203,9 +208,11 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param array $keys
+     * @psalm-assert string[] $keys
      */
     private function validateKeys(array $keys): void
     {
+        /** @var mixed $key */
         foreach ($keys as $key) {
             $this->validateKey($key);
         }

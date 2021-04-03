@@ -25,12 +25,13 @@ final class AnyDependency extends Dependency
     private array $dependencies;
 
     /**
-     * @param array $dependencies List of dependencies that this dependency is composed of.
+     * @param Dependency[] $dependencies List of dependencies that this dependency is composed of.
      * Each array element must be a dependency object.
      */
     public function __construct(array $dependencies = [])
     {
         foreach ($dependencies as $dependency) {
+            /** @psalm-suppress DocblockTypeContradiction */
             if (!($dependency instanceof Dependency)) {
                 throw new InvalidArgumentException(sprintf(
                     'The dependency must be a "%s" instance, "%s" received',

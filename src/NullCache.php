@@ -93,8 +93,10 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
         }
     }
 
+    /** @psalm-assert string[] $keys */
     private function validateKeys(array $keys): void
     {
+        /** @var mixed $key */
         foreach ($keys as $key) {
             $this->validateKey($key);
         }
