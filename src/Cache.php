@@ -67,12 +67,6 @@ final class Cache implements CacheInterface
         return $this->psr;
     }
 
-    /**
-     * @param mixed $key
-     * @psalm-param callable(\Psr\SimpleCache\CacheInterface): mixed $callable
-     *
-     * @param DateInterval|int|null $ttl
-     */
     public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
     {
         $key = $this->keyNormalizer->normalize($key);
