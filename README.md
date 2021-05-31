@@ -158,10 +158,12 @@ In order to implement your own dependency extend from `Yiisoft\Cache\Dependency\
 
 ### Cache stampede prevention
 
-[A cache stampede](https://en.wikipedia.org/wiki/Cache_stampede) is a type of cascading failure that can occur when massively parallel computing systems with caching mechanisms come under very high load. This behaviour is sometimes also called dog-piling. The `\Yiisoft\Cache\Cache` uses a built-in "Probably early expiration" algorithm that prevents cache stampede.
+[A cache stampede](https://en.wikipedia.org/wiki/Cache_stampede) is a type of cascading failure that can occur when massively
+parallel computing systems with caching mechanisms come under very high load. This behaviour is sometimes also called dog-piling.
+The `\Yiisoft\Cache\Cache` uses a built-in "Probably early expiration" algorithm that prevents cache stampede.
 This algorithm randomly fakes a cache miss for one user while others are still served the cached value.
 You can control its behavior with the fifth optional parameter of `getOrSet()`, which is a float value called `$beta`.
-By default, beta is `1.0`, which is sufficient in most cases. The higher the velue the earlier cache will be re-created.
+By default, beta is `1.0`, which is sufficient in most cases. The higher the value the earlier cache will be re-created.
 
 ```php
 /**
