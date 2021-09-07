@@ -29,7 +29,7 @@ final class CallbackDependencyTest extends DependencyTestCase
 
     public function testScopeWithObject(): void
     {
-        $dataObject = new class() {
+        $dataObject = new class () {
             public string $value = 'value';
         };
 

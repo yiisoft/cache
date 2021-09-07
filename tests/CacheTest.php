@@ -205,7 +205,7 @@ final class CacheTest extends TestCase
             ],
             'empty-array' => [$array = [], $keyNormalizer->normalize($array)],
             'object' => [
-                $object = new class() {
+                $object = new class () {
                     public string $name = 'object';
                 },
                 $keyNormalizer->normalize($object),
@@ -363,7 +363,7 @@ final class CacheTest extends TestCase
 
     private function createFalseCache(): CacheInterface
     {
-        return new class() implements CacheInterface {
+        return new class () implements CacheInterface {
             public function get($key, $default = null)
             {
                 return null;

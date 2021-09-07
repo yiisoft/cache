@@ -37,7 +37,7 @@ final class CacheKeyNormalizerTest extends TestCase
             ],
             'empty-array' => [$array = [], $this->encode($array)],
             'object' => [
-                $object = new class() {
+                $object = new class () {
                     public string $name = 'object';
                 },
                 $this->encode($object),
