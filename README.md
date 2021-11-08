@@ -193,6 +193,7 @@ Extra cache handlers are implemented as separate packages:
 - [Database](https://github.com/yiisoft/cache-db)
 - [File](https://github.com/yiisoft/cache-file)
 - [Memcached](https://github.com/yiisoft/cache-memcached)
+- [Redis](https://github.com/yiisoft/cache-redis)
 - [Wincache](https://github.com/yiisoft/cache-wincache)
 
 ### Unit testing
