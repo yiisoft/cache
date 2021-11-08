@@ -1,24 +1,30 @@
-# IDE & OS files
+# phpstorm project files
 .idea
+
+# netbeans project files
 nbproject
+
+# zend studio for eclipse project files
 .buildpath
 .project
 .settings
-*.sublime-project
-*.sublime-workspace
+
+# windows thumbnail cache
 Thumbs.db
+
+# Mac DS_Store Files
 .DS_Store
 
 # composer vendor dir
 /vendor
-
+# composer lock file
+/composer.lock
 # composer itself is not needed
 composer.phar
-composer.lock
 
 # phpunit itself is not needed
 phpunit.phar
 # local phpunit config
 /phpunit.xml
-# local phpunit cache
+# phpunit cache
 .phpunit.result.cache
