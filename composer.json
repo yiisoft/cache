@@ -7,18 +7,28 @@
         "cache",
         "psr-16"
     ],
-    "homepage": "http://www.yiiframework.com/",
+    "homepage": "https://www.yiiframework.com/",
     "license": "BSD-3-Clause",
     "support": {
-        "source": "https://github.com/yiisoft/cache",
-        "issues": "https://github.com/yiisoft/cache/issues",
-        "forum": "http://www.yiiframework.com/forum/",
-        "wiki": "http://www.yiiframework.com/wiki/",
-        "irc": "irc://irc.freenode.net/yii"
+        "issues": "https://github.com/yiisoft/cache/issues?state=open",
+        "forum": "https://www.yiiframework.com/forum/",
+        "wiki": "https://www.yiiframework.com/wiki/",
+        "irc": "irc://irc.freenode.net/yii",
+        "chat": "https://t.me/yii3en",
+        "source": "https://github.com/yiisoft/cache"
     },
+    "funding": [
+        {
+            "type": "opencollective",
+            "url": "https://opencollective.com/yiisoft"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/yiisoft"
+        }
+    ],
     "require": {
         "php": "^7.4|^8.0",
-        "ext-ctype": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "psr/simple-cache": "^1.0.1"
@@ -37,6 +47,7 @@
         "yiisoft/cache-db": "Allows storing cache to the database",
         "yiisoft/cache-file": "Allows storing cache to the files",
         "yiisoft/cache-memcached": "Allows to store cache using Memcached PECL extension",
+        "yiisoft/cache-redis": "Allows storing cache to the Redis",
         "yiisoft/cache-wincache": "Allows to store cache using WinCache PECL extension"
     },
     "autoload": {
