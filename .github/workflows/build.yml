@@ -19,9 +19,6 @@ on:
       - 'infection.json.dist'
       - 'psalm.xml'
 
-  schedule:
-    - cron: '0 0 * * *'
-
 name: build
 
 jobs:
