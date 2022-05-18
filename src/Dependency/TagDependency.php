@@ -73,7 +73,9 @@ final class TagDependency extends Dependency
             $tags[$tag] = $time ?? microtime();
         }
 
-        $cache->psr()->setMultiple($tags, $this->ttl);
+        $cache
+            ->psr()
+            ->setMultiple($tags, $this->ttl);
 
         return $tags;
     }
@@ -95,7 +97,9 @@ final class TagDependency extends Dependency
      */
     public static function invalidate(CacheInterface $cache, $tags): void
     {
-        $cache->psr()->deleteMultiple(self::buildCacheKeys($tags));
+        $cache
+            ->psr()
+            ->deleteMultiple(self::buildCacheKeys($tags));
     }
 
     /**
@@ -147,6 +151,8 @@ final class TagDependency extends Dependency
     private function getTagsData(CacheInterface $cache): array
     {
         /** @psalm-var array<array-key, string|null> */
-        return $this->iterableToArray($cache->psr()->getMultiple(self::buildCacheKeys($this->tags)));
+        return $this->iterableToArray($cache
+                ->psr()
+                ->getMultiple(self::buildCacheKeys($this->tags)));
     }
 }

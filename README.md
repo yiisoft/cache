@@ -127,7 +127,9 @@ You can use PSR-16 methods the following way, but remember that getting and
 setting the cache separately violates the "Probably early expiration" algorithm.
 
 ```php
-$value = $cache->psr()->get('myKey');
+$value = $cache
+    ->psr()
+    ->get('myKey');
 ```
 
 ### Invalidation dependencies
