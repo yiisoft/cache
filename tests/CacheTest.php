@@ -177,14 +177,25 @@ final class CacheTest extends TestCase
         $this->assertSame('value', $cache->getOrSet($key, fn () => null));
 
         if ($matched) {
-            $this->assertTrue($cache->psr()->has($key));
-            $this->assertSame('value', $cache->psr()->get($key));
+            $this->assertTrue($cache
+                ->psr()
+                ->has($key));
+            $this->assertSame(
+                'value',
+                $cache
+                    ->psr()
+                    ->get($key),
+            );
         } else {
             if ($exception) {
                 $this->expectException(InvalidArgumentException::class);
             }
-            $this->assertFalse($cache->psr()->has($key));
-            $this->assertNull($cache->psr()->get($key));
+            $this->assertFalse($cache
+                ->psr()
+                ->has($key));
+            $this->assertNull($cache
+                ->psr()
+                ->get($key));
         }
     }
 

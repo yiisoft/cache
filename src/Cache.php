@@ -169,7 +169,9 @@ final class Cache implements CacheInterface
         }
 
         if ($ttl instanceof DateInterval) {
-            return (new DateTime('@0'))->add($ttl)->getTimestamp();
+            return (new DateTime('@0'))
+                ->add($ttl)
+                ->getTimestamp();
         }
 
         if (is_int($ttl)) {
