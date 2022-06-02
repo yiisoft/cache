@@ -119,7 +119,11 @@ final class DependencyAwareCacheTest extends TestCase
 
         $this->assertSame('value-2', $this->psr->getRaw('key-2')[0]);
         $this->assertInstanceOf(CacheItem::class, $this->psr->getRaw('key-2')[1]);
-        $this->assertSame('key-2', $this->psr->getRaw('key-2')[1]->key());
-        $this->assertSame($dependency, $this->psr->getRaw('key-2')[1]->dependency());
+        $this->assertSame('key-2', $this->psr
+            ->getRaw('key-2')[1]
+            ->key());
+        $this->assertSame($dependency, $this->psr
+            ->getRaw('key-2')[1]
+            ->dependency());
     }
 }
