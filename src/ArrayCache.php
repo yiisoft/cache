@@ -32,7 +32,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     /** @psalm-var array<string, array{0: mixed, 1: int}> */
     private array $cache = [];
 
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if ($this->has($key)) {
             /** @var mixed */
@@ -48,7 +48,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $default;
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
         $expiration = $this->ttlToExpiration($ttl);
@@ -65,7 +65,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         $this->validateKey($key);
         unset($this->cache[$key]);
@@ -78,7 +78,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
@@ -94,7 +94,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $results;
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
@@ -107,7 +107,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
@@ -119,7 +119,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         $this->validateKey($key);
         return !$this->isExpired($key);

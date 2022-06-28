@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
 use Psr\SimpleCache\CacheInterface as PsrSimpleCacheInterface;
 use Yiisoft\Cache\Metadata\CacheItem;
 
@@ -37,14 +38,14 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
         $this->handler = $handler;
     }
 
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         /** @var mixed */
         $value = $this->handler->get($key, $default);
         return $this->checkAndGetValue($key, $value, $default);
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         return $this->handler->set($key, $value, $ttl);
     }
@@ -59,7 +60,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
         return $this->handler->clear();
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $values = [];
 
@@ -75,7 +76,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
         return $values;
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         return $this->handler->setMultiple($values, $ttl);
     }
@@ -85,7 +86,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
         return $this->handler->deleteMultiple($keys);
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return $this->get($key) !== null;
     }

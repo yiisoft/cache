@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 
@@ -23,13 +24,13 @@ use function strpbrk;
  */
 final class NullCache implements \Psr\SimpleCache\CacheInterface
 {
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
         return $default;
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
         return true;
@@ -46,28 +47,28 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         return array_fill_keys($keys, $default);
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
         return true;
     }
 
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
         $this->validateKeys($keys);
         return true;
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         $this->validateKey($key);
         return false;

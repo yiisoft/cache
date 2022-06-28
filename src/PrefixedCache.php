@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
 use Psr\SimpleCache\CacheInterface as PsrSimpleCacheInterface;
 
 /**
@@ -31,17 +32,17 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         $this->prefix = $prefix;
     }
 
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return $this->cache->get($this->prefix . $key, $default);
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         return $this->cache->set($this->prefix . $key, $value, $ttl);
     }
 
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         return $this->cache->delete($this->prefix . $key);
     }
@@ -51,7 +52,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->clear();
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $prefixedKeys = [];
 
@@ -63,7 +64,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->getMultiple($prefixedKeys, $default);
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $prefixedValues = [];
 
@@ -79,7 +80,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->setMultiple($prefixedValues, $ttl);
     }
 
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $prefixedKeys = [];
 
@@ -91,7 +92,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->deleteMultiple($prefixedKeys);
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return $this->cache->has($this->prefix . $key);
     }
