@@ -64,10 +64,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
     {
         $values = [];
 
-        /**
-         * @var string $key
-         * @var mixed $value
-         */
+        /** @var mixed $value */
         foreach ($this->handler->getMultiple($keys, $default) as $key => $value) {
             /** @var mixed */
             $values[$key] = $this->checkAndGetValue($key, $value, $default);
