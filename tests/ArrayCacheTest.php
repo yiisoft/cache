@@ -10,7 +10,6 @@ use Exception;
 use IteratorAggregate;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
-use stdClass;
 use Yiisoft\Cache\ArrayCache;
 
 use function array_keys;

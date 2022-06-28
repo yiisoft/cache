@@ -13,9 +13,7 @@ use Yiisoft\Cache\Exception\SetCacheException;
 use Yiisoft\Cache\Metadata\CacheItem;
 use Yiisoft\Cache\Metadata\CacheItems;
 
-use function gettype;
 use function is_array;
-use function is_int;
 
 /**
  * Cache provides support for the data caching, including cache key composition and dependencies, and uses
