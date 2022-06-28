@@ -14,20 +14,14 @@ use Yiisoft\Cache\CacheInterface;
  */
 final class ValueDependency extends Dependency
 {
-    /**
-     * @var mixed
-     */
-    private $value;
+    private mixed $value;
 
-    /**
-     * @param mixed $value
-     */
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
 
-    protected function generateDependencyData(CacheInterface $cache)
+    protected function generateDependencyData(CacheInterface $cache): mixed
     {
         return $this->value;
     }

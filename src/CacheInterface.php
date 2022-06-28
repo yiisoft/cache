@@ -55,7 +55,13 @@ interface CacheInterface
      *
      * @return mixed Result of `$callable` execution.
      */
-    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0);
+    public function getOrSet(
+        mixed $key,
+        callable $callable,
+        DateInterval|int|null $ttl = null,
+        Dependency $dependency = null,
+        float $beta = 1.0
+    );
 
     /**
      * Removes a value with the specified key from cache.
@@ -65,5 +71,5 @@ interface CacheInterface
      * @throws InvalidArgumentException MUST be thrown if the `$key` is not a legal value.
      * @throws RemoveCacheException Must be thrown if the data could not be removed from the cache.
      */
-    public function remove($key): void;
+    public function remove(mixed $key): void;
 }

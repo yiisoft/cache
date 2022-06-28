@@ -7,9 +7,6 @@ namespace Yiisoft\Cache\Dependency;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 
-use function gettype;
-use function get_class;
-use function is_object;
 use function sprintf;
 
 /**
@@ -37,7 +34,7 @@ final class AnyDependency extends Dependency
                 throw new InvalidArgumentException(sprintf(
                     'The dependency must be a "%s" instance, "%s" received',
                     Dependency::class,
-                    is_object($dependency) ? get_class($dependency) : gettype($dependency),
+                    get_debug_type($dependency),
                 ));
             }
         }
@@ -54,12 +51,8 @@ final class AnyDependency extends Dependency
 
     /**
      * @codeCoverageIgnore Method is not used.
-     *
-     * @param CacheInterface $cache
-     *
-     * @return mixed
      */
-    protected function generateDependencyData(CacheInterface $cache)
+    protected function generateDependencyData(CacheInterface $cache): mixed
     {
         return null;
     }

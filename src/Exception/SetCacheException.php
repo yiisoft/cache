@@ -8,28 +8,17 @@ use Yiisoft\Cache\Metadata\CacheItem;
 
 final class SetCacheException extends CacheException
 {
-    /**
-     * @var mixed
-     */
-    private $value;
+    private mixed $value;
     private CacheItem $item;
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param CacheItem $item
-     */
-    public function __construct(string $key, $value, CacheItem $item)
+    public function __construct(string $key, mixed $value, CacheItem $item)
     {
         $this->value = $value;
         $this->item = $item;
         parent::__construct($key, 'Failed to store the value in the cache.');
     }
 
-    /**
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

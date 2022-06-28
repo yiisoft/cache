@@ -299,41 +299,6 @@ final class CacheTest extends TestCase
         $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
-    public function invalidTtlDataProvider(): array
-    {
-        return [
-            'float' => [1.1],
-            'string' => ['a'],
-            'array' => [[]],
-            'bool' => [true],
-            'callable' => [fn () => null],
-            'object' => [new stdClass()],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidTtlDataProvider
-     *
-     * @param mixed $ttl
-     */
-    public function testConstructorThrowExceptionForInvalidDefaultTtl($ttl): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new Cache($this->handler, $ttl);
-    }
-
-    /**
-     * @dataProvider invalidTtlDataProvider
-     *
-     * @param mixed $ttl
-     */
-    public function testGetOrSetThrowExceptionForInvalidTtl($ttl): void
-    {
-        $cache = new Cache($this->handler);
-        $this->expectException(InvalidArgumentException::class);
-        $cache->getOrSet('key', static fn (): string => 'value', $ttl);
-    }
-
     public function testGetOrSetThrowSetCacheException(): void
     {
         $cache = new Cache($this->createFalseCache());
@@ -375,17 +340,17 @@ final class CacheTest extends TestCase
     private function createFalseCache(): CacheInterface
     {
         return new class () implements CacheInterface {
-            public function get($key, $default = null)
+            public function get(string $key, mixed $default = null): mixed
             {
                 return null;
             }
 
-            public function set($key, $value, $ttl = null): bool
+            public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
             {
                 return false;
             }
 
-            public function delete($key): bool
+            public function delete(string $key): bool
             {
                 return false;
             }
@@ -395,17 +360,17 @@ final class CacheTest extends TestCase
                 return false;
             }
 
-            public function getMultiple($keys, $default = null): iterable
+            public function getMultiple(iterable $keys, mixed $default = null): iterable
             {
                 return [];
             }
 
-            public function setMultiple($values, $ttl = null): bool
+            public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
             {
                 return false;
             }
 
-            public function deleteMultiple($keys): bool
+            public function deleteMultiple(iterable $keys): bool
             {
                 return false;
             }

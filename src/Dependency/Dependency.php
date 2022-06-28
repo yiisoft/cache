@@ -23,7 +23,7 @@ abstract class Dependency
     /**
      * @var mixed The dependency data that is saved in cache and later is compared with the latest dependency data.
      */
-    protected $data;
+    protected mixed $data = null;
 
     /**
      * @var bool Whether this dependency is reusable or not. True value means that dependent
@@ -143,5 +143,5 @@ abstract class Dependency
      *
      * @return mixed The data needed to determine if dependency has been changed.
      */
-    abstract protected function generateDependencyData(CacheInterface $cache);
+    abstract protected function generateDependencyData(CacheInterface $cache): mixed;
 }

@@ -11,8 +11,6 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
 
 use function array_keys;
 use function array_map;
-use function gettype;
-use function is_iterable;
 use function is_object;
 use function is_string;
 use function iterator_to_array;
@@ -32,7 +30,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     /** @psalm-var array<string, array{0: mixed, 1: int}> */
     private array $cache = [];
 
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if ($this->has($key)) {
             /** @var mixed */
@@ -48,7 +46,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $default;
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
         $expiration = $this->ttlToExpiration($ttl);
@@ -65,7 +63,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         $this->validateKey($key);
         unset($this->cache[$key]);
@@ -78,9 +76,10 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
         $results = [];
 
@@ -94,7 +93,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $results;
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
@@ -107,9 +106,10 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
 
         foreach ($keys as $key) {
@@ -119,7 +119,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         $this->validateKey($key);
         return !$this->isExpired($key);
@@ -138,13 +138,9 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * Converts TTL to expiration
-     *
-     * @param DateInterval|int|null $ttl
-     *
-     * @return int
+     * Converts TTL to expiration.
      */
-    private function ttlToExpiration($ttl): int
+    private function ttlToExpiration(DateInterval|int|null $ttl): int
     {
         $ttl = $this->normalizeTtl($ttl);
 
@@ -166,7 +162,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      */
-    private function normalizeTtl($ttl): ?int
+    private function normalizeTtl(DateInterval|int|string|null $ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
             return (new DateTime('@0'))
@@ -182,26 +178,18 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
+     * Converts iterable to array.
      *
-     * @param mixed $iterable
-     *
-     * @return array
+     * @psalm-template T
+     * @psalm-param iterable<T> $iterable
+     * @psalm-return array<array-key,T>
      */
-    private function iterableToArray($iterable): array
+    private function iterableToArray(iterable $iterable): array
     {
-        if (!is_iterable($iterable)) {
-            throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
-        }
-
-        /** @psalm-suppress RedundantCast */
-        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : $iterable;
     }
 
-    /**
-     * @param mixed $key
-     */
-    private function validateKey($key): void
+    private function validateKey(mixed $key): void
     {
         if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
@@ -209,7 +197,6 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * @param array $keys
      * @psalm-assert string[] $keys
      */
     private function validateKeys(array $keys): void

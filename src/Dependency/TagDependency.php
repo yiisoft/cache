@@ -47,7 +47,7 @@ final class TagDependency extends Dependency
      * For a single tag, you may specify it as a string.
      * @param int|null $ttl The TTL value of this item. null means infinity.
      */
-    public function __construct($tags, int $ttl = null)
+    public function __construct(array|string $tags, int $ttl = null)
     {
         $this->tags = (array) $tags;
 
@@ -95,11 +95,11 @@ final class TagDependency extends Dependency
      * @param CacheInterface $cache The cache component that caches the values.
      * @param array|string $tags List of tag names.
      */
-    public static function invalidate(CacheInterface $cache, $tags): void
+    public static function invalidate(CacheInterface $cache, array|string $tags): void
     {
         $cache
             ->psr()
-            ->deleteMultiple(self::buildCacheKeys($tags));
+            ->deleteMultiple(self::buildCacheKeys((array) $tags));
     }
 
     /**
@@ -124,16 +124,14 @@ final class TagDependency extends Dependency
     /**
      * Builds array of keys from a given tags.
      *
-     * @param mixed $tags
-     *
-     * @return array
+     * @return string[]
      */
-    private static function buildCacheKeys($tags): array
+    private static function buildCacheKeys(array $tags): array
     {
         $keys = [];
 
         /** @var mixed $tag */
-        foreach ((array) $tags as $tag) {
+        foreach ($tags as $tag) {
             $keys[] = self::buildCacheKey((string) $tag);
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache;
 
+use DateInterval;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 
@@ -23,13 +24,13 @@ use function strpbrk;
  */
 final class NullCache implements \Psr\SimpleCache\CacheInterface
 {
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
         return $default;
     }
 
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
         return true;
@@ -46,54 +47,57 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
         return array_fill_keys($keys, $default);
     }
 
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
         return true;
     }
 
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
         return true;
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         $this->validateKey($key);
         return false;
     }
 
     /**
-     * @param mixed $iterable
+     * Converts iterable to array.
      *
-     * @return array
+     * @psalm-template T
+     * @psalm-param iterable<T> $iterable
+     * @psalm-return array<array-key,T>
      */
-    private function iterableToArray($iterable): array
+    private function iterableToArray(iterable $iterable): array
     {
-        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : $iterable;
     }
 
-    /**
-     * @param mixed $key
-     */
-    private function validateKey($key): void
+    private function validateKey(mixed $key): void
     {
         if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
 
-    /** @psalm-assert string[] $keys */
+    /**
+     * @psalm-assert string[] $keys
+     */
     private function validateKeys(array $keys): void
     {
         /** @var mixed $key */
