@@ -81,6 +81,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
         $results = [];
 
@@ -110,6 +111,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
 
         foreach ($keys as $key) {
@@ -182,26 +184,18 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * Converts iterable to array. If provided value is not iterable it throws an InvalidArgumentException
+     * Converts iterable to array.
      *
-     * @param mixed $iterable
-     *
-     * @return array
+     * @psalm-template T
+     * @psalm-param iterable<T> $iterable
+     * @psalm-return array<array-key,T>
      */
-    private function iterableToArray($iterable): array
+    private function iterableToArray(iterable $iterable): array
     {
-        if (!is_iterable($iterable)) {
-            throw new InvalidArgumentException('Iterable is expected, got ' . gettype($iterable));
-        }
-
-        /** @psalm-suppress RedundantCast */
-        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : $iterable;
     }
 
-    /**
-     * @param mixed $key
-     */
-    private function validateKey($key): void
+    private function validateKey(mixed $key): void
     {
         if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
@@ -209,7 +203,6 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * @param array $keys
      * @psalm-assert string[] $keys
      */
     private function validateKeys(array $keys): void

@@ -50,6 +50,7 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
     public function getMultiple(iterable $keys, $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
         return array_fill_keys($keys, $default);
     }
@@ -64,6 +65,7 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
     public function deleteMultiple(iterable $keys): bool
     {
         $keys = $this->iterableToArray($keys);
+        /** @psalm-suppress RedundantCondition */
         $this->validateKeys($keys);
         return true;
     }
@@ -75,26 +77,27 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * @param mixed $iterable
+     * Converts iterable to array.
      *
-     * @return array
+     * @psalm-template T
+     * @psalm-param iterable<T> $iterable
+     * @psalm-return array<array-key,T>
      */
-    private function iterableToArray($iterable): array
+    private function iterableToArray(iterable $iterable): array
     {
-        return $iterable instanceof Traversable ? iterator_to_array($iterable) : (array) $iterable;
+        return $iterable instanceof Traversable ? iterator_to_array($iterable) : $iterable;
     }
 
-    /**
-     * @param mixed $key
-     */
-    private function validateKey($key): void
+    private function validateKey(mixed $key): void
     {
         if (!is_string($key) || $key === '' || strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException('Invalid key value.');
         }
     }
 
-    /** @psalm-assert string[] $keys */
+    /**
+     * @psalm-assert string[] $keys
+     */
     private function validateKeys(array $keys): void
     {
         /** @var mixed $key */
