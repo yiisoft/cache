@@ -11,8 +11,6 @@ use Yiisoft\Cache\Exception\InvalidArgumentException;
 
 use function array_keys;
 use function array_map;
-use function gettype;
-use function is_iterable;
 use function is_object;
 use function is_string;
 use function iterator_to_array;
@@ -140,13 +138,9 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * Converts TTL to expiration
-     *
-     * @param DateInterval|int|null $ttl
-     *
-     * @return int
+     * Converts TTL to expiration.
      */
-    private function ttlToExpiration($ttl): int
+    private function ttlToExpiration(DateInterval|int|null $ttl): int
     {
         $ttl = $this->normalizeTtl($ttl);
 
@@ -168,7 +162,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity
      */
-    private function normalizeTtl($ttl): ?int
+    private function normalizeTtl(DateInterval|int|string|null $ttl): ?int
     {
         if ($ttl instanceof DateInterval) {
             return (new DateTime('@0'))

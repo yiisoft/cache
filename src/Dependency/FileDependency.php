@@ -30,10 +30,8 @@ final class FileDependency extends Dependency
 
     /**
      * @param CacheInterface $cache
-     *
-     * @return false|int
      */
-    protected function generateDependencyData(CacheInterface $cache)
+    protected function generateDependencyData(CacheInterface $cache): false|int
     {
         clearstatcache(false, $this->fileName);
         return @filemtime($this->fileName);

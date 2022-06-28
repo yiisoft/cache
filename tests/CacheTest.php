@@ -299,41 +299,6 @@ final class CacheTest extends TestCase
         $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
-    public function invalidTtlDataProvider(): array
-    {
-        return [
-            'float' => [1.1],
-            'string' => ['a'],
-            'array' => [[]],
-            'bool' => [true],
-            'callable' => [fn () => null],
-            'object' => [new stdClass()],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidTtlDataProvider
-     *
-     * @param mixed $ttl
-     */
-    public function testConstructorThrowExceptionForInvalidDefaultTtl($ttl): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new Cache($this->handler, $ttl);
-    }
-
-    /**
-     * @dataProvider invalidTtlDataProvider
-     *
-     * @param mixed $ttl
-     */
-    public function testGetOrSetThrowExceptionForInvalidTtl($ttl): void
-    {
-        $cache = new Cache($this->handler);
-        $this->expectException(InvalidArgumentException::class);
-        $cache->getOrSet('key', static fn (): string => 'value', $ttl);
-    }
-
     public function testGetOrSetThrowSetCacheException(): void
     {
         $cache = new Cache($this->createFalseCache());

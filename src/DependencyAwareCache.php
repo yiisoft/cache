@@ -109,7 +109,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
      *
      * @return mixed The cache value or `$default` if the dependency has been changed.
      */
-    private function checkAndGetValue(string $key, $value, $default = null)
+    private function checkAndGetValue(string $key, mixed $value, mixed $default = null): mixed
     {
         if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
             [$value, $item] = $value;

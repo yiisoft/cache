@@ -47,7 +47,7 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
         return true;
     }
 
-    public function getMultiple(iterable $keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $keys = $this->iterableToArray($keys);
         /** @psalm-suppress RedundantCondition */

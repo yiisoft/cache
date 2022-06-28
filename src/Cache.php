@@ -54,7 +54,7 @@ final class Cache implements CacheInterface
      * null meaning infinity, negative or zero results in the cache key deletion.
      * This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler, $defaultTtl = null)
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler, DateInterval|int|null $defaultTtl = null)
     {
         $this->psr = new DependencyAwareCache($this, $handler);
         $this->items = new CacheItems();
@@ -67,8 +67,13 @@ final class Cache implements CacheInterface
         return $this->psr;
     }
 
-    public function getOrSet($key, callable $callable, $ttl = null, Dependency $dependency = null, float $beta = 1.0)
-    {
+    public function getOrSet(
+        mixed $key,
+        callable $callable,
+        DateInterval|int|null $ttl = null,
+        Dependency $dependency = null,
+        float $beta = 1.0
+    ) {
         $key = $this->keyNormalizer->normalize($key);
         /** @var mixed */
         $value = $this->getValue($key, $beta);
@@ -76,7 +81,7 @@ final class Cache implements CacheInterface
         return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
     }
 
-    public function remove($key): void
+    public function remove(mixed $key): void
     {
         $key = $this->keyNormalizer->normalize($key);
 
@@ -95,7 +100,7 @@ final class Cache implements CacheInterface
      *
      * @return mixed|null The cache value or `null` if the cache is outdated or a dependency has been changed.
      */
-    private function getValue(string $key, float $beta)
+    private function getValue(string $key, float $beta): mixed
     {
         if ($this->items->expired($key, $beta, $this)) {
             return null;
@@ -132,8 +137,12 @@ final class Cache implements CacheInterface
      *
      * @return mixed|null The cache value.
      */
-    private function setAndGet(string $key, callable $callable, $ttl, ?Dependency $dependency)
-    {
+    private function setAndGet(
+        string $key,
+        callable $callable,
+        DateInterval|int|null $ttl,
+        ?Dependency $dependency
+    ): mixed {
         $ttl = $this->normalizeTtl($ttl);
         $ttl ??= $this->defaultTtl;
         /** @var mixed */
@@ -156,13 +165,13 @@ final class Cache implements CacheInterface
     /**
      * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
      *
-     * @param mixed $ttl raw TTL.
+     * @param DateInterval|int|null $ttl raw TTL.
      *
      * @throws InvalidArgumentException For invalid TTL.
      *
      * @return int|null TTL value as UNIX timestamp or null meaning infinity.
      */
-    private function normalizeTtl($ttl): ?int
+    private function normalizeTtl(DateInterval|int|null $ttl): ?int
     {
         if ($ttl === null) {
             return null;
@@ -174,13 +183,6 @@ final class Cache implements CacheInterface
                 ->getTimestamp();
         }
 
-        if (is_int($ttl)) {
-            return $ttl;
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'Invalid TTL "%s" specified. It must be a \DateInterval instance, an integer, or null.',
-            gettype($ttl),
-        ));
+        return $ttl;
     }
 }

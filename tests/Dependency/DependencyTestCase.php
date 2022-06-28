@@ -12,7 +12,7 @@ use Yiisoft\Cache\Tests\TestCase;
 
 abstract class DependencyTestCase extends TestCase
 {
-    private CacheInterface $cache;
+    private ?CacheInterface $cache = null;
 
     protected function getCache(): CacheInterface
     {
@@ -37,7 +37,7 @@ abstract class DependencyTestCase extends TestCase
     protected function createMockDependency(): Dependency
     {
         return new class () extends Dependency {
-            protected function generateDependencyData(CacheInterface $cache)
+            protected function generateDependencyData(CacheInterface $cache): mixed
             {
                 return $this->data;
             }
