@@ -19,17 +19,12 @@ use Psr\SimpleCache\CacheInterface as PsrSimpleCacheInterface;
  */
 final class PrefixedCache implements PsrSimpleCacheInterface
 {
-    private PsrSimpleCacheInterface $cache;
-    private string $prefix;
-
     /**
      * @param PsrSimpleCacheInterface $cache PSR-16 cache to add prefix to.
      * @param string $prefix Prefix to use for all cache keys.
      */
-    public function __construct(PsrSimpleCacheInterface $cache, string $prefix)
+    public function __construct(private PsrSimpleCacheInterface $cache, private string $prefix)
     {
-        $this->cache = $cache;
-        $this->prefix = $prefix;
     }
 
     public function get(string $key, mixed $default = null): mixed

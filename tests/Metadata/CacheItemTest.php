@@ -71,17 +71,13 @@ final class CacheItemTest extends TestCase
             '0.1-1-false' => [0.1, 1, false],
             '1.0-1-false' => [1.0, 1, false],
             '1.0-3600-false' => [1.0, 3600, false],
-            '1000000.0-1-true' => [1000000.0, 1, true],
+            '1000000.0-1-true' => [1_000_000.0, 1, true],
             '0.1--1-true' => [1.0, -1, true],
         ];
     }
 
     /**
      * @dataProvider probablyEarlyExpirationProvider
-     *
-     * @param float $beta
-     * @param int $ttl
-     * @param bool $expired
      */
     public function testExpiredWithProbablyEarlyExpiration(float $beta, int $ttl, bool $expired): void
     {
