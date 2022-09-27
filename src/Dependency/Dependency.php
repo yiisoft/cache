@@ -124,7 +124,6 @@ abstract class Dependency
     /**
      * Converts iterable to array.
      *
-     *
      * @return array
      */
     protected function iterableToArray(iterable $iterable): array

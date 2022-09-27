@@ -59,7 +59,7 @@ final class NullCacheTest extends TestCase
 
     public function testCreateCacheAndGetOrSet(): void
     {
-        $this->assertSame(42, (new Cache($this->cache))->getOrSet('key', static fn() => 42));
+        $this->assertSame(42, (new Cache($this->cache))->getOrSet('key', static fn () => 42));
     }
 
     public function testGetThrowExceptionForInvalidKey(): void

@@ -56,7 +56,7 @@ final class PrefixedCacheTest extends TestCase
 
     public function testCreateCacheAndGetOrSet(): void
     {
-        $this->assertSame('value', (new Cache($this->cache))->getOrSet('key', static fn() => 'value'));
+        $this->assertSame('value', (new Cache($this->cache))->getOrSet('key', static fn () => 'value'));
 
         $this->assertSame($this->prefix . 'key', $this->getCacheKeys()[0]);
     }

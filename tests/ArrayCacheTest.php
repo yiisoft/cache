@@ -175,7 +175,6 @@ final class ArrayCacheTest extends TestCase
     /**
      * @dataProvider dataProviderSetMultiple
      *
-     *
      * @throws InvalidArgumentException
      */
     public function testSetMultiple(?int $ttl): void
@@ -227,7 +226,7 @@ final class ArrayCacheTest extends TestCase
 
         $this->cache->deleteMultiple($keys);
 
-        $emptyData = array_map(static fn($v) => null, $data);
+        $emptyData = array_map(static fn ($v) => null, $data);
 
         $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
     }
@@ -254,7 +253,6 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider dataProviderNormalizeTtl
-     *
      *
      * @throws ReflectionException
      */
@@ -286,7 +284,6 @@ final class ArrayCacheTest extends TestCase
     /**
      * @dataProvider ttlToExpirationProvider
      *
-     *
      * @throws ReflectionException
      */
     public function testTtlToExpiration(mixed $ttl, mixed $expected): void
@@ -309,7 +306,6 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider iterableProvider
-     *
      *
      * @throws InvalidArgumentException
      */

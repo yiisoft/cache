@@ -9,8 +9,6 @@ use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependency\CallbackDependency;
 use Yiisoft\Cache\Dependency\Dependency;
 
-use function get_class;
-
 final class CallbackDependencyTest extends DependencyTestCase
 {
     public function testPlainClosure(): void

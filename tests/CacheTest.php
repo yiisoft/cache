@@ -19,7 +19,6 @@ use Yiisoft\Cache\DependencyAwareCache;
 
 use function fclose;
 use function fopen;
-use function get_class;
 use function md5;
 use function time;
 

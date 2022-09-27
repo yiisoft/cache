@@ -141,7 +141,6 @@ final class TagDependency extends Dependency
     /**
      * Gets the tags data from the cache storage.
      *
-     *
      * @psalm-return array<array-key, string|null>
      */
     private function getTagsData(CacheInterface $cache): array
