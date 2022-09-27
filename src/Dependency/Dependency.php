@@ -124,7 +124,6 @@ abstract class Dependency
     /**
      * Converts iterable to array.
      *
-     * @param iterable $iterable
      *
      * @return array
      */

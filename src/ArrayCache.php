@@ -128,9 +128,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     /**
      * Checks whether item is expired or not
      *
-     * @param string $key
      *
-     * @return bool
      */
     private function isExpired(string $key): bool
     {

@@ -22,7 +22,7 @@ final class CallbackDependencyTest extends DependencyTestCase
 
     public function testClosureWithCache(): void
     {
-        $dependency = $this->createDependency(static fn (CacheInterface $cache) => get_class($cache), Cache::class);
+        $dependency = $this->createDependency(static fn (CacheInterface $cache) => $cache::class, Cache::class);
 
         $this->assertDependencyNotChanged($dependency);
     }

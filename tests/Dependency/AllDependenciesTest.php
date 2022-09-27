@@ -21,13 +21,9 @@ final class AllDependenciesTest extends DependencyTestCase
             public int $data = 2;
         };
 
-        $dependency1 = new CallbackDependency(static function () use ($data1) {
-            return $data1->data;
-        });
+        $dependency1 = new CallbackDependency(static fn() => $data1->data);
 
-        $dependency2 = new CallbackDependency(static function () use ($data2) {
-            return $data2->data;
-        });
+        $dependency2 = new CallbackDependency(static fn() => $data2->data);
 
         $anyDependency = new AllDependencies([$dependency1, $dependency2]);
         $anyDependency->evaluateDependency($this->getCache());
@@ -59,8 +55,6 @@ final class AllDependenciesTest extends DependencyTestCase
 
     /**
      * @dataProvider invalidDependenciesProvider
-     *
-     * @param array $dependencies
      */
     public function testConstructorExceptions(array $dependencies): void
     {

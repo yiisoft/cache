@@ -35,7 +35,7 @@ final class CacheTest extends TestCase
     public function testGetOrSet(): void
     {
         $cache = new Cache($this->handler);
-        $value = $cache->getOrSet('key', fn (CacheInterface $cache): string => get_class($cache));
+        $value = $cache->getOrSet('key', fn (CacheInterface $cache): string => $cache::class);
         $items = $this->getItems($cache);
 
         $this->assertSame('key', $items['key']->key());
@@ -164,10 +164,6 @@ final class CacheTest extends TestCase
 
     /**
      * @dataProvider stringKeyDataProvider
-     *
-     * @param string $key
-     * @param bool $matched
-     * @param bool $exception
      */
     public function testKeyMatchingToHandler(string $key, bool $matched, bool $exception): void
     {
@@ -228,11 +224,8 @@ final class CacheTest extends TestCase
 
     /**
      * @dataProvider normalizeKeyDataProvider
-     *
-     * @param mixed $key
-     * @param string $excepted
      */
-    public function testGetOrSetAndRemoveWithOtherKeys($key, string $excepted): void
+    public function testGetOrSetAndRemoveWithOtherKeys(mixed $key, string $excepted): void
     {
         $cache = new Cache($this->handler);
         $cache->getOrSet($key, static fn (): string => 'value');
@@ -269,16 +262,14 @@ final class CacheTest extends TestCase
         return [
             'null' => [null],
             'int' => [3600],
-            'DateInterval' => [$interval],
+            \DateInterval::class => [$interval],
         ];
     }
 
     /**
      * @dataProvider ttlDataProvider
-     *
-     * @param mixed $ttl
      */
-    public function testConstructorWithOtherDefaultTtl($ttl): void
+    public function testConstructorWithOtherDefaultTtl(mixed $ttl): void
     {
         $cache = new Cache($this->handler, $ttl);
         $cache->getOrSet('key', static fn (): string => 'value');
@@ -288,10 +279,8 @@ final class CacheTest extends TestCase
 
     /**
      * @dataProvider ttlDataProvider
-     *
-     * @param mixed $ttl
      */
-    public function testGetOrSetWithOtherTtl($ttl): void
+    public function testGetOrSetWithOtherTtl(mixed $ttl): void
     {
         $cache = new Cache($this->handler);
         $cache->getOrSet('key', static fn (): string => 'value', $ttl);
@@ -383,8 +372,6 @@ final class CacheTest extends TestCase
     }
 
     /**
-     * @param \Yiisoft\Cache\CacheInterface $cache
-     *
      * @return array<string, CacheItem>
      */
     private function getItems(\Yiisoft\Cache\CacheInterface $cache): array

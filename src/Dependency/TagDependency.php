@@ -112,7 +112,7 @@ final class TagDependency extends Dependency
      */
     private static function buildCacheKey(string $tag): string
     {
-        $jsonTag = json_encode([__CLASS__, $tag]);
+        $jsonTag = json_encode([self::class, $tag]);
 
         if ($jsonTag === false) {
             throw new InvalidArgumentException('Invalid tag. ' . json_last_error_msg() . '.');
@@ -141,9 +141,7 @@ final class TagDependency extends Dependency
     /**
      * Gets the tags data from the cache storage.
      *
-     * @param CacheInterface $cache
      *
-     * @return array
      * @psalm-return array<array-key, string|null>
      */
     private function getTagsData(CacheInterface $cache): array

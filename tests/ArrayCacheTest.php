@@ -175,7 +175,6 @@ final class ArrayCacheTest extends TestCase
     /**
      * @dataProvider dataProviderSetMultiple
      *
-     * @param int|null $ttl
      *
      * @throws InvalidArgumentException
      */
@@ -228,9 +227,7 @@ final class ArrayCacheTest extends TestCase
 
         $this->cache->deleteMultiple($keys);
 
-        $emptyData = array_map(static function ($v) {
-            return null;
-        }, $data);
+        $emptyData = array_map(static fn($v) => null, $data);
 
         $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
     }
@@ -258,12 +255,10 @@ final class ArrayCacheTest extends TestCase
     /**
      * @dataProvider dataProviderNormalizeTtl
      *
-     * @param mixed $ttl
-     * @param mixed $expectedResult
      *
      * @throws ReflectionException
      */
-    public function testNormalizeTtl($ttl, $expectedResult): void
+    public function testNormalizeTtl(mixed $ttl, mixed $expectedResult): void
     {
         $cache = new ArrayCache();
         $this->assertSameExceptObject($expectedResult, $this->invokeMethod($cache, 'normalizeTtl', [$ttl]));
@@ -291,12 +286,10 @@ final class ArrayCacheTest extends TestCase
     /**
      * @dataProvider ttlToExpirationProvider
      *
-     * @param mixed $ttl
-     * @param mixed $expected
      *
      * @throws ReflectionException
      */
-    public function testTtlToExpiration($ttl, $expected): void
+    public function testTtlToExpiration(mixed $ttl, mixed $expected): void
     {
         if ($expected === 'calculate_expiration') {
             $expected = time() + $ttl;
@@ -317,8 +310,6 @@ final class ArrayCacheTest extends TestCase
     /**
      * @dataProvider iterableProvider
      *
-     * @param array $array
-     * @param iterable $iterable
      *
      * @throws InvalidArgumentException
      */
@@ -338,11 +329,11 @@ final class ArrayCacheTest extends TestCase
                 ['a' => 1, 'b' => 2,],
                 ['a' => 1, 'b' => 2,],
             ],
-            'ArrayIterator' => [
+            \ArrayIterator::class => [
                 ['a' => 1, 'b' => 2,],
                 new ArrayIterator(['a' => 1, 'b' => 2,]),
             ],
-            'IteratorAggregate' => [
+            \IteratorAggregate::class => [
                 ['a' => 1, 'b' => 2,],
                 new class () implements IteratorAggregate {
                     public function getIterator(): ArrayIterator
@@ -382,10 +373,8 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testGetInvalidKey($key): void
+    public function testGetInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->get($key);
@@ -393,10 +382,8 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testSetInvalidKey($key): void
+    public function testSetInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->set($key, 'value');
@@ -404,10 +391,8 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testDeleteInvalidKey($key): void
+    public function testDeleteInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->delete($key);
@@ -415,10 +400,8 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testGetMultipleInvalidKeys($key): void
+    public function testGetMultipleInvalidKeys(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->getMultiple([$key]);
@@ -426,10 +409,8 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testDeleteMultipleInvalidKeys($key): void
+    public function testDeleteMultipleInvalidKeys(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->deleteMultiple([$key]);
@@ -437,10 +418,8 @@ final class ArrayCacheTest extends TestCase
 
     /**
      * @dataProvider invalidKeyProvider
-     *
-     * @param mixed $key
      */
-    public function testHasInvalidKey($key): void
+    public function testHasInvalidKey(mixed $key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->has($key);

@@ -17,20 +17,14 @@ use function filemtime;
  */
 final class FileDependency extends Dependency
 {
-    private string $fileName;
-
     /**
      * @param string $fileName The file path whose last modification time is used to
      * check if the dependency has been changed.
      */
-    public function __construct(string $fileName)
+    public function __construct(private string $fileName)
     {
-        $this->fileName = $fileName;
     }
 
-    /**
-     * @param CacheInterface $cache
-     */
     protected function generateDependencyData(CacheInterface $cache): false|int
     {
         clearstatcache(false, $this->fileName);
