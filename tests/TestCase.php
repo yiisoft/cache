@@ -19,7 +19,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      *
      * @param $object
      * @param $method
-     * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution
      *
      * @throws ReflectionException

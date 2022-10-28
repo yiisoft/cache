@@ -49,11 +49,8 @@ final class CacheKeyNormalizerTest extends TestCase
 
     /**
      * @dataProvider keyDataProvider
-     *
-     * @param mixed $key
-     * @param string $excepted
      */
-    public function testNormalize($key, string $excepted): void
+    public function testNormalize(mixed $key, string $excepted): void
     {
         $this->assertSame($excepted, $this->normalizer->normalize($key));
     }
@@ -66,13 +63,8 @@ final class CacheKeyNormalizerTest extends TestCase
         fclose($resource);
     }
 
-    /**
-     * @param mixed $key
-     *
-     * @return string
-     */
-    private function encode($key): string
+    private function encode(mixed $key): string
     {
-        return md5(json_encode($key));
+        return md5(json_encode($key, JSON_THROW_ON_ERROR));
     }
 }

@@ -25,10 +25,8 @@ final class ValueDependencyTest extends DependencyTestCase
 
     /**
      * @dataProvider valueDataProvider
-     *
-     * @param mixed $value
      */
-    public function testMatchingValue($value): void
+    public function testMatchingValue(mixed $value): void
     {
         $dependency = new ValueDependency($value);
 

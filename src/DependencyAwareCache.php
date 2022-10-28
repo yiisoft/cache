@@ -19,23 +19,11 @@ use function is_array;
 final class DependencyAwareCache implements PsrSimpleCacheInterface
 {
     /**
-     * @var CacheInterface The actual cache.
-     */
-    private CacheInterface $cache;
-
-    /**
-     * @var PsrSimpleCacheInterface The actual cache handler.
-     */
-    private PsrSimpleCacheInterface $handler;
-
-    /**
      * @param CacheInterface $cache The actual cache.
      * @param PsrSimpleCacheInterface $handler The actual cache handler.
      */
-    public function __construct(CacheInterface $cache, PsrSimpleCacheInterface $handler)
+    public function __construct(private CacheInterface $cache, private PsrSimpleCacheInterface $handler)
     {
-        $this->cache = $cache;
-        $this->handler = $handler;
     }
 
     public function get(string $key, mixed $default = null): mixed

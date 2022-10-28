@@ -24,9 +24,7 @@ use const PHP_INT_MAX;
  */
 final class CacheItem
 {
-    private string $key;
     private ?int $expiry;
-    private ?Dependency $dependency;
     private float $updated;
 
     /**
@@ -34,11 +32,9 @@ final class CacheItem
      * @param int|null $ttl The TTL value of this item. null means infinity.
      * @param Dependency|null $dependency The cache invalidation dependency or null for none.
      */
-    public function __construct(string $key, ?int $ttl, ?Dependency $dependency)
+    public function __construct(private string $key, ?int $ttl, private ?Dependency $dependency)
     {
-        $this->key = $key;
         $this->expiry = ($ttl > 0) ? time() + $ttl : $ttl;
-        $this->dependency = $dependency;
         $this->updated = microtime(true);
     }
 

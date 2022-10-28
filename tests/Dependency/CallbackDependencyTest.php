@@ -9,8 +9,6 @@ use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependency\CallbackDependency;
 use Yiisoft\Cache\Dependency\Dependency;
 
-use function get_class;
-
 final class CallbackDependencyTest extends DependencyTestCase
 {
     public function testPlainClosure(): void
@@ -22,7 +20,7 @@ final class CallbackDependencyTest extends DependencyTestCase
 
     public function testClosureWithCache(): void
     {
-        $dependency = $this->createDependency(static fn (CacheInterface $cache) => get_class($cache), Cache::class);
+        $dependency = $this->createDependency(static fn (CacheInterface $cache) => $cache::class, Cache::class);
 
         $this->assertDependencyNotChanged($dependency);
     }
