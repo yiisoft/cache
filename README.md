@@ -27,7 +27,7 @@ providing own features. It is used in [Yii Framework](https://www.yiiframework.c
 
 ## Requirements
 
-- PHP 7.4 or higher.
+- PHP 8.0 or higher.
 - `JSON` PHP extension.
 - `Mbstring` PHP extension.
   
@@ -36,7 +36,7 @@ providing own features. It is used in [Yii Framework](https://www.yiiframework.c
 The package could be installed with composer:
 
 ```shell
-composer require yiisoft/cache --prefer-dist
+composer require yiisoft/cache
 ```
 
 ## Configuration
