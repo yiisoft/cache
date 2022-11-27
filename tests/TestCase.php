@@ -15,10 +15,8 @@ use function is_object;
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Invokes a inaccessible method.
+     * Invokes an inaccessible method.
      *
-     * @param $object
-     * @param $method
      * @param bool $revoke whether to make method inaccessible after execution
      *
      * @throws ReflectionException

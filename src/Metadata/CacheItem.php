@@ -32,8 +32,11 @@ final class CacheItem
      * @param int|null $ttl The TTL value of this item. null means infinity.
      * @param Dependency|null $dependency The cache invalidation dependency or null for none.
      */
-    public function __construct(private string $key, ?int $ttl, private ?Dependency $dependency)
-    {
+    public function __construct(
+        private string $key,
+        ?int $ttl,
+        private ?Dependency $dependency
+    ) {
         $this->expiry = ($ttl > 0) ? time() + $ttl : $ttl;
         $this->updated = microtime(true);
     }

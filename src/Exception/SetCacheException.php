@@ -8,8 +8,11 @@ use Yiisoft\Cache\Metadata\CacheItem;
 
 final class SetCacheException extends CacheException
 {
-    public function __construct(string $key, private mixed $value, private CacheItem $item)
-    {
+    public function __construct(
+        string $key,
+        private mixed $value,
+        private CacheItem $item
+    ) {
         parent::__construct($key, 'Failed to store the value in the cache.');
     }
 

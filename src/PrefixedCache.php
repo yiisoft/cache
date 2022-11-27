@@ -23,8 +23,10 @@ final class PrefixedCache implements PsrSimpleCacheInterface
      * @param PsrSimpleCacheInterface $cache PSR-16 cache to add prefix to.
      * @param string $prefix Prefix to use for all cache keys.
      */
-    public function __construct(private PsrSimpleCacheInterface $cache, private string $prefix)
-    {
+    public function __construct(
+        private PsrSimpleCacheInterface $cache,
+        private string $prefix
+    ) {
     }
 
     public function get(string $key, mixed $default = null): mixed
