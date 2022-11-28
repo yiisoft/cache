@@ -22,8 +22,10 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
      * @param CacheInterface $cache The actual cache.
      * @param PsrSimpleCacheInterface $handler The actual cache handler.
      */
-    public function __construct(private CacheInterface $cache, private PsrSimpleCacheInterface $handler)
-    {
+    public function __construct(
+        private CacheInterface $cache,
+        private PsrSimpleCacheInterface $handler
+    ) {
     }
 
     public function get(string $key, mixed $default = null): mixed

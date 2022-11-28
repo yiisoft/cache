@@ -9,8 +9,12 @@ use Throwable;
 
 abstract class CacheException extends RuntimeException implements \Psr\SimpleCache\CacheException
 {
-    public function __construct(private string $key, string $message = '', int $code = 0, Throwable $previous = null)
-    {
+    public function __construct(
+        private string $key,
+        string $message = '',
+        int $code = 0,
+        Throwable $previous = null
+    ) {
         parent::__construct($message, $code, $previous);
     }
 
