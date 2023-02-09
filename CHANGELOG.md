@@ -1,8 +1,8 @@
 # Yii Cache Change Log
 
-## 2.0.1 under development
+## 3.0.0 under development
 
-- no changes in this release.
+- Chg #117: Adapt configuration group names to Yii conventions (@vjik)
 
 ## 2.0.0 June 29, 2022
 
