@@ -7,6 +7,7 @@ namespace Yiisoft\Cache\Tests\Dependency;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\FileDependency;
+
 use function dirname;
 
 final class FileDependencyTest extends DependencyTestCase
