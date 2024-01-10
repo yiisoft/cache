@@ -261,7 +261,7 @@ final class CacheTest extends TestCase
         return [
             'null' => [null],
             'int' => [3600],
-            \DateInterval::class => [$interval],
+            DateInterval::class => [$interval],
         ];
     }
 
