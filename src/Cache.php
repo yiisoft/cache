@@ -73,7 +73,6 @@ final class Cache implements CacheInterface
         float $beta = 1.0
     ) {
         $key = $this->keyNormalizer->normalize($key);
-        /** @var mixed */
         $value = $this->getValue($key, $beta);
 
         return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
@@ -104,7 +103,6 @@ final class Cache implements CacheInterface
             return null;
         }
 
-        /** @var mixed */
         $value = $this->psr->getRaw($key);
 
         if (is_array($value) && isset($value[1]) && $value[1] instanceof CacheItem) {
@@ -143,7 +141,6 @@ final class Cache implements CacheInterface
     ): mixed {
         $ttl = $this->normalizeTtl($ttl);
         $ttl ??= $this->defaultTtl;
-        /** @var mixed */
         $value = $callable($this->psr);
 
         if ($dependency !== null) {

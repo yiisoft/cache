@@ -130,7 +130,6 @@ final class TagDependency extends Dependency
     {
         $keys = [];
 
-        /** @var mixed $tag */
         foreach ($tags as $tag) {
             $keys[] = self::buildCacheKey((string) $tag);
         }
