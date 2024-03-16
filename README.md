@@ -204,6 +204,50 @@ Extra cache handlers are implemented as separate packages:
 - [Redis](https://github.com/yiisoft/cache-redis)
 - [Wincache](https://github.com/yiisoft/cache-wincache)
 
+### Data serialization
+
+By default, data is serialized using the php functions `serialize/unserialize`. 
+You can create your own serializer implementing `Yiisoft\Cache\Serializer\SerializerInterface`.
+
+> By default, this is implemented in [Database](https://github.com/yiisoft/cache-db), [File](https://github.com/yiisoft/cache-file) and [Redis](https://github.com/yiisoft/cache-redis).
+> For [APCu](https://github.com/yiisoft/cache-apcu) and [Memcached](https://github.com/yiisoft/cache-memcached) better use php directives `apc.serializer` and `memcached.serializer` accordingly.
+
+For example:
+
+```php
+<?php
+
+use Yiisoft\Cache\Serializer\SerializerInterface;
+
+final class IgbinarySerializer implements SerializerInterface 
+{
+    public function serialize(mixed $value) : string
+    {
+        return igbinary_serialize($value);
+    }
+
+    public function unserialize(string $data) : mixed
+    {
+        return igbinary_unserialize($data);
+    }
+}
+```
+
+In `di`
+
+```php
+
+use Yiisoft\Cache\Db\DbCache;
+
+return [
+    DbCache::class => [
+        '__construct()' => [
+             'serializer' => new IgbinarySerializer(),
+        ],
+    ],   
+];
+```
+
 ## Testing
 
 ### Unit testing

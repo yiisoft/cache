@@ -2,7 +2,7 @@
 
 ## 3.0.1 under development
 
-- no changes in this release.
+- Add #132: Support for custom serializers (@Gerych1984)
 
 ## 3.0.0 February 15, 2023
 
