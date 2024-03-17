@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 
-use function pi;
-
 use const PHP_INT_MAX;
 
 final class PhpSerializerTest extends TestCase
@@ -34,7 +32,7 @@ final class PhpSerializerTest extends TestCase
                 PHP_INT_MAX,
             ],
             [
-                pi(),
+                M_PI,
             ],
             [
                 'string',
