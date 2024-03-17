@@ -204,6 +204,30 @@ Extra cache handlers are implemented as separate packages:
 - [Redis](https://github.com/yiisoft/cache-redis)
 - [Wincache](https://github.com/yiisoft/cache-wincache)
 
+### Data serialization
+
+The package provides `Yiisoft\Cache\Serializer\SerializerInterface` for data serialization. It can be useful in database, file
+or Redis cache implementations. Out of box, you can use `Yiisoft\Cache\Serializer\PhpSerializer` that works via PHP functions
+`serialize()` and `unserialize()`. You can make own implementation, for example:
+
+```php
+<?php
+
+use Yiisoft\Cache\Serializer\SerializerInterface;
+
+final class IgbinarySerializer implements SerializerInterface 
+{
+    public function serialize(mixed $value) : string
+    {
+        return igbinary_serialize($value);
+    }
+
+    public function unserialize(string $data) : mixed
+    {
+        return igbinary_unserialize($data);
+    }
+}
+
 ## Testing
 
 ### Unit testing
