@@ -14,12 +14,6 @@ final class PhpSerializer implements SerializerInterface
         return serialize($value);
     }
 
-    /**
-     * @param string $data
-     * @return mixed
-     *
-     * @psalm-suppress MixedArgumentTypeCoercion
-     */
     public function unserialize(string $data): mixed
     {
         return unserialize($data);

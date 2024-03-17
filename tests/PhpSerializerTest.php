@@ -57,8 +57,6 @@ final class PhpSerializerTest extends TestCase
 
     /**
      * @dataProvider serializeDataProvider
-     * @param mixed $data
-     * @return void
      */
     public function testSerialize(mixed $data): void
     {
