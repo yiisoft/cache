@@ -206,13 +206,9 @@ Extra cache handlers are implemented as separate packages:
 
 ### Data serialization
 
-By default, data is serialized using the php functions `serialize/unserialize`. 
-You can create your own serializer implementing `Yiisoft\Cache\Serializer\SerializerInterface`.
-
-> By default, this is implemented in [Database](https://github.com/yiisoft/cache-db), [File](https://github.com/yiisoft/cache-file) and [Redis](https://github.com/yiisoft/cache-redis).
-> For [APCu](https://github.com/yiisoft/cache-apcu) and [Memcached](https://github.com/yiisoft/cache-memcached) better use php directives `apc.serializer` and `memcached.serializer` accordingly.
-
-For example:
+The package provide `Yiisoft\Cache\Serializer\SerializerInterface` for data serialization. It's can be useful in database, file
+or redis cache implementations. Out of box you can use `Yiisoft\Cache\Serializer\PhpSerializer` that work via PHP functions
+`serialize()` and `unserialize()`. And you can make own implementation, for example:
 
 ```php
 <?php
@@ -231,22 +227,6 @@ final class IgbinarySerializer implements SerializerInterface
         return igbinary_unserialize($data);
     }
 }
-```
-
-In `di`
-
-```php
-
-use Yiisoft\Cache\Db\DbCache;
-
-return [
-    DbCache::class => [
-        '__construct()' => [
-             'serializer' => new IgbinarySerializer(),
-        ],
-    ],   
-];
-```
 
 ## Testing
 
