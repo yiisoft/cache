@@ -206,9 +206,9 @@ Extra cache handlers are implemented as separate packages:
 
 ### Data serialization
 
-The package provide `Yiisoft\Cache\Serializer\SerializerInterface` for data serialization. It's can be useful in database, file
-or redis cache implementations. Out of box you can use `Yiisoft\Cache\Serializer\PhpSerializer` that work via PHP functions
-`serialize()` and `unserialize()`. And you can make own implementation, for example:
+The package provides `Yiisoft\Cache\Serializer\SerializerInterface` for data serialization. It can be useful in database, file
+or Redis cache implementations. Out of box, you can use `Yiisoft\Cache\Serializer\PhpSerializer` that works via PHP functions
+`serialize()` and `unserialize()`. You can make own implementation, for example:
 
 ```php
 <?php
