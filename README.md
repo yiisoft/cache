@@ -54,7 +54,7 @@ $arrayCacheWithPrefix = new \Yiisoft\Cache\PrefixedCache(new \Yiisoft\Cache\Arra
 ```
 
 If you need a simpler yet more powerful way to cache values based on recomputation callbacks use `getOrSet()`
-and `remove()`, additional features such as invalidation dependencies and "Probably early expiration" 
+and `remove()`, additional features such as invalidation dependencies and "Probably early expiration"
 stampede prevention, you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
 
 ```php
@@ -211,8 +211,6 @@ or Redis cache implementations. Out of box, you can use `Yiisoft\Cache\Serialize
 `serialize()` and `unserialize()`. You can make own implementation, for example:
 
 ```php
-<?php
-
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
 final class IgbinarySerializer implements SerializerInterface 
