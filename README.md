@@ -54,7 +54,7 @@ $arrayCacheWithPrefix = new \Yiisoft\Cache\PrefixedCache(new \Yiisoft\Cache\Arra
 ```
 
 If you need a simpler yet more powerful way to cache values based on recomputation callbacks use `getOrSet()`
-and `remove()`, additional features such as invalidation dependencies and "Probably early expiration" 
+and `remove()`, additional features such as invalidation dependencies and "Probably early expiration"
 stampede prevention, you should wrap PSR-16 cache instance with `\Yiisoft\Cache\Cache`:
 
 ```php
@@ -211,8 +211,6 @@ or Redis cache implementations. Out of box, you can use `Yiisoft\Cache\Serialize
 `serialize()` and `unserialize()`. You can make own implementation, for example:
 
 ```php
-<?php
-
 use Yiisoft\Cache\Serializer\SerializerInterface;
 
 final class IgbinarySerializer implements SerializerInterface 
@@ -227,40 +225,16 @@ final class IgbinarySerializer implements SerializerInterface
         return igbinary_unserialize($data);
     }
 }
-
-## Testing
-
-### Unit testing
-
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
-
-```shell
-./vendor/bin/phpunit
 ```
 
-### Mutation testing
+## Documentation
 
-The package tests are checked with [Infection](https://infection.github.io/) mutation framework with
-[Infection Static Analysis Plugin](https://github.com/Roave/infection-static-analysis-plugin). To run it:
+- [Internals](docs/internals.md)
 
-```shell
-./vendor/bin/roave-infection-static-analysis-plugin
-```
+## Support
 
-### Static analysis
-
-The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
-
-```shell
-./vendor/bin/psalm
-```
-
-## License
-
-The Yii Caching Library is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
+If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
+You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
 ## Support the project
 
@@ -270,6 +244,13 @@ Maintained by [Yii Software](https://www.yiiframework.com/).
 
 [![Official website](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](https://www.yiiframework.com/)
 [![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/yiiframework)
-[![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3ru)
+[![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
+
+## License
+
+The Yii Caching Library is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).
