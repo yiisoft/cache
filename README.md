@@ -33,7 +33,7 @@ providing own features. It is used in [Yii Framework](https://www.yiiframework.c
   
 ## Installation
 
-The package could be installed with composer:
+The package could be installed with [composer](https://getcomposer.org/download/)
 
 ```shell
 composer require yiisoft/cache
