@@ -15,13 +15,6 @@ use function md5;
 
 final class CacheKeyNormalizerTest extends TestCase
 {
-    private CacheKeyNormalizer $normalizer;
-
-    protected function setUp(): void
-    {
-        $this->normalizer = new CacheKeyNormalizer();
-    }
-
     public function keyDataProvider(): array
     {
         return [
@@ -52,14 +45,14 @@ final class CacheKeyNormalizerTest extends TestCase
      */
     public function testNormalize(mixed $key, string $excepted): void
     {
-        $this->assertSame($excepted, $this->normalizer->normalize($key));
+        $this->assertSame($excepted, CacheKeyNormalizer::normalize($key));
     }
 
     public function testNormalizeThrowExceptionForInvalidKey(): void
     {
         $resource = fopen('php://memory', 'r');
         $this->expectException(InvalidArgumentException::class);
-        $this->normalizer->normalize($resource);
+        CacheKeyNormalizer::normalize($resource);
         fclose($resource);
     }
 

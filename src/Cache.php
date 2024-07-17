@@ -36,11 +36,6 @@ final class Cache implements CacheInterface
     private CacheItems $items;
 
     /**
-     * @var CacheKeyNormalizer Normalizes the cache key into a valid string.
-     */
-    private CacheKeyNormalizer $keyNormalizer;
-
-    /**
      * @var int|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
      * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
@@ -56,7 +51,6 @@ final class Cache implements CacheInterface
     {
         $this->psr = new DependencyAwareCache($this, $handler);
         $this->items = new CacheItems();
-        $this->keyNormalizer = new CacheKeyNormalizer();
         $this->defaultTtl = $this->normalizeTtl($defaultTtl);
     }
 
@@ -72,7 +66,7 @@ final class Cache implements CacheInterface
         Dependency $dependency = null,
         float $beta = 1.0
     ) {
-        $key = $this->keyNormalizer->normalize($key);
+        $key = CacheKeyNormalizer::normalize($key);
         $value = $this->getValue($key, $beta);
 
         return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
@@ -80,7 +74,7 @@ final class Cache implements CacheInterface
 
     public function remove(mixed $key): void
     {
-        $key = $this->keyNormalizer->normalize($key);
+        $key = CacheKeyNormalizer::normalize($key);
 
         if (!$this->psr->delete($key)) {
             throw new RemoveCacheException($key);
