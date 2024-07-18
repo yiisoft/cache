@@ -3,7 +3,7 @@
 ## 3.0.1 under development
 
 - New #132: Add interface `SerializerInterface` for data serialization, and `PhpSerializer` implementation (@Gerych1984)
-- Enh #139: Make `normalize()` method to static in `CacheKeyNormalizer::class` (@terabytesoftw)
+- Chg #139: Make `normalize()` method static in `CacheKeyNormalizer` class (@terabytesoftw)
 
 ## 3.0.0 February 15, 2023
 
