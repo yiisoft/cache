@@ -13,7 +13,7 @@ abstract class CacheException extends RuntimeException implements \Psr\SimpleCac
         private string $key,
         string $message = '',
         int $code = 0,
-        Throwable $previous = null
+        Throwable|null $previous = null
     ) {
         parent::__construct($message, $code, $previous);
     }
