@@ -4,6 +4,7 @@
 
 - New #132: Add interface `SerializerInterface` for data serialization, and `PhpSerializer` implementation (@Gerych1984)
 - Chg #139: Make `normalize()` method static in `CacheKeyNormalizer` class (@terabytesoftw)
+- Enh #142: Minor refactoring: explicitly mark parameters as nullable (@terabytesoftw)
 
 ## 3.0.0 February 15, 2023
 

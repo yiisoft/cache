@@ -63,7 +63,7 @@ final class Cache implements CacheInterface
         mixed $key,
         callable $callable,
         DateInterval|int|null $ttl = null,
-        Dependency $dependency = null,
+        Dependency|null $dependency = null,
         float $beta = 1.0
     ) {
         $key = CacheKeyNormalizer::normalize($key);
