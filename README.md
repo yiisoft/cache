@@ -28,7 +28,6 @@ providing own features. It is used in [Yii Framework](https://www.yiiframework.c
 ## Requirements
 
 - PHP 8.0 or higher.
-- `JSON` PHP extension.
 - `Mbstring` PHP extension.
   
 ## Installation
