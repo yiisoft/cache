@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests\Dependency;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 use Yiisoft\Cache\Dependency\ValueDependency;
 
 final class ValueDependencyTest extends DependencyTestCase
 {
-    public function valueDataProvider(): array
+    public static function valueDataProvider(): array
     {
         return [
             'int' => [1],
@@ -23,9 +24,7 @@ final class ValueDependencyTest extends DependencyTestCase
         ];
     }
 
-    /**
-     * @dataProvider valueDataProvider
-     */
+    #[DataProvider('valueDataProvider')]
     public function testMatchingValue(mixed $value): void
     {
         $dependency = new ValueDependency($value);

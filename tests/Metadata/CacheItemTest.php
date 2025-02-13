@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests\Metadata;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\Dependency\TagDependency;
@@ -65,7 +66,7 @@ final class CacheItemTest extends TestCase
         $this->assertTrue($item->expired(1.0, $this->cache));
     }
 
-    public function probablyEarlyExpirationProvider(): array
+    public static function probablyEarlyExpirationProvider(): array
     {
         return [
             '0.1-1-false' => [0.1, 1, false],
@@ -76,9 +77,7 @@ final class CacheItemTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider probablyEarlyExpirationProvider
-     */
+    #[DataProvider('probablyEarlyExpirationProvider')]
     public function testExpiredWithProbablyEarlyExpiration(float $beta, int $ttl, bool $expired): void
     {
         $item = new CacheItem('key', $ttl, $this->dependency);

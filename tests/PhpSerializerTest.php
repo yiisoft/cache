@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Cache\Db\Tests;
+namespace Yiisoft\Cache\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Cache\Serializer\PhpSerializer;
@@ -53,9 +54,7 @@ final class PhpSerializerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider serializeDataProvider
-     */
+    #[DataProvider('serializeDataProvider')]
     public function testSerialize(mixed $data): void
     {
         $serializer = new PhpSerializer();
