@@ -35,12 +35,12 @@ final class TagDependency extends Dependency
     /**
      * @var array List of tag names for this dependency.
      */
-    private array $tags;
+    private readonly array $tags;
 
     /**
      * @var int|null The TTL value of this item. null means infinity.
      */
-    private ?int $ttl;
+    private readonly ?int $ttl;
 
     /**
      * @param array|string $tags List of tag names for this dependency.

@@ -28,18 +28,18 @@ final class Cache implements CacheInterface
     /**
      * @var DependencyAwareCache Decorator over the actual cache handler.
      */
-    private DependencyAwareCache $psr;
+    private readonly DependencyAwareCache $psr;
 
     /**
      * @var CacheItems The items that store the metadata of each cache.
      */
-    private CacheItems $items;
+    private readonly CacheItems $items;
 
     /**
      * @var int|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
      * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
-    private ?int $defaultTtl;
+    private readonly ?int $defaultTtl;
 
     /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
