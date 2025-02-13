@@ -23,8 +23,8 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
      * @param PsrSimpleCacheInterface $handler The actual cache handler.
      */
     public function __construct(
-        private CacheInterface $cache,
-        private PsrSimpleCacheInterface $handler
+        private readonly CacheInterface $cache,
+        private readonly PsrSimpleCacheInterface $handler
     ) {
     }
 

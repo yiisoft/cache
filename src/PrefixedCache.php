@@ -24,8 +24,8 @@ final class PrefixedCache implements PsrSimpleCacheInterface
      * @param string $prefix Prefix to use for all cache keys.
      */
     public function __construct(
-        private PsrSimpleCacheInterface $cache,
-        private string $prefix
+        private readonly PsrSimpleCacheInterface $cache,
+        private readonly string $prefix
     ) {
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests\Dependency;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 use Yiisoft\Cache\Dependency\AnyDependency;
 use Yiisoft\Cache\Dependency\CallbackDependency;
@@ -35,7 +36,7 @@ final class AnyDependencyTest extends DependencyTestCase
         $this->assertDependencyChanged($anyDependency);
     }
 
-    public function invalidDependenciesProvider(): array
+    public static function invalidDependenciesProvider(): array
     {
         return [
             'int' => [[1]],
@@ -49,9 +50,7 @@ final class AnyDependencyTest extends DependencyTestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidDependenciesProvider
-     */
+    #[DataProvider('invalidDependenciesProvider')]
     public function testConstructorExceptions(array $dependencies): void
     {
         $this->expectException(InvalidArgumentException::class);

@@ -89,7 +89,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         $object = new stdClass();
         $object->test_field = 'test_value';

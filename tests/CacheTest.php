@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Cache\Tests;
 
 use DateInterval;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\SimpleCache\CacheInterface;
 use stdClass;
 use Yiisoft\Cache\ArrayCache;
@@ -142,15 +143,15 @@ final class CacheTest extends TestCase
         $cache = new Cache($this->handler);
         $cache->getOrSet('key', fn (): string => 'value');
 
-        $this->assertSame('value', $value = $cache->getOrSet('key', fn (): string => 'new-value'));
+        $this->assertSame('value', $cache->getOrSet('key', fn (): string => 'new-value'));
 
-        $items = $this->getItems($cache);
-        $this->setInaccessibleProperty($items['key'], 'key', 'new-key');
+        $this->handler->clear();
+        $this->handler->set('key', ['value', new CacheItem('other-key', null, null)]);
 
-        $this->assertSame('new-value', $value = $cache->getOrSet('key', fn (): string => 'new-value'));
+        $this->assertSame('new-value', $cache->getOrSet('key', fn (): string => 'new-value'));
     }
 
-    public function stringKeyDataProvider(): array
+    public static function stringKeyDataProvider(): array
     {
         return [
             'simple-key' => ['simple-key', true, false],
@@ -161,9 +162,7 @@ final class CacheTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider stringKeyDataProvider
-     */
+    #[DataProvider('stringKeyDataProvider')]
     public function testKeyMatchingToHandler(string $key, bool $matched, bool $exception): void
     {
         $cache = new Cache($this->handler);
@@ -194,7 +193,7 @@ final class CacheTest extends TestCase
         }
     }
 
-    public function normalizeKeyDataProvider(): array
+    public static function normalizeKeyDataProvider(): array
     {
         $keyNormalizer = new CacheKeyNormalizer();
 
@@ -221,9 +220,7 @@ final class CacheTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider normalizeKeyDataProvider
-     */
+    #[DataProvider('normalizeKeyDataProvider')]
     public function testGetOrSetAndRemoveWithOtherKeys(mixed $key, string $excepted): void
     {
         $cache = new Cache($this->handler);
@@ -254,7 +251,7 @@ final class CacheTest extends TestCase
         fclose($resource);
     }
 
-    public function ttlDataProvider(): array
+    public static function ttlDataProvider(): array
     {
         $interval = new DateInterval('P2Y4DT6H8M');
 
@@ -265,9 +262,7 @@ final class CacheTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider ttlDataProvider
-     */
+    #[DataProvider('ttlDataProvider')]
     public function testConstructorWithOtherDefaultTtl(mixed $ttl): void
     {
         $cache = new Cache($this->handler, $ttl);
@@ -276,9 +271,7 @@ final class CacheTest extends TestCase
         $this->assertFalse($items['key']->expired(1.0, $cache));
     }
 
-    /**
-     * @dataProvider ttlDataProvider
-     */
+    #[DataProvider('ttlDataProvider')]
     public function testGetOrSetWithOtherTtl(mixed $ttl): void
     {
         $cache = new Cache($this->handler);
