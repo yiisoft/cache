@@ -44,7 +44,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     *
      * @param $key
      * @param $value
      * @throws InvalidArgumentException
@@ -60,7 +59,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     *
      * @param $key
      * @param $value
      * @throws InvalidArgumentException
@@ -77,7 +75,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     *
      * @param $key
      * @param $value
      * @throws InvalidArgumentException
@@ -102,7 +99,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     *
      * @param $key
      * @param $value
      * @throws InvalidArgumentException
@@ -130,7 +126,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     *
      * @param $key
      * @param $value
      * @throws InvalidArgumentException
@@ -148,7 +143,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     *
      * @param $key
      * @param $value
      * @throws InvalidArgumentException
