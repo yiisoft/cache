@@ -144,7 +144,8 @@ final class CacheTest extends TestCase
 
         $this->assertSame('value', $cache->getOrSet('key', fn (): string => 'new-value'));
 
-        $cache->remove('key');
+        $this->handler->clear();
+        $this->handler->set('key', ['value', new CacheItem('other-key', null, null)]);
 
         $this->assertSame('new-value', $cache->getOrSet('key', fn (): string => 'new-value'));
     }
