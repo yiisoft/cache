@@ -28,7 +28,7 @@
         }
     ],
     "require": {
-        "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
         "ext-mbstring": "*",
         "psr/simple-cache": "^2.0 || ^3.0"
     },
@@ -38,7 +38,7 @@
         "rector/rector": "^2.0.9",
         "roave/infection-static-analysis-plugin": "^1.25",
         "spatie/phpunit-watcher": "^1.23.6",
-        "vimeo/psalm": "^4.30 || ^5.26.1 || ^6.5.1",
+        "vimeo/psalm": "^5.26.1 || ^6.5.1",
         "yiisoft/di": "^1.2.1"
     },
     "provide": {

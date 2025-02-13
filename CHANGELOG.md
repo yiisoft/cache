@@ -6,6 +6,7 @@
 - Chg #139: Make `normalize()` method static in `CacheKeyNormalizer` class (@terabytesoftw)
 - Enh #142: Minor refactoring: explicitly mark parameters as nullable (@terabytesoftw)
 - Chg #146: Change PHP constraint in `composer.json` to `~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0` (@vjik)
+- Chg #147: Bump minimal PHP version to 8.1 (@vjik)
 
 ## 3.0.0 February 15, 2023
 
