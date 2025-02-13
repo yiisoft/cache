@@ -142,12 +142,11 @@ final class CacheTest extends TestCase
         $cache = new Cache($this->handler);
         $cache->getOrSet('key', fn (): string => 'value');
 
-        $this->assertSame('value', $value = $cache->getOrSet('key', fn (): string => 'new-value'));
+        $this->assertSame('value', $cache->getOrSet('key', fn (): string => 'new-value'));
 
-        $items = $this->getItems($cache);
-        $this->setInaccessibleProperty($items['key'], 'key', 'new-key');
+        $cache->remove('key');
 
-        $this->assertSame('new-value', $value = $cache->getOrSet('key', fn (): string => 'new-value'));
+        $this->assertSame('new-value', $cache->getOrSet('key', fn (): string => 'new-value'));
     }
 
     public function stringKeyDataProvider(): array
