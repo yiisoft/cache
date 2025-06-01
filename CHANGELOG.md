@@ -1,5 +1,9 @@
 # Yii Cache Change Log
 
+## 3.1.1 under development
+
+- no changes in this release.
+
 ## 3.1.0 June 01, 2025
 
 - New #132: Add interface `SerializerInterface` for data serialization, and `PhpSerializer` implementation (@Gerych1984)
