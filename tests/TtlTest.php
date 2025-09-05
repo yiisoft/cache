@@ -6,24 +6,33 @@ namespace Yiisoft\Cache\Tests;
 
 use Yiisoft\Cache\Ttl;
 
-class TtlTest extends TestCase
+final class TtlTest extends TestCase
 {
-    public function testSeconds(): void
+    /**
+     * @dataProvider ttlProvider
+     */
+    public function testFactories(Ttl $ttl, int $expectedSeconds): void
     {
-        $ttl = Ttl::seconds(10);
-        $this->assertSame(10, $ttl());
+        $this->assertInstanceOf(Ttl::class, Ttl::seconds(10));
+        $this->assertInstanceOf(Ttl::class, Ttl::minutes(5));
+        $this->assertInstanceOf(Ttl::class, Ttl::hours(2));
+        $this->assertInstanceOf(Ttl::class, Ttl::days(1));
+        $this->assertInstanceOf(Ttl::class, Ttl::create(sec:1, min:1, hour:1, day:1));
+
+        $this->assertSame($expectedSeconds, $ttl());
+        $this->assertSame($expectedSeconds, $ttl->toInt());
     }
 
-    public function testHours(): void
+    public static function ttlProvider(): array
     {
-        $ttl = Ttl::hours(2);
-        $this->assertSame(7200, $ttl());
-    }
-
-    public function testCreate(): void
-    {
-        $ttl = Ttl::create(sec:10, min:5, hour:1, day:1);
-        $expected = 10 + 5 * 60 + 3600 + 86400;
-        $this->assertSame($expected, $ttl());
+        return [
+            'seconds' => [Ttl::seconds(10), 10],
+            'minutes' => [Ttl::minutes(5), 5 * 60],
+            'hours' => [Ttl::hours(2), 2 * 3600],
+            'days' => [Ttl::days(1), 1 * 86400],
+            'create' => [Ttl::create(sec:10, min:5, hour:1, day:1), 10 + 5 * 60 + 3600 + 86400],
+            'zeroSeconds' => [Ttl::seconds(0), 0],
+            'zeroCreate' => [Ttl::create(), 0],
+        ];
     }
 }
