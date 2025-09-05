@@ -66,6 +66,15 @@ Set a default TTL:
 $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 ```
 
+`Ttl` is a simple immutable value object representing cache time-to-live in seconds.  
+It eliminates magic numbers (60 * 60), improves readability, and provides convenient factories: `seconds()`, `minutes()`, `hours()`, `days()`.
+
+```php
+$cache->set('key', 'value', Ttl::minutes(15)());
+$cache->set('key', 'value', Ttl::create(hour:1, min:30)());
+$cache->set('key', 'value', Ttl::create(hour:5, min:30)->toInt());
+````
+
 ## General usage
 
 Typical PSR-16 cache usage is the following:
