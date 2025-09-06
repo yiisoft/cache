@@ -70,9 +70,8 @@ $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 It eliminates magic numbers (60 * 60), improves readability, and provides convenient factories: `seconds()`, `minutes()`, `hours()`, `days()`.
 
 ```php
-$cache->set('key', 'value', Ttl::minutes(15)());
-$cache->set('key', 'value', Ttl::create(hour:1, min:30)());
-$cache->set('key', 'value', Ttl::create(hour:5, min:30)->toInt());
+$cache->set('key', 'value', Ttl::minutes(15)->toSeconds());
+$cache->set('key', 'value', Ttl::create(hour:5, min:30)->toSeconds());
 ````
 
 ## General usage
