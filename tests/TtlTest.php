@@ -17,9 +17,7 @@ final class TtlTest extends TestCase
         $this->assertInstanceOf(Ttl::class, Ttl::create(sec:1, min:1, hour:1, day:1));
     }
 
-    /**
-     * @dataProvider ttlProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('ttlProvider')]
     public function testFactories(Ttl $ttl, int $expectedSeconds): void
     {
         $this->assertSame($expectedSeconds, $ttl->toSeconds());
