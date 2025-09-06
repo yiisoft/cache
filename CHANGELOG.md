@@ -2,7 +2,7 @@
 
 ## 3.1.1 under development
 
-- no changes in this release.
+- Chg #150: Add `Ttl` value object for working with time-to-live duration (@Pekhov14)
 
 ## 3.1.0 June 01, 2025
 

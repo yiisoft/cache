@@ -8,19 +8,21 @@ use Yiisoft\Cache\Ttl;
 
 final class TtlTest extends TestCase
 {
-    /**
-     * @dataProvider ttlProvider
-     */
-    public function testFactories(Ttl $ttl, int $expectedSeconds): void
+    public function testFactoriesReturnTtlInstance(): void
     {
         $this->assertInstanceOf(Ttl::class, Ttl::seconds(10));
         $this->assertInstanceOf(Ttl::class, Ttl::minutes(5));
         $this->assertInstanceOf(Ttl::class, Ttl::hours(2));
         $this->assertInstanceOf(Ttl::class, Ttl::days(1));
         $this->assertInstanceOf(Ttl::class, Ttl::create(sec:1, min:1, hour:1, day:1));
+    }
 
-        $this->assertSame($expectedSeconds, $ttl());
-        $this->assertSame($expectedSeconds, $ttl->toInt());
+    /**
+     * @dataProvider ttlProvider
+     */
+    public function testFactories(Ttl $ttl, int $expectedSeconds): void
+    {
+        $this->assertSame($expectedSeconds, $ttl->toSeconds());
     }
 
     public static function ttlProvider(): array
