@@ -70,8 +70,27 @@ $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 It eliminates magic numbers (60 * 60), improves readability, and provides convenient factories: `seconds()`, `minutes()`, `hours()`, `days()`.
 
 ```php
-$cache->set('key', 'value', Ttl::minutes(15)->toSeconds());
-$cache->set('key', 'value', Ttl::create(hour:5, min:30)->toSeconds());
+use Yiisoft\Cache\Ttl;
+
+// Simple usage
+$cache->set('key', 'value', Ttl::seconds(30)->toSeconds()); // 30 seconds
+$cache->set('key', 'value', Ttl::minutes(15)->toSeconds()); // 15 minutes
+$cache->set('key', 'value', Ttl::hours(2)->toSeconds());    // 2 hours
+$cache->set('key', 'value', Ttl::days(1)->toSeconds());     // 1 day
+
+// Complex durations
+$ttl = Ttl::create(sec: 30, min: 10, hour: 1); // 1 hour 10 minutes 30 seconds
+$cache->set('key', 'value', $ttl->toSeconds());
+
+// From DateInterval
+$ttl = Ttl::from(new DateInterval('PT45M')); // 45 minutes
+# OR
+$ttl = Ttl::fromInterval(new DateInterval('PT45M'));
+$cache->set('key', 'value', $ttl);
+
+// Infinity (no expiration)
+$ttl = Ttl::from(null);
+$cache->set('key', 'value', $ttl?->toSeconds());
 ````
 
 ## General usage

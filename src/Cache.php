@@ -141,7 +141,7 @@ final class Cache implements CacheInterface
 
         $item = new CacheItem($key, $ttl, $dependency);
 
-        if (!$this->psr->set($key, [$value, $item], $ttl)) {
+        if (!$this->psr->set($key, [$value, $item], $ttl?->toSeconds())) {
             throw new SetCacheException($key, $value, $item);
         }
 
