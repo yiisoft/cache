@@ -13,6 +13,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
 use Yiisoft\Cache\ArrayCache;
 
+use Yiisoft\Cache\Ttl;
 use function array_keys;
 use function array_map;
 use function is_object;
@@ -242,40 +243,13 @@ final class ArrayCacheTest extends TestCase
     /**
      * @throws ReflectionException
      */
-    #[DataProvider('dataProviderNormalizeTtl')]
-    public function testNormalizeTtl(mixed $ttl, mixed $expectedResult): void
-    {
-        $cache = new ArrayCache();
-        $this->assertSameExceptObject($expectedResult, $this->invokeMethod($cache, 'normalizeTtl', [$ttl]));
-    }
-
-    /**
-     * Data provider for {@see testNormalizeTtl()}
-     *
-     * @throws Exception
-     *
-     * @return array test data
-     */
-    public static function dataProviderNormalizeTtl(): array
-    {
-        return [
-            [123, 123],
-            ['123', 123],
-            [null, null],
-            [0, 0],
-            [new DateInterval('PT6H8M'), 6 * 3600 + 8 * 60],
-            [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600],
-        ];
-    }
-
-    /**
-     * @throws ReflectionException
-     */
     #[DataProvider('ttlToExpirationProvider')]
     public function testTtlToExpiration(mixed $ttl, mixed $expected): void
     {
+        $ttl = Ttl::from($ttl);
+
         if ($expected === 'calculate_expiration') {
-            $expected = time() + $ttl;
+            $expected = time() + $ttl->toSeconds();
         }
         $cache = new ArrayCache();
         $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));

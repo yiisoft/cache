@@ -58,7 +58,7 @@ interface CacheInterface
     public function getOrSet(
         mixed $key,
         callable $callable,
-        DateInterval|int|null $ttl = null,
+        Ttl|DateInterval|int|null $ttl = null,
         Dependency|null $dependency = null,
         float $beta = 1.0
     );

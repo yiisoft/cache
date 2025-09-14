@@ -45,10 +45,10 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $default;
     }
 
-    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, Ttl|null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
-        $expiration = $this->ttlToExpiration($ttl);
+        $expiration = $this->ttlToExpiration(Ttl::from($ttl));
 
         if ($expiration < 0) {
             return $this->delete($key);
@@ -90,7 +90,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $results;
     }
 
-    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, Ttl|null|int|DateInterval $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);
@@ -131,10 +131,12 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * Converts TTL to expiration.
+     *
+     * @param Ttl|null $ttl
      */
-    private function ttlToExpiration(DateInterval|int|null $ttl): int
+    private function ttlToExpiration(Ttl|null $ttl): int
     {
-        $ttl = $this->normalizeTtl($ttl);
+        $ttl = $ttl?->toSeconds();
 
         if ($ttl === null) {
             return self::EXPIRATION_INFINITY;
@@ -145,28 +147,6 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         }
 
         return $ttl + time();
-    }
-
-    /**
-     * Normalizes cache TTL handling strings and {@see DateInterval} objects.
-     *
-     * @param DateInterval|int|string|null $ttl Raw TTL.
-     *
-     * @return int|null TTL value as UNIX timestamp or null meaning infinity
-     */
-    private function normalizeTtl(DateInterval|int|string|null $ttl): ?int
-    {
-        if ($ttl instanceof DateInterval) {
-            return (new DateTime('@0'))
-                ->add($ttl)
-                ->getTimestamp();
-        }
-
-        if ($ttl === null) {
-            return null;
-        }
-
-        return (int) $ttl;
     }
 
     /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Tests;
 
+use DateInterval;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Cache\Ttl;
 
 final class TtlTest extends TestCase
@@ -17,10 +19,24 @@ final class TtlTest extends TestCase
         $this->assertInstanceOf(Ttl::class, Ttl::create(sec:1, min:1, hour:1, day:1));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ttlProvider')]
+    #[DataProvider('ttlProvider')]
     public function testFactories(Ttl $ttl, int $expectedSeconds): void
     {
         $this->assertSame($expectedSeconds, $ttl->toSeconds());
+    }
+
+    public function testFromCoversOldNormalizeCases(): void
+    {
+        $this->assertSame(123, Ttl::from(123)?->toSeconds());
+        $this->assertSame(123, Ttl::from('123')?->toSeconds());
+        $this->assertNull(Ttl::from(null));
+        $this->assertSame(0, Ttl::from(0)?->toSeconds());
+
+        $interval1 = new DateInterval('PT6H8M');
+        $this->assertSame(6 * 3600 + 8 * 60, Ttl::from($interval1)?->toSeconds());
+
+        $interval2 = new DateInterval('P2Y4D');
+        $this->assertSame(2 * 365 * 24 * 3600 + 4 * 24 * 3600, Ttl::from($interval2)?->toSeconds());
     }
 
     public static function ttlProvider(): array
