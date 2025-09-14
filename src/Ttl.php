@@ -6,7 +6,6 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
-use TypeError;
 
 /**
  * Value object representing a time-to-live (TTL) duration in seconds.
@@ -53,7 +52,7 @@ final class Ttl
      *
      * Handles null, integers, DateInterval, and Ttl objects.
      *
-     * @param Ttl|DateInterval|int|string|null $ttl Raw TTL value.
+     * @param DateInterval|int|string|Ttl|null $ttl Raw TTL value.
      *
      * @return Ttl|null Normalized TTL object or null for infinity.
      *
