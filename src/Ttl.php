@@ -6,6 +6,7 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
+use TypeError;
 
 /**
  * Value object representing a time-to-live (TTL) duration in seconds.
@@ -52,18 +53,16 @@ final class Ttl
      *
      * Handles null, integers, DateInterval, and Ttl objects.
      *
-     * @param Ttl|DateInterval|int|null $ttl Raw TTL value.
+     * @param Ttl|DateInterval|int|string|null $ttl Raw TTL value.
      *
      * @return Ttl|null Normalized TTL object or null for infinity.
      *
-     * @throws \TypeError if $ttl is not a supported type
-     *
      * Example usage:
-     * ```php
-     * $ttl = Ttl::from(3600); // 1 hour
-     * $ttl = Ttl::from(new DateInterval('PT1H'));
-     * $ttl = Ttl::from(null); // infinity
-     * ```
+     *  ```php
+     *  $ttl = Ttl::from(3600); // 1 hour
+     *  $ttl = Ttl::from(new DateInterval('PT1H'));
+     *  $ttl = Ttl::from(null); // infinity
+     *  ```
      */
     public static function from(self|DateInterval|int|string|null $ttl): ?self
     {

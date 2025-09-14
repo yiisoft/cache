@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Cache;
 
 use DateInterval;
-use DateTime;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 

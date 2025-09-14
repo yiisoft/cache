@@ -7,8 +7,8 @@ namespace Yiisoft\Cache\Metadata;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
-
 use Yiisoft\Cache\Ttl;
+
 use function ceil;
 use function log;
 use function microtime;
@@ -30,7 +30,7 @@ final class CacheItem
 
     /**
      * @param string $key The key that identifies the cache item.
-     * @param Ttl|int|null $ttl The TTL value of this item. null means infinity.
+     * @param int|Ttl|null $ttl The TTL value of this item. null means infinity.
      * @param Dependency|null $dependency The cache invalidation dependency or null for none.
      */
     public function __construct(

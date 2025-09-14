@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Cache;
 
 use DateInterval;
-use DateTime;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
@@ -43,7 +42,7 @@ final class Cache implements CacheInterface
 
     /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
-     * @param Ttl|DateInterval|int|null $defaultTtl The default TTL for a cache entry.
+     * @param DateInterval|int|Ttl|null $defaultTtl The default TTL for a cache entry.
      * null meaning infinity, negative or zero results in the cache key deletion.
      * This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
@@ -119,7 +118,7 @@ final class Cache implements CacheInterface
      * @param callable $callable The callable or closure that will be used to generate a value to be cached.
      * @psalm-param callable(\Psr\SimpleCache\CacheInterface): mixed $callable
      *
-     * @param Ttl|DateInterval|int|null $ttl The TTL of this value. If not set, default value is used.
+     * @param DateInterval|int|Ttl|null $ttl The TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency The dependency of the cache value.
      *
      * @throws InvalidArgumentException Must be thrown if the `$key` or `$ttl` is not a legal value.

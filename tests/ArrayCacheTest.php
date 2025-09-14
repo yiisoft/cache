@@ -6,14 +6,13 @@ namespace Yiisoft\Cache\Tests;
 
 use ArrayIterator;
 use DateInterval;
-use Exception;
 use IteratorAggregate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionException;
 use Yiisoft\Cache\ArrayCache;
-
 use Yiisoft\Cache\Ttl;
+
 use function array_keys;
 use function array_map;
 use function is_object;
