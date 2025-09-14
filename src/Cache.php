@@ -61,14 +61,16 @@ final class Cache implements CacheInterface
     public function getOrSet(
         mixed $key,
         callable $callable,
-        Ttl|DateInterval|int|null $ttl = null,
+        DateInterval|int|null $ttl = null,
         Dependency|null $dependency = null,
         float $beta = 1.0
     ) {
+        $ttlObj = Ttl::from($ttl) ?? $this->defaultTtl;
+
         $key = CacheKeyNormalizer::normalize($key);
         $value = $this->getValue($key, $beta);
 
-        return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
+        return $value ?? $this->setAndGet($key, $callable, $ttlObj, $dependency);
     }
 
     public function remove(mixed $key): void
