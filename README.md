@@ -94,12 +94,7 @@ $cache->set('key', 'value', Ttl::from(null));
 $cache->set('key', 'value', Ttl::forever());
 ````
 Notes:
-- `Ttl::forever()` is just a shorthand for `null` TTL (no expiration).
-- For most adapters, you need to call ->toSeconds() when passing TTL to set().
-- For some adapters (ArrayCache and NullCache), you can pass Ttl directly without converting. 
-    ```php
-      $cache->set('key', 'value', Ttl::days(1));
-     ```
+`Ttl::forever()` is just a shorthand for `null` TTL (no expiration).
 
 ## General usage
 
