@@ -66,13 +66,13 @@ Set a default TTL:
 $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 ```
 
-`Ttl` is a simple immutable value object representing cache time-to-live in seconds.  
-It eliminates magic numbers (60 * 60), improves readability, and provides convenient factories: `seconds()`, `minutes()`, `hours()`, `days()`.
+`Ttl` is a simple immutable value object that represents cache time-to-live (TTL) in seconds.
+It eliminates magic numbers (like 60 * 60 or 3600), improves readability, and provides convenient factory methods.
 
 ```php
 use Yiisoft\Cache\Ttl;
 
-// Simple usage
+// Basic usage
 $cache->set('key', 'value', Ttl::seconds(30)->toSeconds()); // 30 seconds
 $cache->set('key', 'value', Ttl::minutes(15)->toSeconds()); // 15 minutes
 $cache->set('key', 'value', Ttl::hours(2)->toSeconds());    // 2 hours
@@ -86,12 +86,20 @@ $cache->set('key', 'value', $ttl->toSeconds());
 $ttl = Ttl::from(new DateInterval('PT45M')); // 45 minutes
 # OR
 $ttl = Ttl::fromInterval(new DateInterval('PT45M'));
-$cache->set('key', 'value', $ttl);
+$cache->set('key', 'value', $ttl?->toSeconds());
 
 // Infinity (no expiration)
-$ttl = Ttl::from(null);
-$cache->set('key', 'value', $ttl?->toSeconds());
+$cache->set('key', 'value', Ttl::from(null));
+# OR
+$cache->set('key', 'value', Ttl::forever());
 ````
+Notes:
+- `Ttl::forever()` is just a shorthand for `null` TTL (no expiration).
+- For most adapters, you need to call ->toSeconds() when passing TTL to set().
+- For some adapters (ArrayCache and NullCache), you can pass Ttl directly without converting. 
+    ```php
+      $cache->set('key', 'value', Ttl::days(1));
+     ```
 
 ## General usage
 

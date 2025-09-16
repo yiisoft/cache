@@ -39,6 +39,11 @@ final class TtlTest extends TestCase
         $this->assertSame(2 * 365 * 24 * 3600 + 4 * 24 * 3600, Ttl::from($interval2)?->toSeconds());
     }
 
+    public function testInfinityReturnsNull(): void
+    {
+        $this->assertNull(Ttl::forever());
+    }
+
     public static function ttlProvider(): array
     {
         return [

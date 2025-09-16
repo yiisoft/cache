@@ -129,6 +129,16 @@ final class Ttl
     }
 
     /**
+     * Creates a TTL representing "forever" (no expiration).
+     *
+     * @psalm-return null Indicates infinite TTL.
+     */
+    public static function forever(): ?self
+    {
+        return null;
+    }
+
+    /**
      * Get TTL value in seconds.
      *
      * @return int Number of seconds.
