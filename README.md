@@ -66,36 +66,80 @@ Set a default TTL:
 $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 ```
 
-`Ttl` is a simple immutable value object that represents cache time-to-live (TTL) in seconds.
+#### `Ttl` is a simple immutable value object that represents cache time-to-live (TTL) in seconds.
 It eliminates magic numbers (like 60 * 60 or 3600), improves readability, and provides convenient factory methods.
+
+## Cheat Sheet: Ttl Usage
+
+PSR-16 Cache Adapter Example with Ttl
+- TTL must be in seconds (int) or null for infinite lifetime.
+- Always use ?->toSeconds() when passing a Ttl object:
 
 ```php
 use Yiisoft\Cache\Ttl;
+use Yiisoft\Cache\ArrayCache;
 
-// Basic usage
-$cache->set('key', 'value', Ttl::seconds(30)->toSeconds()); // 30 seconds
-$cache->set('key', 'value', Ttl::minutes(15)->toSeconds()); // 15 minutes
-$cache->set('key', 'value', Ttl::hours(2)->toSeconds());    // 2 hours
-$cache->set('key', 'value', Ttl::days(1)->toSeconds());     // 1 day
+$cache = new ArrayCache();
+
+$cache->set('key1', 'value1', Ttl::seconds(30)->toSeconds()); // 30 seconds
+$cache->set('key2', 'value2', Ttl::minutes(15)->toSeconds()); // 15 minutes
+$cache->set('key3', 'value3', Ttl::hours(2)->toSeconds());    // 2 hours
+$cache->set('key4', 'value4', Ttl::days(1)->toSeconds());     // 1 day
 
 // Complex durations
 $ttl = Ttl::create(sec: 30, min: 10, hour: 1); // 1 hour 10 minutes 30 seconds
 $cache->set('key', 'value', $ttl->toSeconds());
 
-// From DateInterval
+// Infinity / no expiration
+$cache->set('key6', 'value6', Ttl::forever()); // shorthand for null
+$cache->set('key7', 'value7', Ttl::from(null));
+```
+Dynamic TTL
+```php
+// Normalizing TTL from Ttl|DateInterval|int|string|null
 $ttl = Ttl::from(new DateInterval('PT45M')); // 45 minutes
-# OR
+$ttl = Ttl::from(10); // 10 seconds
+$ttl = Ttl::from('12'); // 12 seconds
+$ttl = Ttl::from(null); // Infinity / no expiration
+
+$ttlObject = $ttl = Ttl::create(sec: 30, min: 15);
+$ttl = Ttl::from($ttlObject);
+
+// From DateInterval
 $ttl = Ttl::fromInterval(new DateInterval('PT45M'));
 $cache->set('key', 'value', $ttl?->toSeconds());
 
-// Infinity (no expiration)
-$cache->set('key', 'value', Ttl::from(null));
-# OR
+// Ttl::forever() is just a shorthand for `null` TTL (no expiration), no need to call toSeconds()
 $cache->set('key', 'value', Ttl::forever());
-````
-Notes:
-`Ttl::forever()` is just a shorthand for `null` TTL (no expiration).
 
+$cache->set('key', 'value', Ttl::from(null));
+
+// If TTL value is unknown at runtime (e.g., 10 or null), use ?->toSeconds()
+$ttlInRuntime = getTtlFromYouCode();
+$cache->set('key', 'value', Ttl::from($ttlInRuntime)?->toSeconds());
+````
+
+Yii Cache Wrapper Example with Ttl
+- Supports passing a Ttl object in the constructor as the default TTL.
+- Methods like getOrSet() expect TTL in seconds (int) or null:
+```php
+use Yiisoft\Cache\Cache;
+use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\Ttl;
+
+$cache = new Cache(new ArrayCache(), Ttl::minutes(5)); // default TTL
+
+// Using default TTL 5 minutes
+$cache->getOrSet('key', 'value');
+
+// Custom TTL per call
+$cache->getOrSet('key2', fn() => 'value2', Ttl::seconds(30)?->toSeconds());
+$cache->getOrSet('key3', fn() => 'value3', Ttl::forever()); // no expiration
+
+// Dynamic TTL from runtime variable
+$ttlFromCode = getTtlFromYourCode(); // Ttl|DateInterval|int|null
+$cache->getOrSet('key4', fn() => 'value4', Ttl::from($ttlFromCode)?->toSeconds());
+```
 ## General usage
 
 Typical PSR-16 cache usage is the following:
