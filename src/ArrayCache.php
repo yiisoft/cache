@@ -131,21 +131,20 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     /**
      * Converts TTL to expiration.
      *
-     * @param Ttl|null $ttl
+     * @param Ttl $ttl
      */
-    private function ttlToExpiration(Ttl|null $ttl): int
+    private function ttlToExpiration(Ttl $ttl): int
     {
-        $ttl = $ttl?->toSeconds();
-
-        if ($ttl === null) {
+        if ($ttl->isForever) {
             return self::EXPIRATION_INFINITY;
         }
 
-        if ($ttl <= 0) {
+        $seconds = $ttl->toSeconds();
+        if ($seconds <= 0) {
             return self::EXPIRATION_EXPIRED;
         }
 
-        return $ttl + time();
+        return $seconds + time();
     }
 
     /**

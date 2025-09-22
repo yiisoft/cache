@@ -36,7 +36,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
 
     public function set(string $key, mixed $value, Ttl|null|int|DateInterval $ttl = null): bool
     {
-        return $this->handler->set($key, $value, Ttl::from($ttl)?->toSeconds());
+        return $this->handler->set($key, $value, Ttl::from($ttl)->toSeconds());
     }
 
     public function delete($key): bool
@@ -62,7 +62,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
 
     public function setMultiple(iterable $values, Ttl|null|int|DateInterval $ttl = null): bool
     {
-        return $this->handler->setMultiple($values, Ttl::from($ttl)?->toSeconds());
+        return $this->handler->setMultiple($values, Ttl::from($ttl)->toSeconds());
     }
 
     public function deleteMultiple($keys): bool

@@ -21,12 +21,21 @@ final class Ttl
     private const SECONDS_IN_HOUR = 3600;
     private const SECONDS_IN_DAY = 86400;
 
-    private function __construct(public readonly int $value)
-    {
+    private const INT_PLACEHOLDER_FOR_FOREVER_VALUE = 0;
+
+    private function __construct(
+        public readonly int $value,
+        public readonly bool $isForever = false
+    ) {
+        if (!$isForever && $value < 0) {
+            throw new \InvalidArgumentException('TTL must be non-negative.');
+        }
     }
 
     /**
      * Create TTL from a combination of seconds, minutes, hours and days.
+     *
+     * @throws \InvalidArgumentException If the $totalSeconds results in a negative TTL.
      *
      * @param int $sec Number of seconds.
      * @param int $min Number of minutes.
@@ -44,40 +53,63 @@ final class Ttl
             + $hour * self::SECONDS_IN_HOUR
             + $day * self::SECONDS_IN_DAY;
 
+        if ($totalSeconds < 0) {
+            throw new \InvalidArgumentException('TTL must be non-negative.');
+        }
+
         return new self($totalSeconds);
     }
 
     /**
      * Creates a Ttl object from various TTL representations.
      *
-     * Handles null, integers, DateInterval, and Ttl objects.
+     * Handles null, integers, numeric strings, DateInterval, and Ttl objects.
      *
-     * @param DateInterval|int|string|Ttl|null $ttl Raw TTL value.
+     * @param DateInterval|int|string|Ttl|null $ttl Raw TTL value (string must be numeric, e.g., '3600')
      *
-     * @return Ttl|null Normalized TTL object or null for infinity.
+     * @throws \InvalidArgumentException For invalid TTL values (e.g., negative duration or invalid string).
+     *
+     * @return Ttl Normalized TTL object.
      *
      * Example usage:
      *  ```php
      *  $ttl = Ttl::from(3600); // 1 hour
+     *  $ttl = Ttl::from('3600'); // 1 hour
      *  $ttl = Ttl::from(new DateInterval('PT1H'));
      *  $ttl = Ttl::from(null); // infinity
      *  ```
      */
-    public static function from(self|DateInterval|int|string|null $ttl): ?self
+    public static function from(self|DateInterval|int|string|null $ttl): self
     {
         return match (true) {
-            $ttl === null => null,
+            $ttl === null => self::forever(),
             $ttl instanceof self => $ttl,
             $ttl instanceof DateInterval => self::fromInterval($ttl),
-            default => self::seconds((int) $ttl),
+            is_string($ttl), is_int($ttl) => self::seconds((int) $ttl),
+            default => throw new \InvalidArgumentException('Invalid TTL value: must be int, string, DateInterval, Ttl, or null.'),
         };
     }
 
+    /**
+     * Creates a Ttl object from a DateInterval.
+     *
+     * @param DateInterval $interval The interval to convert to TTL.
+     *
+     * @throws \InvalidArgumentException If the DateInterval results in a negative TTL.
+     *
+     * @return self TTL instance.
+     */
     public static function fromInterval(DateInterval $interval): self
     {
-        return new self((new DateTime('@0'))
+        $seconds = (new DateTime('@0'))
             ->add($interval)
-            ->getTimestamp());
+            ->getTimestamp();
+
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException('DateInterval must result in non-negative TTL.');
+        }
+
+        return new self($seconds);
     }
 
     /**
@@ -130,21 +162,17 @@ final class Ttl
 
     /**
      * Creates a TTL representing "forever" (no expiration).
-     *
-     * @psalm-return null Indicates infinite TTL.
      */
-    public static function forever(): ?self
+    public static function forever(): self
     {
-        return null;
+        return new self(self::INT_PLACEHOLDER_FOR_FOREVER_VALUE, true);
     }
 
     /**
-     * Get TTL value in seconds.
-     *
-     * @return int Number of seconds.
+     * Get TTL value in seconds or null if forever.
      */
-    public function toSeconds(): int
+    public function toSeconds(): ?int
     {
-        return $this->value;
+        return $this->isForever ? null : $this->value;
     }
 }

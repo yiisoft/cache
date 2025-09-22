@@ -38,7 +38,7 @@ final class CacheItem
         Ttl|int|null $ttl,
         private ?Dependency $dependency
     ) {
-        $ttl = Ttl::from($ttl)?->toSeconds();
+        $ttl = Ttl::from($ttl)->toSeconds();
 
         $this->expiry = ($ttl > 0) ? time() + $ttl : $ttl;
         $this->updated = microtime(true);

@@ -65,7 +65,7 @@ final class Cache implements CacheInterface
         Dependency|null $dependency = null,
         float $beta = 1.0
     ) {
-        $ttlObj = Ttl::from($ttl) ?? $this->defaultTtl;
+        $ttlObj = Ttl::from($ttl ?? $this->defaultTtl);
 
         $key = CacheKeyNormalizer::normalize($key);
         $value = $this->getValue($key, $beta);
@@ -134,7 +134,7 @@ final class Cache implements CacheInterface
         Ttl|DateInterval|int|null $ttl,
         ?Dependency $dependency
     ): mixed {
-        $ttl = Ttl::from($ttl) ?? $this->defaultTtl;
+        $ttl = Ttl::from($ttl ?? $this->defaultTtl);
         $value = $callable($this->psr);
 
         if ($dependency !== null) {
@@ -143,7 +143,7 @@ final class Cache implements CacheInterface
 
         $item = new CacheItem($key, $ttl, $dependency);
 
-        if (!$this->psr->set($key, [$value, $item], $ttl?->toSeconds())) {
+        if (!$this->psr->set($key, [$value, $item], $ttl->toSeconds())) {
             throw new SetCacheException($key, $value, $item);
         }
 
