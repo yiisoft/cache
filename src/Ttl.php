@@ -84,8 +84,8 @@ final class Ttl
             $ttl === null => self::forever(),
             $ttl instanceof self => $ttl,
             $ttl instanceof DateInterval => self::fromInterval($ttl),
-            is_string($ttl), is_int($ttl) => self::seconds((int) $ttl),
-            default => throw new \InvalidArgumentException('Invalid TTL value: must be int, string, DateInterval, Ttl, or null.'),
+            is_string($ttl) => self::seconds((int) $ttl),
+            is_int($ttl) => self::seconds($ttl),
         };
     }
 
