@@ -172,6 +172,10 @@ final class Ttl
      */
     public function toSeconds(): ?int
     {
-        return $this->isForever ? null : $this->value;
+        if ($this->isForever) {
+            return null;
+        }
+
+        return $this->value;
     }
 }
