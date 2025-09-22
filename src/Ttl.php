@@ -35,12 +35,11 @@ final class Ttl
     /**
      * Create TTL from a combination of seconds, minutes, hours and days.
      *
-     * @throws \InvalidArgumentException If the $totalSeconds results in a negative TTL.
-     *
      * @param int $sec Number of seconds.
      * @param int $min Number of minutes.
      * @param int $hour Number of hours.
      * @param int $day Number of days.
+     * @throws \InvalidArgumentException If the $totalSeconds results in a negative TTL.
      */
     public static function create(
         int $sec = 0,
