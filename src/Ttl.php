@@ -154,7 +154,7 @@ final class Ttl
      *
      * @return self TTL instance.
      */
-    public static function days(int $day): self
+    public static function days(int $days): self
     {
         return new self($day * self::SECONDS_IN_DAY);
     }
