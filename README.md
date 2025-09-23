@@ -122,9 +122,10 @@ $ttlInRuntime = getTtlFromYouCode();
 $cache->set('key', 'value', Ttl::from($ttlInRuntime)->toSeconds());
 ````
 
-Yii Cache Wrapper Example with Ttl
-- Supports passing a Ttl object in the constructor as the default TTL.
-- Methods like getOrSet() expect TTL in seconds (int) or null:
+When using `Ttl` with Yii cache wrapper:
+
+- You can pass a `Ttl` object in the constructor as the default value.
+- You can pass it to methods like `getOrSet()` which expect integer number of seconds or `null`.
 ```php
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\ArrayCache;
