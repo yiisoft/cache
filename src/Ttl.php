@@ -118,7 +118,7 @@ final class Ttl
      *
      * @return self TTL instance.
      */
-    public static function seconds(int $sec): self
+    public static function seconds(int $seconds): self
     {
         return new self($sec);
     }
