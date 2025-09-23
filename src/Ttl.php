@@ -130,7 +130,7 @@ final class Ttl
      *
      * @return self TTL instance.
      */
-    public static function minutes(int $min): self
+    public static function minutes(int $minutes): self
     {
         return new self($min * self::SECONDS_IN_MINUTE);
     }
