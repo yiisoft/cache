@@ -17,7 +17,7 @@ final class TtlTest extends TestCase
         $this->assertInstanceOf(Ttl::class, Ttl::minutes(5));
         $this->assertInstanceOf(Ttl::class, Ttl::hours(2));
         $this->assertInstanceOf(Ttl::class, Ttl::days(1));
-        $this->assertInstanceOf(Ttl::class, Ttl::create(sec: 1, min: 1, hour: 1, day: 1));
+        $this->assertInstanceOf(Ttl::class, Ttl::create(seconds: 1, minutes: 1, hours: 1, days: 1));
         $this->assertInstanceOf(Ttl::class, Ttl::forever());
     }
 
@@ -35,7 +35,7 @@ final class TtlTest extends TestCase
             'minutes' => [Ttl::minutes(5), 5 * 60, false],
             'hours' => [Ttl::hours(2), 2 * 3600, false],
             'days' => [Ttl::days(1), 1 * 86400, false],
-            'create' => [Ttl::create(sec: 10, min: 5, hour: 1, day: 1), 10 + 5 * 60 + 3600 + 86400, false],
+            'create' => [Ttl::create(seconds: 10, minutes: 5, hours: 1, days: 1), 10 + 5 * 60 + 3600 + 86400, false],
             'zeroSeconds' => [Ttl::seconds(0), 0, false],
             'zeroCreate' => [Ttl::create(), 0, false],
             'forever' => [Ttl::forever(), null, true],
@@ -82,7 +82,7 @@ final class TtlTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('TTL must be non-negative.');
-        Ttl::create(sec: -86400);
+        Ttl::create(seconds: -86400);
     }
 
     public function testNegativeDateIntervalThrowsException(): void

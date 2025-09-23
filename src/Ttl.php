@@ -47,10 +47,10 @@ final class Ttl
         int $hours = 0,
         int $days = 0,
     ): self {
-        $totalSeconds = $sec
-            + $min * self::SECONDS_IN_MINUTE
-            + $hour * self::SECONDS_IN_HOUR
-            + $day * self::SECONDS_IN_DAY;
+        $totalSeconds = $seconds
+            + $minutes * self::SECONDS_IN_MINUTE
+            + $hours * self::SECONDS_IN_HOUR
+            + $days * self::SECONDS_IN_DAY;
 
         if ($totalSeconds < 0) {
             throw new \InvalidArgumentException('TTL must be non-negative.');
@@ -120,7 +120,7 @@ final class Ttl
      */
     public static function seconds(int $seconds): self
     {
-        return new self($sec);
+        return new self($seconds);
     }
 
     /**
@@ -132,7 +132,7 @@ final class Ttl
      */
     public static function minutes(int $minutes): self
     {
-        return new self($min * self::SECONDS_IN_MINUTE);
+        return new self($minutes * self::SECONDS_IN_MINUTE);
     }
 
     /**
@@ -144,7 +144,7 @@ final class Ttl
      */
     public static function hours(int $hours): self
     {
-        return new self($hour * self::SECONDS_IN_HOUR);
+        return new self($hours * self::SECONDS_IN_HOUR);
     }
 
     /**
@@ -156,7 +156,7 @@ final class Ttl
      */
     public static function days(int $days): self
     {
-        return new self($day * self::SECONDS_IN_DAY);
+        return new self($days * self::SECONDS_IN_DAY);
     }
 
     /**
