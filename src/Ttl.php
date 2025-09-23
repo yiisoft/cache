@@ -142,7 +142,7 @@ final class Ttl
      *
      * @return self TTL instance.
      */
-    public static function hours(int $hour): self
+    public static function hours(int $hours): self
     {
         return new self($hour * self::SECONDS_IN_HOUR);
     }
