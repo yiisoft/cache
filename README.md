@@ -71,7 +71,7 @@ $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 `Ttl` is a simple immutable value object that represents cache time-to-live (TTL) in seconds.
 It eliminates magic numbers (like 60 * 60 or 3600), improves readability, and provides convenient factory methods.
 
-## Cheat Sheet: Ttl Usage
+Below are examples on how to use it.
 
 PSR-16 Cache Adapter Example with Ttl
 - TTL must be in seconds (int) or null for infinite lifetime.
