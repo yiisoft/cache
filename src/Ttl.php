@@ -42,10 +42,10 @@ final class Ttl
      * @throws \InvalidArgumentException If the $totalSeconds results in a negative TTL.
      */
     public static function create(
-        int $sec = 0,
-        int $min = 0,
-        int $hour = 0,
-        int $day = 0,
+        int $seconds = 0,
+        int $minutes = 0,
+        int $hours = 0,
+        int $days = 0,
     ): self {
         $totalSeconds = $sec
             + $min * self::SECONDS_IN_MINUTE
