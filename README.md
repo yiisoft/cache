@@ -73,9 +73,10 @@ It eliminates magic numbers (like 60 * 60 or 3600), improves readability, and pr
 
 Below are examples on how to use it.
 
-PSR-16 Cache Adapter Example with Ttl
-- TTL must be in seconds (int) or null for infinite lifetime.
-- Always use ->toSeconds() when passing a Ttl object:
+If you're using PSR-16 cache adapter directly:
+
+- TTL must be an integer number of seconds or `null` for infinite lifetime.
+- Always use `->toSeconds()` when using `Ttl` object.
 
 ```php
 use Yiisoft\Cache\Ttl;
