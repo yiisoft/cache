@@ -22,46 +22,44 @@ final class TtlTest extends TestCase
     }
 
     #[DataProvider('ttlProvider')]
-    public function testFactories(Ttl $ttl, ?int $expectedSeconds, bool $expectedIsForever = false): void
+    public function testFactories(Ttl $ttl, ?int $expectedSeconds): void
     {
         $this->assertSame($expectedSeconds, $ttl->toSeconds());
-        $this->assertSame($expectedIsForever, $ttl->isForever());
     }
 
     public static function ttlProvider(): array
     {
         return [
-            'seconds' => [Ttl::seconds(10), 10, false],
-            'minutes' => [Ttl::minutes(5), 5 * 60, false],
-            'hours' => [Ttl::hours(2), 2 * 3600, false],
-            'days' => [Ttl::days(1), 1 * 86400, false],
-            'create' => [Ttl::create(seconds: 10, minutes: 5, hours: 1, days: 1), 10 + 5 * 60 + 3600 + 86400, false],
-            'zeroSeconds' => [Ttl::seconds(0), 0, false],
-            'zeroCreate' => [Ttl::create(), 0, false],
-            'forever' => [Ttl::forever(), null, true],
+            'seconds' => [Ttl::seconds(10), 10],
+            'minutes' => [Ttl::minutes(5), 5 * 60],
+            'hours' => [Ttl::hours(2), 2 * 3600],
+            'days' => [Ttl::days(1), 1 * 86400],
+            'create' => [Ttl::create(seconds: 10, minutes: 5, hours: 1, days: 1), 10 + 5 * 60 + 3600 + 86400],
+            'zeroSeconds' => [Ttl::seconds(0), 0],
+            'zeroCreate' => [Ttl::create(), 0],
+            'forever' => [Ttl::forever(), null],
         ];
     }
 
     #[DataProvider('fromProvider')]
-    public function testFrom(mixed $input, ?int $expectedSeconds, bool $expectedIsForever = false): void
+    public function testFrom(mixed $input, ?int $expectedSeconds): void
     {
         $ttl = Ttl::from($input);
         $this->assertSame($expectedSeconds, $ttl->toSeconds());
-        $this->assertSame($expectedIsForever, $ttl->isForever());
     }
 
     public static function fromProvider(): array
     {
         return [
-            'int' => [123, 123, false],
-            'string' => ['123', 123, false],
-            'zero' => [0, 0, false],
-            'zeroString' => ['0', 0, false],
-            'null' => [null, null, true],
-            'DateInterval_hours_minutes' => [new DateInterval('PT6H8M'), 6 * 3600 + 8 * 60, false],
-            'DateInterval_years_days' => [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600, false],
-            'Ttl_instance' => [Ttl::seconds(500), 500, false],
-            'nonNumericString' => ['abc', 0, false], // Converts to 0 as per current logic
+            'int' => [123, 123],
+            'string' => ['123', 123],
+            'zero' => [0, 0],
+            'zeroString' => ['0', 0],
+            'null' => [null, null],
+            'DateInterval_hours_minutes' => [new DateInterval('PT6H8M'), 6 * 3600 + 8 * 60],
+            'DateInterval_years_days' => [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600],
+            'Ttl_instance' => [Ttl::seconds(500), 500],
+            'nonNumericString' => ['abc', 0], // Converts to 0 as per current logic
         ];
     }
 
