@@ -98,32 +98,29 @@ $cache->set('key6', 'value6', Ttl::forever()); // shorthand for null
 $cache->set('key7', 'value7', Ttl::from(null));
 ```
 
-Normalizing TTL from mixed types
+### Creating and Normalizing TTL
+
+The Ttl::from() method normalizes various TTL representations (Ttl, DateInterval, int, string, or null) into a Ttl object.
 ```php
-// Normalizing TTL from Ttl|DateInterval|int|string|null
 $ttl = Ttl::from(new DateInterval('PT45M')); // 45 minutes
 $ttl = Ttl::from(10); // 10 seconds
 $ttl = Ttl::from('12'); // 12 seconds
 $ttl = Ttl::from(null); // Infinity / no expiration
+$ttl = Ttl::from(Ttl::seconds(500));
 
-$ttlObject = $ttl = Ttl::create(sec: 30, min: 15);
-$ttl = Ttl::from($ttlObject);
+$ttl = Ttl::create(sec: 30, min: 15);
 
 // From DateInterval
 $ttl = Ttl::fromInterval(new DateInterval('PT45M'));
 $cache->set('key', 'value', $ttl->toSeconds());
 
-// Ttl::forever() is just a shorthand for `null` TTL (no expiration), no need to call toSeconds()
-$cache->set('key', 'value', Ttl::forever());
+// Ttl::forever() is just a shorthand for `null` TTL (no expiration)
+$cache->set('key', 'value', Ttl::forever()->toSeconds());
+// or
+$cache->set('key', 'value', Ttl::from(null)->toSeconds());
+```
 
-$cache->set('key', 'value', Ttl::from(null));
-
-// If TTL value is unknown at runtime (e.g., 10 or null), use ->toSeconds()
-$ttlInRuntime = getTtlFromYouCode();
-$cache->set('key', 'value', Ttl::from($ttlInRuntime)->toSeconds());
-````
-
-When using `Ttl` with Yii cache wrapper:
+### When using `Ttl` with Yii cache wrapper:
 
 - You can pass a `Ttl` object in the constructor as the default value.
 - You can pass it to methods like `getOrSet()` which expect integer number of seconds or `null`.
@@ -133,18 +130,37 @@ use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Ttl;
 
 $cache = new Cache(new ArrayCache(), Ttl::minutes(5)); // default TTL
+$cache->getOrSet('key', 'value'); // // Uses default TTL
 
-// Using default TTL 5 minutes
-$cache->getOrSet('key', 'value');
-
-// Custom TTL per call
+// Custom TTL
 $cache->getOrSet('key2', fn() => 'value2', Ttl::seconds(30)->toSeconds());
-$cache->getOrSet('key3', fn() => 'value3', Ttl::forever()->toSeconds()); // no expiration
-
-// Dynamic TTL from runtime variable
-$ttlFromCode = getTtlFromYourCode(); // Ttl|DateInterval|int|null
-$cache->getOrSet('key4', fn() => 'value4', Ttl::from($ttlFromCode)->toSeconds());
+$cache->getOrSet('key3', fn() => 'value3', Ttl::forever()->toSeconds()); // No expiration
 ```
+### Additional Notes on Ttl
+Checking Infinite TTL: Use isForever() to check if a TTL represents "forever" (i.e., no expiration). It returns true when the TTL value is null.
+
+```php
+if (Ttl::from(null)->isForever()) {
+    // No expiration
+}
+````
+
+### Accessing TTL Value: 
+Use toSeconds() to get the TTL in seconds (int) or null for "forever". The public $value property can be accessed directly (e.g., Ttl::seconds(30)->value), but toSeconds() is preferred for clarity.
+
+```php
+$ttl = Ttl::seconds(60);
+$seconds = $ttl->toSeconds(); // Returns 60
+$seconds = $ttl->value; // Also 60
+```
+
+### Negative Values and Non-Numeric String
+Negative TTL values (e.g., -10 or '-10') and non-numeric strings (e.g., 'abc') are converted to 0
+```php
+$ttl = Ttl::from(-10); // Converts to 0
+$ttl = Ttl::from('abc'); // Converts to 0
+```
+
 ## General usage
 
 Typical PSR-16 cache usage is the following:
