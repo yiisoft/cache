@@ -60,6 +60,8 @@ final class TtlTest extends TestCase
             'DateInterval_years_days' => [new DateInterval('P2Y4D'), 2 * 365 * 24 * 3600 + 4 * 24 * 3600],
             'Ttl_instance' => [Ttl::seconds(500), 500],
             'nonNumericString' => ['abc', 0], // Converts to 0 as per current logic
+            'negativeString' => ['-10', 0],
+            'negativeInt' => [-10, 0],
         ];
     }
 

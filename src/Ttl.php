@@ -74,7 +74,7 @@ final class Ttl
      */
     public static function from(self|DateInterval|int|string|null $ttl): self
     {
-         $seconds = match (true) {
+        $seconds = match (true) {
             $ttl === null => self::forever(),
             $ttl instanceof self => $ttl,
             $ttl instanceof DateInterval => self::fromInterval($ttl),
