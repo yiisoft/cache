@@ -25,7 +25,7 @@ final class TtlTest extends TestCase
     public function testFactories(Ttl $ttl, ?int $expectedSeconds, bool $expectedIsForever = false): void
     {
         $this->assertSame($expectedSeconds, $ttl->toSeconds());
-        $this->assertSame($expectedIsForever, $ttl->isForever);
+        $this->assertSame($expectedIsForever, $ttl->isForever());
     }
 
     public static function ttlProvider(): array
@@ -47,7 +47,7 @@ final class TtlTest extends TestCase
     {
         $ttl = Ttl::from($input);
         $this->assertSame($expectedSeconds, $ttl->toSeconds());
-        $this->assertSame($expectedIsForever, $ttl->isForever);
+        $this->assertSame($expectedIsForever, $ttl->isForever());
     }
 
     public static function fromProvider(): array
@@ -71,34 +71,34 @@ final class TtlTest extends TestCase
         Ttl::from(1.5); // Float is invalid
     }
 
-    public function testNegativeTtlThrowsException(): void
+    public function testNegativeTtlBecomesZero(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('TTL must be non-negative.');
-        Ttl::seconds(-10);
+        $ttl = Ttl::seconds(-10);
+        $this->assertSame(0, $ttl->toSeconds());
+        $this->assertFalse($ttl->isForever());
     }
 
-    public function testNegativeCreateThrowsException(): void
+    public function testNegativeCreateBecomesZero(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('TTL must be non-negative.');
-        Ttl::create(seconds: -86400);
+        $ttl = Ttl::create(seconds: -86400);
+        $this->assertSame(0, $ttl->toSeconds());
+        $this->assertFalse($ttl->isForever());
     }
 
-    public function testNegativeDateIntervalThrowsException(): void
+    public function testNegativeDateIntervalBecomesZero(): void
     {
         $interval = new DateInterval('PT1H');
         $interval->invert = 1;
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('DateInterval must result in non-negative TTL.');
-        Ttl::from($interval);
+        $ttl = Ttl::from($interval);
+        $this->assertSame(0, $ttl->toSeconds());
+        $this->assertFalse($ttl->isForever());
     }
 
-    public function testInfinityReturnsNull(): void
+    public function testZeroTtlMeansExpired(): void
     {
-        $ttl = Ttl::from(null);
-        $this->assertTrue($ttl->isForever);
-        $this->assertNull($ttl->toSeconds());
+        $ttl = Ttl::seconds(0);
+        $this->assertSame(0, $ttl->toSeconds());
+        $this->assertFalse($ttl->isForever());
     }
 }

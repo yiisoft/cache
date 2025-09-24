@@ -24,10 +24,6 @@ final class Ttl
     private function __construct(
         public readonly ?int $value,
     ) {
-//        if ($value < 0) {
-//            new self(0);
-//            $this->value = 0;
-//        }
     }
 
     /**
@@ -78,13 +74,19 @@ final class Ttl
      */
     public static function from(self|DateInterval|int|string|null $ttl): self
     {
-        return match (true) {
+         $seconds = match (true) {
             $ttl === null => self::forever(),
             $ttl instanceof self => $ttl,
             $ttl instanceof DateInterval => self::fromInterval($ttl),
             is_string($ttl) => self::seconds((int) $ttl),
             is_int($ttl) => self::seconds($ttl),
         };
+
+        if ($seconds->value !== null && $seconds->value < 0) {
+            $seconds = self::seconds(0);
+        }
+
+        return $seconds;
     }
 
     /**
@@ -118,7 +120,7 @@ final class Ttl
      */
     public static function seconds(int $seconds): self
     {
-        return new self($seconds);
+        return new self(max($seconds, 0));
     }
 
     /**
@@ -130,7 +132,8 @@ final class Ttl
      */
     public static function minutes(int $minutes): self
     {
-        return new self($minutes * self::SECONDS_IN_MINUTE);
+        $seconds = $minutes * self::SECONDS_IN_MINUTE;
+        return new self(max($seconds, 0));
     }
 
     /**
@@ -142,7 +145,8 @@ final class Ttl
      */
     public static function hours(int $hours): self
     {
-        return new self($hours * self::SECONDS_IN_HOUR);
+        $seconds = $hours * self::SECONDS_IN_HOUR;
+        return new self(max($seconds, 0));
     }
 
     /**
@@ -154,7 +158,8 @@ final class Ttl
      */
     public static function days(int $days): self
     {
-        return new self($days * self::SECONDS_IN_DAY);
+        $seconds = $days * self::SECONDS_IN_DAY;
+        return new self(max($seconds, 0));
     }
 
     /**
@@ -180,6 +185,5 @@ final class Ttl
         }
 
         return max(0, $this->value);
-//        return $this->value;
     }
 }

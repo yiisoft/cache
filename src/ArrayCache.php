@@ -135,7 +135,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
      */
     private function ttlToExpiration(Ttl $ttl): int
     {
-        if ($ttl->isForever) {
+        if ($ttl->isForever()) {
             return self::EXPIRATION_INFINITY;
         }
 
