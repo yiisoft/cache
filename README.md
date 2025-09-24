@@ -66,7 +66,7 @@ Set a default TTL:
 $cache = new \Yiisoft\Cache\Cache($arrayCache, 60 * 60); // 1 hour
 ```
 
-#### `Ttl` object
+## `Ttl` object
 
 `Ttl` is a simple immutable value object that represents cache time-to-live (TTL) in seconds.
 It eliminates magic numbers (like 60 * 60 or 3600), improves readability, and provides convenient factory methods.
@@ -97,7 +97,8 @@ $cache->set('key', 'value', $ttl->toSeconds());
 $cache->set('key6', 'value6', Ttl::forever()); // shorthand for null
 $cache->set('key7', 'value7', Ttl::from(null));
 ```
-Dynamic TTL
+
+Normalizing TTL from mixed types
 ```php
 // Normalizing TTL from Ttl|DateInterval|int|string|null
 $ttl = Ttl::from(new DateInterval('PT45M')); // 45 minutes
