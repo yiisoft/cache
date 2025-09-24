@@ -63,7 +63,7 @@ final class CacheTest extends TestCase
         $items = $this->getItems($cache);
 
         $this->assertSame('value', $value);
-        $this->assertSame(-1, $items['key']->expiry());
+        $this->assertSame(0, $items['key']->expiry());
         $this->assertTrue($items['key']->expired(1.0, $cache));
     }
 
