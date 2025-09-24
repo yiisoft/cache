@@ -21,15 +21,13 @@ final class Ttl
     private const SECONDS_IN_HOUR = 3600;
     private const SECONDS_IN_DAY = 86400;
 
-    private const INT_PLACEHOLDER_FOR_FOREVER_VALUE = 0;
-
     private function __construct(
-        public readonly int $value,
-        public readonly bool $isForever = false
+        public readonly ?int $value,
     ) {
-        if (!$isForever && $value < 0) {
-            throw new \InvalidArgumentException('TTL must be non-negative.');
-        }
+//        if ($value < 0) {
+//            new self(0);
+//            $this->value = 0;
+//        }
     }
 
     /**
@@ -53,7 +51,7 @@ final class Ttl
             + $days * self::SECONDS_IN_DAY;
 
         if ($totalSeconds < 0) {
-            throw new \InvalidArgumentException('TTL must be non-negative.');
+            $totalSeconds = 0;
         }
 
         return new self($totalSeconds);
@@ -105,7 +103,7 @@ final class Ttl
             ->getTimestamp();
 
         if ($seconds < 0) {
-            throw new \InvalidArgumentException('DateInterval must result in non-negative TTL.');
+            $seconds = 0;
         }
 
         return new self($seconds);
@@ -164,7 +162,12 @@ final class Ttl
      */
     public static function forever(): self
     {
-        return new self(self::INT_PLACEHOLDER_FOR_FOREVER_VALUE, true);
+        return new self(null);
+    }
+
+    public function isForever(): bool
+    {
+        return $this->value === null;
     }
 
     /**
@@ -172,10 +175,11 @@ final class Ttl
      */
     public function toSeconds(): ?int
     {
-        if ($this->isForever) {
+        if ($this->isForever()) {
             return null;
         }
 
-        return $this->value;
+        return max(0, $this->value);
+//        return $this->value;
     }
 }
