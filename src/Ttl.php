@@ -217,7 +217,7 @@ final class Ttl
         return match ($this->status()) {
             self::EXPIRATION_FOREVER => self::EXPIRATION_FOREVER,
             self::EXPIRATION_EXPIRED => self::EXPIRATION_EXPIRED,
-            self::EXPIRATION_LIVE => $this->value + $now,
+            self::EXPIRATION_LIVE => $now + (int) $this->value,
         };
     }
 
