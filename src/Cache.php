@@ -35,10 +35,10 @@ final class Cache implements CacheInterface
     private readonly CacheItems $items;
 
     /**
-     * @var Ttl|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
+     * @var Ttl The default TTL for a cache entry. null meaning infinity, negative or zero results in the
      * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
-    private readonly ?Ttl $defaultTtl;
+    private readonly Ttl $defaultTtl;
 
     /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
