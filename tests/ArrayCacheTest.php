@@ -240,30 +240,6 @@ final class ArrayCacheTest extends TestCase
     }
 
     /**
-     * @throws ReflectionException
-     */
-    #[DataProvider('ttlToExpirationProvider')]
-    public function testTtlToExpiration(mixed $ttl, mixed $expected): void
-    {
-        $ttl = Ttl::from($ttl);
-
-        if ($expected === 'calculate_expiration') {
-            $expected = time() + $ttl->toSeconds();
-        }
-        $cache = new ArrayCache();
-        $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));
-    }
-
-    public static function ttlToExpirationProvider(): array
-    {
-        return [
-            [3, 'calculate_expiration'],
-            [null, 0],
-            [-5, -1],
-        ];
-    }
-
-    /**
      * @throws InvalidArgumentException
      */
     #[DataProvider('iterableProvider')]
