@@ -15,7 +15,6 @@ use function array_keys;
 use function array_map;
 use function is_object;
 use function sleep;
-use function time;
 
 final class ArrayCacheTest extends TestCase
 {
