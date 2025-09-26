@@ -136,8 +136,10 @@ $cache->getOrSet('key', 'value'); // // Uses default TTL
 $cache->getOrSet('key2', fn() => 'value2', Ttl::seconds(30)->toSeconds());
 $cache->getOrSet('key3', fn() => 'value3', Ttl::forever()->toSeconds()); // No expiration
 ```
-### Additional Notes on Ttl
-Checking Infinite TTL: Use isForever() to check if a TTL represents "forever" (i.e., no expiration). It returns true when the TTL value is null.
+### Additional Features
+Checking Infinite TTL: 
+
+Use isForever() to check if a TTL represents "forever" (i.e., no expiration). It returns true when the TTL value is null.
 
 ```php
 if (Ttl::from(null)->isForever()) {
@@ -145,7 +147,28 @@ if (Ttl::from(null)->isForever()) {
 }
 ````
 
-### Accessing TTL Value: 
+### Expired TTL
+
+```php
+$ttl = Ttl::seconds(0);
+var_dump($ttl->isExpired()); // true
+
+$ttl = Ttl::seconds(-5);
+var_dump($ttl->isExpired()); // true
+```
+
+### Getting Expiration Timestamp
+`toExpiration()` converts TTL to an absolute expiration timestamp relative to $now:
+
+```php
+$now = time();
+
+Ttl::seconds(10)->toExpiration($now); // $now + 10
+Ttl::forever()->toExpiration($now);   // 0 (forever)
+Ttl::seconds(-5)->toExpiration($now); // -1 (expired)
+```
+
+### Accessing TTL Value
 Use toSeconds() to get the TTL in seconds (int) or null for "forever". The public $value property can be accessed directly (e.g., Ttl::seconds(30)->value), but toSeconds() is preferred for clarity.
 
 ```php
@@ -154,11 +177,10 @@ $seconds = $ttl->toSeconds(); // Returns 60
 $seconds = $ttl->value; // Also 60
 ```
 
-### Negative Values and Non-Numeric String
-Negative TTL values (e.g., -10 or '-10') and non-numeric strings (e.g., 'abc') are converted to 0
+### Invalid TTL values
 ```php
-$ttl = Ttl::from(-10); // Converts to 0
-$ttl = Ttl::from('abc'); // Converts to 0
+$ttl = Ttl::from('abc'); // Converts to 0 (expired)
+$ttl = Ttl::from(1.5);   // TypeError: invalid TTL type
 ```
 
 ## General usage
