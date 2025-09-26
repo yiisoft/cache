@@ -10,10 +10,17 @@ use DateTime;
 /**
  * Value object representing a time-to-live (TTL) duration in seconds.
  *
+ *  A TTL can be:
+ *  - `null` → forever (no expiration)
+ *  - positive integer → active TTL
+ *  - zero or negative → expired TTL
+ *
  * ```php
  * $ttl = Ttl::minutes(5);
  * $seconds = $ttl->toSeconds(); // 300
  * ```
+ *
+ * @psalm-immutable
  */
 final class Ttl
 {
@@ -21,6 +28,16 @@ final class Ttl
     private const SECONDS_IN_HOUR = 3600;
     private const SECONDS_IN_DAY = 86400;
 
+    /**
+     * TTL state constants.
+     */
+    public const EXPIRATION_EXPIRED = -1;
+    public const EXPIRATION_FOREVER = 0;
+    public const EXPIRATION_LIVE = 1;
+
+    /**
+     * @param int|null $value TTL value in seconds. Null represents "forever".
+     */
     private function __construct(
         public readonly ?int $value,
     ) {
@@ -29,11 +46,10 @@ final class Ttl
     /**
      * Create TTL from a combination of seconds, minutes, hours and days.
      *
-     * @param int $sec Number of seconds.
-     * @param int $min Number of minutes.
-     * @param int $hour Number of hours.
-     * @param int $day Number of days.
-     * @throws \InvalidArgumentException If the $totalSeconds results in a negative TTL.
+     * @param int $seconds Number of seconds.
+     * @param int $minutes Number of minutes.
+     * @param int $hours Number of hours.
+     * @param int $days Number of days.
      */
     public static function create(
         int $seconds = 0,
@@ -46,10 +62,6 @@ final class Ttl
             + $hours * self::SECONDS_IN_HOUR
             + $days * self::SECONDS_IN_DAY;
 
-        if ($totalSeconds < 0) {
-            $totalSeconds = 0;
-        }
-
         return new self($totalSeconds);
     }
 
@@ -60,9 +72,9 @@ final class Ttl
      *
      * @param DateInterval|int|string|Ttl|null $ttl Raw TTL value (string must be numeric, e.g., '3600')
      *
-     * @throws \InvalidArgumentException For invalid TTL values (e.g., negative duration or invalid string).
+     * @throws \TypeError For invalid TTL values types.
      *
-     * @return Ttl Normalized TTL object.
+     * @psalm-return self
      *
      * Example usage:
      *  ```php
@@ -98,62 +110,55 @@ final class Ttl
             ->add($interval)
             ->getTimestamp();
 
-        if ($seconds < 0) {
-            $seconds = 0;
-        }
-
         return new self($seconds);
     }
 
     /**
      * Create TTL from seconds.
      *
-     * @param int $sec Number of seconds.
+     * @param int $seconds Number of seconds.
      *
      * @return self TTL instance.
      */
     public static function seconds(int $seconds): self
     {
-        return new self(max($seconds, 0));
+        return new self($seconds);
     }
 
     /**
      * Create TTL from minutes.
      *
-     * @param int $min Number of minutes.
+     * @param int $minutes Number of minutes.
      *
      * @return self TTL instance.
      */
     public static function minutes(int $minutes): self
     {
-        $seconds = $minutes * self::SECONDS_IN_MINUTE;
-        return new self(max($seconds, 0));
+        return new self($minutes * self::SECONDS_IN_MINUTE);
     }
 
     /**
      * Create TTL from hours.
      *
-     * @param int $hour Number of hours.
+     * @param int $hours Number of hours.
      *
      * @return self TTL instance.
      */
     public static function hours(int $hours): self
     {
-        $seconds = $hours * self::SECONDS_IN_HOUR;
-        return new self(max($seconds, 0));
+        return new self($hours * self::SECONDS_IN_HOUR);
     }
 
     /**
      * Create TTL from days.
      *
-     * @param int $day Number of days.
+     * @param int $days Number of days.
      *
      * @return self TTL instance.
      */
     public static function days(int $days): self
     {
-        $seconds = $days * self::SECONDS_IN_DAY;
-        return new self(max($seconds, 0));
+        return new self($days * self::SECONDS_IN_DAY);
     }
 
     /**
@@ -164,13 +169,62 @@ final class Ttl
         return new self(null);
     }
 
+    /**
+     * Checks whether the TTL represents "forever".
+     */
     public function isForever(): bool
     {
         return $this->value === null;
     }
 
     /**
+     * Checks whether the TTL is expired.
+     *
+     * @return bool True if TTL <= 0 and not forever
+     */
+    public function isExpired(): bool
+    {
+        return !$this->isForever() && $this->value <= 0;
+    }
+
+    /**
+     * Returns TTL state.
+     */
+    public function status(): int
+    {
+        if ($this->isForever()) {
+            return self::EXPIRATION_FOREVER;
+        }
+
+        if ($this->isExpired()) {
+            return self::EXPIRATION_EXPIRED;
+        }
+
+        return self::EXPIRATION_LIVE;
+    }
+
+    /**
+     * Returns the expiration timestamp relative to $now.
+     *
+     * - For expired TTL, returns EXPIRATION_EXPIRED (-1)
+     * - For forever TTL, returns EXPIRATION_FOREVER (0)
+     * - For live TTL, returns $now + value
+     *
+     * @param int $now Reference timestamp
+     */
+    public function toExpiration(int $now): int
+    {
+        return match ($this->status()) {
+            self::EXPIRATION_FOREVER => self::EXPIRATION_FOREVER,
+            self::EXPIRATION_EXPIRED => self::EXPIRATION_EXPIRED,
+            self::EXPIRATION_LIVE => $this->value + $now,
+        };
+    }
+
+    /**
      * Get TTL value in seconds or null if forever.
+     *
+     * @return int|null
      */
     public function toSeconds(): ?int
     {
