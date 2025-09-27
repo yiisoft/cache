@@ -6,7 +6,6 @@ namespace Yiisoft\Cache\Tests;
 
 use ArrayIterator;
 use DateInterval;
-use Exception;
 use IteratorAggregate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\SimpleCache\InvalidArgumentException;
