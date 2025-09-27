@@ -6,15 +6,19 @@ namespace Yiisoft\Cache\Tests;
 
 use ArrayIterator;
 use DateInterval;
+use Exception;
 use IteratorAggregate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\SimpleCache\InvalidArgumentException;
+use ReflectionException;
 use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\Ttl;
 
 use function array_keys;
 use function array_map;
 use function is_object;
 use function sleep;
+use function time;
 
 final class ArrayCacheTest extends TestCase
 {
@@ -234,6 +238,30 @@ final class ArrayCacheTest extends TestCase
         $this->cache->set('b', 22, 0);
 
         $this->assertFalse($this->cache->has('b'));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    #[DataProvider('ttlToExpirationProvider')]
+    public function testTtlToExpiration(mixed $ttl, mixed $expected): void
+    {
+        $ttl = Ttl::from($ttl);
+
+        if ($expected === 'calculate_expiration') {
+            $expected = time() + $ttl->toSeconds();
+        }
+        $cache = new ArrayCache();
+        $this->assertSameExceptObject($expected, $this->invokeMethod($cache, 'ttlToExpiration', [$ttl]));
+    }
+
+    public static function ttlToExpirationProvider(): array
+    {
+        return [
+            [3, 'calculate_expiration'],
+            [null, 0],
+            [-5, -1],
+        ];
     }
 
     /**

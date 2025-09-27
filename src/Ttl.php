@@ -31,9 +31,9 @@ final class Ttl
     /**
      * TTL state constants.
      */
-    public const EXPIRATION_EXPIRED = -1;
-    public const EXPIRATION_FOREVER = 0;
-    public const EXPIRATION_LIVE = 1;
+//    public const EXPIRATION_EXPIRED = -1;
+//    public const EXPIRATION_FOREVER = 0;
+//    public const EXPIRATION_LIVE = 1;
 
     /**
      * @param int|null $value TTL value in seconds. Null represents "forever".
@@ -177,49 +177,49 @@ final class Ttl
         return $this->value === null;
     }
 
-    /**
-     * Checks whether the TTL is expired.
-     *
-     * @return bool True if TTL <= 0 and not forever
-     */
-    public function isExpired(): bool
-    {
-        return !$this->isForever() && $this->value <= 0;
-    }
+//    /**
+//     * Checks whether the TTL is expired.
+//     *
+//     * @return bool True if TTL <= 0 and not forever
+//     */
+//    public function isExpired(): bool
+//    {
+//        return !$this->isForever() && $this->value <= 0;
+//    }
 
-    /**
-     * Returns TTL state.
-     */
-    public function status(): int
-    {
-        if ($this->isForever()) {
-            return self::EXPIRATION_FOREVER;
-        }
+//    /**
+//     * Returns TTL state.
+//     */
+//    public function status(): int
+//    {
+//        if ($this->isForever()) {
+//            return self::EXPIRATION_FOREVER;
+//        }
+//
+//        if ($this->isExpired()) {
+//            return self::EXPIRATION_EXPIRED;
+//        }
+//
+//        return self::EXPIRATION_LIVE;
+//    }
 
-        if ($this->isExpired()) {
-            return self::EXPIRATION_EXPIRED;
-        }
-
-        return self::EXPIRATION_LIVE;
-    }
-
-    /**
-     * Returns the expiration timestamp relative to $now.
-     *
-     * - For expired TTL, returns EXPIRATION_EXPIRED (-1)
-     * - For forever TTL, returns EXPIRATION_FOREVER (0)
-     * - For live TTL, returns $now + value
-     *
-     * @param int $now Reference timestamp
-     */
-    public function toExpiration(int $now): int
-    {
-        return match ($this->status()) {
-            self::EXPIRATION_FOREVER => self::EXPIRATION_FOREVER,
-            self::EXPIRATION_EXPIRED => self::EXPIRATION_EXPIRED,
-            self::EXPIRATION_LIVE => $now + (int) $this->value,
-        };
-    }
+//    /**
+//     * Returns the expiration timestamp relative to $now.
+//     *
+//     * - For expired TTL, returns EXPIRATION_EXPIRED (-1)
+//     * - For forever TTL, returns EXPIRATION_FOREVER (0)
+//     * - For live TTL, returns $now + value
+//     *
+//     * @param int $now Reference timestamp
+//     */
+//    public function toExpiration(int $now): int
+//    {
+//        return match ($this->status()) {
+//            self::EXPIRATION_FOREVER => self::EXPIRATION_FOREVER,
+//            self::EXPIRATION_EXPIRED => self::EXPIRATION_EXPIRED,
+//            self::EXPIRATION_LIVE => $now + (int) $this->value,
+//        };
+//    }
 
     /**
      * Get TTL value in seconds or null if forever.

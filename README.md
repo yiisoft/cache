@@ -147,27 +147,6 @@ if (Ttl::from(null)->isForever()) {
 }
 ````
 
-### Expired TTL
-
-```php
-$ttl = Ttl::seconds(0);
-var_dump($ttl->isExpired()); // true
-
-$ttl = Ttl::seconds(-5);
-var_dump($ttl->isExpired()); // true
-```
-
-### Getting Expiration Timestamp
-`toExpiration()` converts TTL to an absolute expiration timestamp relative to $now:
-
-```php
-$now = time();
-
-Ttl::seconds(10)->toExpiration($now); // $now + 10
-Ttl::forever()->toExpiration($now);   // 0 (forever)
-Ttl::seconds(-5)->toExpiration($now); // -1 (expired)
-```
-
 ### Accessing TTL Value
 Use toSeconds() to get the TTL in seconds (int) or null for "forever". The public $value property can be accessed directly (e.g., Ttl::seconds(30)->value), but toSeconds() is preferred for clarity.
 

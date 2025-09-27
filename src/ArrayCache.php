@@ -47,9 +47,9 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
-        $ttlObj = Ttl::from($ttl);
+        $expiration = $this->ttlToExpiration(Ttl::from($ttl));
 
-        if ($ttlObj->isExpired()) {
+        if ($expiration < 0) {
             return $this->delete($key);
         }
 
@@ -57,7 +57,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
             $value = clone $value;
         }
 
-        $this->cache[$key] = [$value, $ttlObj->toExpiration(time())];
+        $this->cache[$key] = [$value, $expiration];
         return true;
     }
 
@@ -126,6 +126,25 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     private function isExpired(string $key): bool
     {
         return !isset($this->cache[$key]) || ($this->cache[$key][1] !== 0 && $this->cache[$key][1] <= time());
+    }
+
+    /**
+     * Converts TTL to expiration.
+     *
+     * @param Ttl $ttl
+     */
+    private function ttlToExpiration(Ttl $ttl): int
+    {
+        if ($ttl->isForever()) {
+            return self::EXPIRATION_INFINITY;
+        }
+
+        $seconds = $ttl->toSeconds();
+        if ($seconds <= 0) {
+            return self::EXPIRATION_EXPIRED;
+        }
+
+        return $seconds + time();
     }
 
     /**
