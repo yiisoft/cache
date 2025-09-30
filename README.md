@@ -100,7 +100,8 @@ $cache->set('key7', 'value7', Ttl::from(null));
 
 ### Creating and Normalizing TTL
 
-The Ttl::from() method normalizes various TTL representations (Ttl, DateInterval, int, string, or null) into a Ttl object.
+The `Ttl::from()` method normalizes various TTL representations (`Ttl`, `DateInterval`, `int`, `string`, or `null`) into a `Ttl` object.
+
 ```php
 $ttl = Ttl::from(new DateInterval('PT45M')); // 45 minutes
 $ttl = Ttl::from(10); // 10 seconds
