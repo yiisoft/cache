@@ -137,9 +137,6 @@ $cache->getOrSet('key', 'value'); // // Uses default TTL
 // Custom TTL
 $cache->getOrSet('key2', fn() => 'value2', Ttl::seconds(30)->toSeconds());
 $cache->getOrSet('key3', fn() => 'value3', Ttl::forever()->toSeconds()); // No expiration
-```
-### Additional Features
-Checking Infinite TTL: 
 
 Use isForever() to check if a TTL represents "forever" (i.e., no expiration). It returns true when the TTL value is null.
 
