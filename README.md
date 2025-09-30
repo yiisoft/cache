@@ -147,7 +147,8 @@ if (Ttl::from(null)->isForever()) {
 ````
 
 ### Accessing TTL Value
-Use toSeconds() to get the TTL in seconds (int) or null for "forever". The public $value property can be accessed directly (e.g., Ttl::seconds(30)->value), but toSeconds() is preferred for clarity.
+
+Use `toSeconds()` to get the TTL in seconds (`int`) or `null` for "forever". The public `$value` property can be accessed directly (e.g., `Ttl::seconds(30)->value`), but `toSeconds()` is preferred for clarity.
 
 ```php
 $ttl = Ttl::seconds(60);
