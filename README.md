@@ -157,6 +157,7 @@ $seconds = $ttl->value; // Also 60
 ```
 
 ### Invalid TTL values
+
 ```php
 $ttl = Ttl::from('abc'); // Converts to 0 (expired)
 $ttl = Ttl::from(1.5);   // TypeError: invalid TTL type
