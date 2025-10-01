@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Cache;
 
 use DateInterval;
-use DateTime;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 
@@ -48,7 +47,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
-        $expiration = $this->ttlToExpiration($ttl);
+        $expiration = $this->ttlToExpiration(Ttl::from($ttl));
 
         if ($expiration < 0) {
             return $this->delete($key);
@@ -131,42 +130,21 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * Converts TTL to expiration.
+     *
+     * @param Ttl $ttl
      */
-    private function ttlToExpiration(DateInterval|int|null $ttl): int
+    private function ttlToExpiration(Ttl $ttl): int
     {
-        $ttl = $this->normalizeTtl($ttl);
-
-        if ($ttl === null) {
+        if ($ttl->isForever()) {
             return self::EXPIRATION_INFINITY;
         }
 
-        if ($ttl <= 0) {
+        $seconds = $ttl->toSeconds();
+        if ($seconds <= 0) {
             return self::EXPIRATION_EXPIRED;
         }
 
-        return $ttl + time();
-    }
-
-    /**
-     * Normalizes cache TTL handling strings and {@see DateInterval} objects.
-     *
-     * @param DateInterval|int|string|null $ttl Raw TTL.
-     *
-     * @return int|null TTL value as UNIX timestamp or null meaning infinity
-     */
-    private function normalizeTtl(DateInterval|int|string|null $ttl): ?int
-    {
-        if ($ttl instanceof DateInterval) {
-            return (new DateTime('@0'))
-                ->add($ttl)
-                ->getTimestamp();
-        }
-
-        if ($ttl === null) {
-            return null;
-        }
-
-        return (int) $ttl;
+        return $seconds + time();
     }
 
     /**

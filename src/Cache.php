@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Cache;
 
 use DateInterval;
-use DateTime;
 use Yiisoft\Cache\Dependency\Dependency;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
 use Yiisoft\Cache\Exception\RemoveCacheException;
@@ -36,22 +35,22 @@ final class Cache implements CacheInterface
     private readonly CacheItems $items;
 
     /**
-     * @var int|null The default TTL for a cache entry. null meaning infinity, negative or zero results in the
+     * @var Ttl The default TTL for a cache entry. null meaning infinity, negative or zero results in the
      * cache key deletion. This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
-    private readonly ?int $defaultTtl;
+    private readonly Ttl $defaultTtl;
 
     /**
      * @param \Psr\SimpleCache\CacheInterface $handler The actual cache handler.
-     * @param DateInterval|int|null $defaultTtl The default TTL for a cache entry.
+     * @param DateInterval|int|Ttl|null $defaultTtl The default TTL for a cache entry.
      * null meaning infinity, negative or zero results in the cache key deletion.
      * This value is used by {@see getOrSet()}, if the duration is not explicitly given.
      */
-    public function __construct(\Psr\SimpleCache\CacheInterface $handler, DateInterval|int|null $defaultTtl = null)
+    public function __construct(\Psr\SimpleCache\CacheInterface $handler, Ttl|DateInterval|int|null $defaultTtl = null)
     {
         $this->psr = new DependencyAwareCache($this, $handler);
         $this->items = new CacheItems();
-        $this->defaultTtl = $this->normalizeTtl($defaultTtl);
+        $this->defaultTtl = Ttl::from($defaultTtl);
     }
 
     public function psr(): \Psr\SimpleCache\CacheInterface
@@ -66,10 +65,12 @@ final class Cache implements CacheInterface
         Dependency|null $dependency = null,
         float $beta = 1.0
     ) {
+        $ttlObj = Ttl::from($ttl ?? $this->defaultTtl);
+
         $key = CacheKeyNormalizer::normalize($key);
         $value = $this->getValue($key, $beta);
 
-        return $value ?? $this->setAndGet($key, $callable, $ttl, $dependency);
+        return $value ?? $this->setAndGet($key, $callable, $ttlObj, $dependency);
     }
 
     public function remove(mixed $key): void
@@ -119,7 +120,7 @@ final class Cache implements CacheInterface
      * @param callable $callable The callable or closure that will be used to generate a value to be cached.
      * @psalm-param callable(\Psr\SimpleCache\CacheInterface): mixed $callable
      *
-     * @param DateInterval|int|null $ttl The TTL of this value. If not set, default value is used.
+     * @param DateInterval|int|Ttl|null $ttl The TTL of this value. If not set, default value is used.
      * @param Dependency|null $dependency The dependency of the cache value.
      *
      * @throws InvalidArgumentException Must be thrown if the `$key` or `$ttl` is not a legal value.
@@ -130,11 +131,10 @@ final class Cache implements CacheInterface
     private function setAndGet(
         string $key,
         callable $callable,
-        DateInterval|int|null $ttl,
+        Ttl|DateInterval|int|null $ttl,
         ?Dependency $dependency
     ): mixed {
-        $ttl = $this->normalizeTtl($ttl);
-        $ttl ??= $this->defaultTtl;
+        $ttl = Ttl::from($ttl ?? $this->defaultTtl);
         $value = $callable($this->psr);
 
         if ($dependency !== null) {
@@ -143,35 +143,11 @@ final class Cache implements CacheInterface
 
         $item = new CacheItem($key, $ttl, $dependency);
 
-        if (!$this->psr->set($key, [$value, $item], $ttl)) {
+        if (!$this->psr->set($key, [$value, $item], $ttl->toSeconds())) {
             throw new SetCacheException($key, $value, $item);
         }
 
         $this->items->set($item);
         return $value;
-    }
-
-    /**
-     * Normalizes cache TTL handling `null` value and {@see DateInterval} objects.
-     *
-     * @param DateInterval|int|null $ttl raw TTL.
-     *
-     * @throws InvalidArgumentException For invalid TTL.
-     *
-     * @return int|null TTL value as UNIX timestamp or null meaning infinity.
-     */
-    private function normalizeTtl(DateInterval|int|null $ttl): ?int
-    {
-        if ($ttl === null) {
-            return null;
-        }
-
-        if ($ttl instanceof DateInterval) {
-            return (new DateTime('@0'))
-                ->add($ttl)
-                ->getTimestamp();
-        }
-
-        return $ttl;
     }
 }
