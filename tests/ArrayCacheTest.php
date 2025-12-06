@@ -194,7 +194,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->clear();
 
         $data = $this->getDataProviderData();
-        $keys = array_map('\strval', array_keys($data));
+        $keys = array_map(\strval(...), array_keys($data));
 
         $this->cache->setMultiple($data);
 
@@ -206,7 +206,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->clear();
 
         $data = $this->getDataProviderData();
-        $keys = array_map('\strval', array_keys($data));
+        $keys = array_map(\strval(...), array_keys($data));
 
         $this->cache->setMultiple($data);
 
