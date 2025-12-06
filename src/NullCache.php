@@ -107,7 +107,7 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
 
     private function validateKeysOfValues(array $values): void
     {
-        $keys = array_map('\strval', array_keys($values));
+        $keys = array_map(\strval(...), array_keys($values));
         $this->validateKeys($keys);
     }
 }
