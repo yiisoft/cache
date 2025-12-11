@@ -1,5 +1,9 @@
 # Yii Cache Change Log
 
+## 3.2.1 under development
+
+- no changes in this release.
+
 ## 3.2.0 December 11, 2025
 
 - New #150: Add `Ttl` value object for working with time-to-live duration (@Pekhov14)
