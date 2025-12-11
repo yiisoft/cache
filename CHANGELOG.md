@@ -1,6 +1,6 @@
 # Yii Cache Change Log
 
-## 3.1.1 under development
+## 3.2.0 December 11, 2025
 
 - New #150: Add `Ttl` value object for working with time-to-live duration (@Pekhov14)
 - Enh #152: Add PHP 8.5 support (@vjik)
