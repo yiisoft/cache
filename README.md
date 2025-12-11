@@ -27,8 +27,8 @@ providing own features. It is used in [Yii Framework](https://www.yiiframework.c
 
 ## Requirements
 
-- PHP 8.1 or higher.
-- `Mbstring` PHP extension.
+- PHP 8.1 - 8.5.
+- `mbstring` PHP extension.
   
 ## Installation
 
