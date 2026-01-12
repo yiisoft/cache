@@ -49,14 +49,6 @@ final class AnyDependency extends Dependency
         }
     }
 
-    /**
-     * @codeCoverageIgnore Method is not used.
-     */
-    protected function generateDependencyData(CacheInterface $cache): mixed
-    {
-        return null;
-    }
-
     public function isChanged(CacheInterface $cache): bool
     {
         foreach ($this->dependencies as $dependency) {
@@ -66,5 +58,13 @@ final class AnyDependency extends Dependency
         }
 
         return false;
+    }
+
+    /**
+     * @codeCoverageIgnore Method is not used.
+     */
+    protected function generateDependencyData(CacheInterface $cache): mixed
+    {
+        return null;
     }
 }

@@ -7,6 +7,7 @@ namespace Yiisoft\Cache;
 use DateInterval;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
+use Psr\SimpleCache\CacheInterface;
 
 use function array_keys;
 use function array_map;
@@ -19,9 +20,9 @@ use function time;
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
  *
- * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that ArrayCache supports.
+ * See {@see CacheInterface} for common cache operations that ArrayCache supports.
  */
-final class ArrayCache implements \Psr\SimpleCache\CacheInterface
+final class ArrayCache implements CacheInterface
 {
     private const EXPIRATION_INFINITY = 0;
     private const EXPIRATION_EXPIRED = -1;
@@ -44,7 +45,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $default;
     }
 
-    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, int|DateInterval|null $ttl = null): bool
     {
         $this->validateKey($key);
         $expiration = $this->ttlToExpiration(Ttl::from($ttl));
@@ -89,7 +90,7 @@ final class ArrayCache implements \Psr\SimpleCache\CacheInterface
         return $results;
     }
 
-    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, int|DateInterval|null $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);

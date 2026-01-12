@@ -8,6 +8,9 @@ use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Di\Container;
 use Yiisoft\Di\ContainerConfig;
+use Yiisoft\Cache\CacheInterface;
+
+use function dirname;
 
 final class ConfigTest extends TestCase
 {
@@ -15,7 +18,7 @@ final class ConfigTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $yiiCache = $container->get(\Yiisoft\Cache\CacheInterface::class);
+        $yiiCache = $container->get(CacheInterface::class);
         $psrCache = $container->get(\Psr\SimpleCache\CacheInterface::class);
 
         $this->assertInstanceOf(Cache::class, $yiiCache);
@@ -26,8 +29,8 @@ final class ConfigTest extends TestCase
     {
         return new Container(
             ContainerConfig::create()->withDefinitions(
-                $this->getDiConfig()
-            )
+                $this->getDiConfig(),
+            ),
         );
     }
 

@@ -13,25 +13,25 @@ final class CallbackDependencyTest extends DependencyTestCase
 {
     public function testPlainClosure(): void
     {
-        $dependency = $this->createDependency(static fn () => true, true);
+        $dependency = $this->createDependency(static fn() => true, true);
 
         $this->assertDependencyNotChanged($dependency);
     }
 
     public function testClosureWithCache(): void
     {
-        $dependency = $this->createDependency(static fn (CacheInterface $cache) => $cache::class, Cache::class);
+        $dependency = $this->createDependency(static fn(CacheInterface $cache) => $cache::class, Cache::class);
 
         $this->assertDependencyNotChanged($dependency);
     }
 
     public function testScopeWithObject(): void
     {
-        $dataObject = new class () {
+        $dataObject = new class {
             public string $value = 'value';
         };
 
-        $dependency = $this->createDependency(static fn () => $dataObject->value, 'value');
+        $dependency = $this->createDependency(static fn() => $dataObject->value, 'value');
 
         $this->assertDependencyNotChanged($dependency);
 

@@ -44,19 +44,19 @@ final class PrefixedCacheTest extends TestCase
 
         $this->assertSame(
             [$this->prefix . 'key-1' => 'value-1', $this->prefix . 'key-2' => 'value-2'],
-            $this->cache->getMultiple(['key-1', 'key-2'])
+            $this->cache->getMultiple(['key-1', 'key-2']),
         );
 
         $this->cache->deleteMultiple(['key-1', 'key-2']);
         $this->assertSame(
             [$this->prefix . 'key-1' => null, $this->prefix . 'key-2' => null],
-            $this->cache->getMultiple(['key-1', 'key-2'])
+            $this->cache->getMultiple(['key-1', 'key-2']),
         );
     }
 
     public function testCreateCacheAndGetOrSet(): void
     {
-        $this->assertSame('value', (new Cache($this->cache))->getOrSet('key', static fn () => 'value'));
+        $this->assertSame('value', (new Cache($this->cache))->getOrSet('key', static fn() => 'value'));
 
         $this->assertSame($this->prefix . 'key', $this->getCacheKeys()[0]);
     }
