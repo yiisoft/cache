@@ -2,7 +2,7 @@
 
 ## 3.2.1 under development
 
-- no changes in this release.
+- Enh #153: Explicitly import classes and functions in "use" section (@mspirkov)
 
 ## 3.2.0 December 11, 2025
 
