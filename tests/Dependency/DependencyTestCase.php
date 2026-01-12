@@ -36,7 +36,7 @@ abstract class DependencyTestCase extends TestCase
 
     protected function createMockDependency(): Dependency
     {
-        return new class () extends Dependency {
+        return new class extends Dependency {
             protected function generateDependencyData(CacheInterface $cache): mixed
             {
                 return $this->data;

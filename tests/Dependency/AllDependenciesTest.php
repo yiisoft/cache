@@ -14,17 +14,17 @@ final class AllDependenciesTest extends DependencyTestCase
 {
     public function test(): void
     {
-        $data1 = new class () {
+        $data1 = new class {
             public int $data = 1;
         };
 
-        $data2 = new class () {
+        $data2 = new class {
             public int $data = 2;
         };
 
-        $dependency1 = new CallbackDependency(static fn () => $data1->data);
+        $dependency1 = new CallbackDependency(static fn() => $data1->data);
 
-        $dependency2 = new CallbackDependency(static fn () => $data2->data);
+        $dependency2 = new CallbackDependency(static fn() => $data2->data);
 
         $anyDependency = new AllDependencies([$dependency1, $dependency2]);
         $anyDependency->evaluateDependency($this->getCache());
@@ -49,7 +49,7 @@ final class AllDependenciesTest extends DependencyTestCase
             'array' => [[[]]],
             'bool' => [[true]],
             'null' => [[null]],
-            'callable' => [[fn () => null]],
+            'callable' => [[fn() => null]],
             'object' => [[new stdClass()]],
         ];
     }

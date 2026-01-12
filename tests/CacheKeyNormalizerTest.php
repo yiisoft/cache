@@ -14,6 +14,8 @@ use function fopen;
 use function json_encode;
 use function md5;
 
+use const JSON_THROW_ON_ERROR;
+
 final class CacheKeyNormalizerTest extends TestCase
 {
     public static function keyDataProvider(): array
@@ -31,13 +33,13 @@ final class CacheKeyNormalizerTest extends TestCase
             ],
             'empty-array' => [$array = [], self::encode($array)],
             'object' => [
-                $object = new class () {
+                $object = new class {
                     public string $name = 'object';
                 },
                 self::encode($object),
             ],
             'empty-object' => [$object = new stdClass(), self::encode($object)],
-            'callable' => [$callable = fn () => null, self::encode($callable)],
+            'callable' => [$callable = fn() => null, self::encode($callable)],
         ];
     }
 

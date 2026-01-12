@@ -47,7 +47,7 @@ final class TagDependency extends Dependency
      * For a single tag, you may specify it as a string.
      * @param int|null $ttl The TTL value of this item. null means infinity.
      */
-    public function __construct(array|string $tags, int|null $ttl = null)
+    public function __construct(array|string $tags, ?int $ttl = null)
     {
         $this->tags = (array) $tags;
 
@@ -59,25 +59,6 @@ final class TagDependency extends Dependency
         }
 
         $this->ttl = $ttl;
-    }
-
-    protected function generateDependencyData(CacheInterface $cache): array
-    {
-        if (empty($this->tags)) {
-            return [];
-        }
-
-        $tags = [];
-
-        foreach ($this->getTagsData($cache) as $tag => $time) {
-            $tags[$tag] = $time ?? microtime();
-        }
-
-        $cache
-            ->psr()
-            ->setMultiple($tags, $this->ttl);
-
-        return $tags;
     }
 
     public function isChanged(CacheInterface $cache): bool
@@ -100,6 +81,25 @@ final class TagDependency extends Dependency
         $cache
             ->psr()
             ->deleteMultiple(self::buildCacheKeys((array) $tags));
+    }
+
+    protected function generateDependencyData(CacheInterface $cache): array
+    {
+        if (empty($this->tags)) {
+            return [];
+        }
+
+        $tags = [];
+
+        foreach ($this->getTagsData($cache) as $tag => $time) {
+            $tags[$tag] = $time ?? microtime();
+        }
+
+        $cache
+            ->psr()
+            ->setMultiple($tags, $this->ttl);
+
+        return $tags;
     }
 
     /**

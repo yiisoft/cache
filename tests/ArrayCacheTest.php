@@ -174,7 +174,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->setMultiple($data, $ttl);
 
         foreach ($data as $key => $value) {
-            $this->assertSameExceptObject($value, $this->cache->get((string)$key));
+            $this->assertSameExceptObject($value, $this->cache->get((string) $key));
         }
     }
 
@@ -214,7 +214,7 @@ final class ArrayCacheTest extends TestCase
 
         $this->cache->deleteMultiple($keys);
 
-        $emptyData = array_map(static fn ($v) => null, $data);
+        $emptyData = array_map(static fn($v) => null, $data);
 
         $this->assertSameExceptObject($emptyData, $this->cache->getMultiple($keys));
     }
@@ -289,7 +289,7 @@ final class ArrayCacheTest extends TestCase
             ],
             'IteratorAggregate' => [
                 ['a' => 1, 'b' => 2,],
-                new class () implements IteratorAggregate {
+                new class implements IteratorAggregate {
                     public function getIterator(): ArrayIterator
                     {
                         return new ArrayIterator(['a' => 1, 'b' => 2,]);

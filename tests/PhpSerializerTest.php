@@ -9,7 +9,10 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Cache\Serializer\PhpSerializer;
 
+use function is_object;
+
 use const PHP_INT_MAX;
+use const M_PI;
 
 final class PhpSerializerTest extends TestCase
 {

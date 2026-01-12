@@ -6,6 +6,11 @@ namespace Yiisoft\Cache;
 
 use DateInterval;
 use DateTime;
+use InvalidArgumentException;
+use TypeError;
+
+use function is_int;
+use function is_string;
 
 /**
  * Value object representing a time-to-live (TTL) duration in seconds.
@@ -28,8 +33,7 @@ final class Ttl
      */
     private function __construct(
         public readonly ?int $value,
-    ) {
-    }
+    ) {}
 
     /**
      * Create TTL from a combination of seconds, minutes, hours and days.
@@ -60,7 +64,7 @@ final class Ttl
      *
      * @param DateInterval|int|string|Ttl|null $ttl Raw TTL value (string must be numeric, e.g., '3600')
      *
-     * @throws \TypeError For invalid TTL values types.
+     * @throws TypeError For invalid TTL values types.
      *
      * @psalm-return self
      *
@@ -88,7 +92,7 @@ final class Ttl
      *
      * @param DateInterval $interval The interval to convert to TTL.
      *
-     * @throws \InvalidArgumentException If the DateInterval results in a negative TTL.
+     * @throws InvalidArgumentException If the DateInterval results in a negative TTL.
      *
      * @return self TTL instance.
      */

@@ -14,6 +14,65 @@ use function is_object;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
+    public static function dataProvider(): array
+    {
+        $object = new stdClass();
+        $object->test_field = 'test_value';
+
+        return [
+            'integer' => ['test_integer', 1],
+            'double' => ['test_double', 1.1],
+            'string' => ['test_string', 'a'],
+            'boolean_true' => ['test_boolean_true', true],
+            'boolean_false' => ['test_boolean_false', false],
+            'object' => ['test_object', $object],
+            'array' => ['test_array', ['test_key' => 'test_value']],
+            'null' => ['test_null', null],
+            'supported_key_characters' => ['AZaz09_.', 'b'],
+            '64_characters_key_max' => ['bVGEIeslJXtDPrtK.hgo6HL25_.1BGmzo4VA25YKHveHh7v9tUP8r5BNCyLhx4zy', 'c'],
+            'string_with_number_key' => ['111', 11],
+            'string_with_number_key_1' => ['022', 22],
+        ];
+    }
+
+    public function getDataProviderData($keyPrefix = ''): array
+    {
+        $dataProvider = $this->dataProvider();
+        $data = [];
+
+        foreach ($dataProvider as $item) {
+            $data[$keyPrefix . $item[0]] = $item[1];
+        }
+
+        return $data;
+    }
+
+    public function assertSameExceptObject($expected, $actual): void
+    {
+        // assert for all types
+        $this->assertEquals($expected, $actual);
+
+        // no more asserts for objects
+        if (is_object($expected)) {
+            return;
+        }
+
+        // asserts same for all types except objects and arrays that can contain objects
+        if (!is_array($expected)) {
+            $this->assertSame($expected, $actual);
+            return;
+        }
+
+        // assert same for each element of the array except objects
+        foreach ($expected as $key => $value) {
+            if (is_object($value)) {
+                $this->assertEquals($expected[$key], $actual[$key]);
+            } else {
+                $this->assertSame($expected[$key], $actual[$key]);
+            }
+        }
+    }
+
     /**
      * Invokes an inaccessible method.
      *
@@ -81,64 +140,5 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         }
 
         return $result;
-    }
-
-    public static function dataProvider(): array
-    {
-        $object = new stdClass();
-        $object->test_field = 'test_value';
-
-        return [
-            'integer' => ['test_integer', 1],
-            'double' => ['test_double', 1.1],
-            'string' => ['test_string', 'a'],
-            'boolean_true' => ['test_boolean_true', true],
-            'boolean_false' => ['test_boolean_false', false],
-            'object' => ['test_object', $object],
-            'array' => ['test_array', ['test_key' => 'test_value']],
-            'null' => ['test_null', null],
-            'supported_key_characters' => ['AZaz09_.', 'b'],
-            '64_characters_key_max' => ['bVGEIeslJXtDPrtK.hgo6HL25_.1BGmzo4VA25YKHveHh7v9tUP8r5BNCyLhx4zy', 'c'],
-            'string_with_number_key' => ['111', 11],
-            'string_with_number_key_1' => ['022', 22],
-        ];
-    }
-
-    public function getDataProviderData($keyPrefix = ''): array
-    {
-        $dataProvider = $this->dataProvider();
-        $data = [];
-
-        foreach ($dataProvider as $item) {
-            $data[$keyPrefix . $item[0]] = $item[1];
-        }
-
-        return $data;
-    }
-
-    public function assertSameExceptObject($expected, $actual): void
-    {
-        // assert for all types
-        $this->assertEquals($expected, $actual);
-
-        // no more asserts for objects
-        if (is_object($expected)) {
-            return;
-        }
-
-        // asserts same for all types except objects and arrays that can contain objects
-        if (!is_array($expected)) {
-            $this->assertSame($expected, $actual);
-            return;
-        }
-
-        // assert same for each element of the array except objects
-        foreach ($expected as $key => $value) {
-            if (is_object($value)) {
-                $this->assertEquals($expected[$key], $actual[$key]);
-            } else {
-                $this->assertSame($expected[$key], $actual[$key]);
-            }
-        }
     }
 }

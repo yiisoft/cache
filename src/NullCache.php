@@ -7,6 +7,7 @@ namespace Yiisoft\Cache;
 use DateInterval;
 use Traversable;
 use Yiisoft\Cache\Exception\InvalidArgumentException;
+use Psr\SimpleCache\CacheInterface;
 
 use function array_fill_keys;
 use function array_keys;
@@ -20,9 +21,9 @@ use function strpbrk;
  *
  * By replacing it with some other cache component, one can quickly switch from non-caching mode to caching mode.
  *
- * See {@see \Psr\SimpleCache\CacheInterface} for common cache operations that NullCache supports.
+ * See {@see CacheInterface} for common cache operations that NullCache supports.
  */
-final class NullCache implements \Psr\SimpleCache\CacheInterface
+final class NullCache implements CacheInterface
 {
     public function get(string $key, mixed $default = null): mixed
     {
@@ -30,7 +31,7 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
         return $default;
     }
 
-    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, int|DateInterval|null $ttl = null): bool
     {
         $this->validateKey($key);
         return true;
@@ -55,7 +56,7 @@ final class NullCache implements \Psr\SimpleCache\CacheInterface
         return array_fill_keys($keys, $default);
     }
 
-    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, int|DateInterval|null $ttl = null): bool
     {
         $values = $this->iterableToArray($values);
         $this->validateKeysOfValues($values);

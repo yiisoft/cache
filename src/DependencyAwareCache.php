@@ -24,9 +24,8 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
      */
     public function __construct(
         private readonly CacheInterface $cache,
-        private readonly PsrSimpleCacheInterface $handler
-    ) {
-    }
+        private readonly PsrSimpleCacheInterface $handler,
+    ) {}
 
     public function get(string $key, mixed $default = null): mixed
     {
@@ -34,7 +33,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
         return $this->checkAndGetValue($key, $value, $default);
     }
 
-    public function set(string $key, mixed $value, Ttl|null|int|DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, Ttl|int|DateInterval|null $ttl = null): bool
     {
         return $this->handler->set($key, $value, Ttl::from($ttl)->toSeconds());
     }
@@ -60,7 +59,7 @@ final class DependencyAwareCache implements PsrSimpleCacheInterface
         return $values;
     }
 
-    public function setMultiple(iterable $values, Ttl|null|int|DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, Ttl|int|DateInterval|null $ttl = null): bool
     {
         return $this->handler->setMultiple($values, Ttl::from($ttl)->toSeconds());
     }

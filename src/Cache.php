@@ -20,7 +20,7 @@ use function is_array;
  * PSR-16 {@see \Psr\SimpleCache\CacheInterface} instance passed to constructor.
  * You can use PSR-16 methods via {@see Cache::psr()}.
  *
- * @see \Yiisoft\Cache\CacheInterface
+ * @see CacheInterface
  */
 final class Cache implements CacheInterface
 {
@@ -62,8 +62,8 @@ final class Cache implements CacheInterface
         mixed $key,
         callable $callable,
         DateInterval|int|null $ttl = null,
-        Dependency|null $dependency = null,
-        float $beta = 1.0
+        ?Dependency $dependency = null,
+        float $beta = 1.0,
     ) {
         $ttlObj = Ttl::from($ttl ?? $this->defaultTtl);
 
@@ -132,7 +132,7 @@ final class Cache implements CacheInterface
         string $key,
         callable $callable,
         Ttl|DateInterval|int|null $ttl,
-        ?Dependency $dependency
+        ?Dependency $dependency,
     ): mixed {
         $ttl = Ttl::from($ttl ?? $this->defaultTtl);
         $value = $callable($this->psr);

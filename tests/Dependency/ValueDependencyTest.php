@@ -19,7 +19,7 @@ final class ValueDependencyTest extends DependencyTestCase
             'array' => [[]],
             'bool' => [true],
             'null' => [null],
-            'callable' => [fn () => null],
+            'callable' => [fn() => null],
             'object' => [new stdClass()],
         ];
     }

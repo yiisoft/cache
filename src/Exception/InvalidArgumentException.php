@@ -6,6 +6,4 @@ namespace Yiisoft\Cache\Exception;
 
 use Psr\SimpleCache\InvalidArgumentException as PsrInvalidArgumentException;
 
-final class InvalidArgumentException extends \InvalidArgumentException implements PsrInvalidArgumentException
-{
-}
+final class InvalidArgumentException extends \InvalidArgumentException implements PsrInvalidArgumentException {}

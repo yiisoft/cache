@@ -36,7 +36,7 @@ final class CacheItem
     public function __construct(
         private readonly string $key,
         Ttl|int|null $ttl,
-        private ?Dependency $dependency
+        private ?Dependency $dependency,
     ) {
         $ttl = Ttl::from($ttl)->toSeconds();
 
@@ -100,7 +100,7 @@ final class CacheItem
         if ($beta < 0) {
             throw new InvalidArgumentException(sprintf(
                 'Argument "$beta" must be a positive number, %f given.',
-                $beta
+                $beta,
             ));
         }
 

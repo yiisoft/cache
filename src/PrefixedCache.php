@@ -25,16 +25,15 @@ final class PrefixedCache implements PsrSimpleCacheInterface
      */
     public function __construct(
         private readonly PsrSimpleCacheInterface $cache,
-        private readonly string $prefix
-    ) {
-    }
+        private readonly string $prefix,
+    ) {}
 
     public function get(string $key, mixed $default = null): mixed
     {
         return $this->cache->get($this->prefix . $key, $default);
     }
 
-    public function set(string $key, mixed $value, Ttl|null|int|DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, Ttl|int|DateInterval|null $ttl = null): bool
     {
         return $this->cache->set($this->prefix . $key, $value, $ttl);
     }
@@ -60,7 +59,7 @@ final class PrefixedCache implements PsrSimpleCacheInterface
         return $this->cache->getMultiple($prefixedKeys, $default);
     }
 
-    public function setMultiple(iterable $values, Ttl|null|int|DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, Ttl|int|DateInterval|null $ttl = null): bool
     {
         $prefixedValues = [];
 

@@ -69,10 +69,10 @@ final class DependencyTest extends DependencyTestCase
         $cache = new Cache(new ArrayCache());
         $dependency = new TagDependency('test');
         $dependency->markAsReusable();
-        $cache->getOrSet('a', static fn () => 1, null, $dependency);
+        $cache->getOrSet('a', static fn() => 1, null, $dependency);
         TagDependency::invalidate($cache, 'test');
         $data1 = $this->getInaccessibleProperty($dependency, 'data');
-        $cache->getOrSet('b', static fn () => 2, null, $dependency);
+        $cache->getOrSet('b', static fn() => 2, null, $dependency);
         $data2 = $this->getInaccessibleProperty($dependency, 'data');
         $this->assertEquals($data1, $data2);
     }
