@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Cache\Exception;
 
+use Psr\SimpleCache\CacheException as PsrCacheException;
 use RuntimeException;
 use Throwable;
 
-abstract class CacheException extends RuntimeException implements \Psr\SimpleCache\CacheException
+abstract class CacheException extends RuntimeException implements PsrCacheException
 {
     public function __construct(
         private readonly string $key,
