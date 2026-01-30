@@ -32,6 +32,7 @@
 /README.md     -export-ignore
 /CHANGELOG.md  -export-ignore
 /LICENSE.md    -export-ignore
+/UPGRADE.md    -export-ignore
 
 # Avoid merge conflicts in CHANGELOG
 # https://about.gitlab.com/2015/02/10/gitlab-reduced-merge-conflicts-by-90-percent-with-changelog-placeholders/
