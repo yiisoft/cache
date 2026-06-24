@@ -9,6 +9,7 @@ updates:
       default-days: 7
     ignore:
       - dependency-name: "yiisoft/*"
+
   # Maintain dependencies for Composer
   - package-ecosystem: "composer"
     directory: "/"
