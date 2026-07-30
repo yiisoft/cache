@@ -4,6 +4,7 @@
 
 - Enh #153: Explicitly import classes and functions in "use" section (@mspirkov)
 - Enh #154: Remove unnecessary files from Composer package (@mspirkov)
+- Enh #159: Explicitly import functions in "use" section (@vjik)
 
 ## 3.2.0 December 11, 2025
 
