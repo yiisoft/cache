@@ -16,6 +16,7 @@ use function is_string;
 use function iterator_to_array;
 use function strpbrk;
 use function time;
+use function strval;
 
 /**
  * ArrayCache provides caching for the current request only by storing the values in an array.
@@ -179,7 +180,7 @@ final class ArrayCache implements CacheInterface
 
     private function validateKeysOfValues(array $values): void
     {
-        $keys = array_map(\strval(...), array_keys($values));
+        $keys = array_map(strval(...), array_keys($values));
         $this->validateKeys($keys);
     }
 }
