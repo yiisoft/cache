@@ -18,6 +18,7 @@ use function array_map;
 use function is_object;
 use function sleep;
 use function time;
+use function strval;
 
 final class ArrayCacheTest extends TestCase
 {
@@ -194,7 +195,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->clear();
 
         $data = $this->getDataProviderData();
-        $keys = array_map(\strval(...), array_keys($data));
+        $keys = array_map(strval(...), array_keys($data));
 
         $this->cache->setMultiple($data);
 
@@ -206,7 +207,7 @@ final class ArrayCacheTest extends TestCase
         $this->cache->clear();
 
         $data = $this->getDataProviderData();
-        $keys = array_map(\strval(...), array_keys($data));
+        $keys = array_map(strval(...), array_keys($data));
 
         $this->cache->setMultiple($data);
 

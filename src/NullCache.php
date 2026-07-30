@@ -15,6 +15,7 @@ use function array_map;
 use function is_string;
 use function iterator_to_array;
 use function strpbrk;
+use function strval;
 
 /**
  * NullCache does not cache anything reporting success for all methods calls.
@@ -108,7 +109,7 @@ final class NullCache implements CacheInterface
 
     private function validateKeysOfValues(array $values): void
     {
-        $keys = array_map(\strval(...), array_keys($values));
+        $keys = array_map(strval(...), array_keys($values));
         $this->validateKeys($keys);
     }
 }
